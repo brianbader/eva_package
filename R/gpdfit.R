@@ -18,24 +18,24 @@ findthresh <- function (data, ne) {
 #'@references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
 #'@export
 
-gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps", "pwm"), 
+gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps", "pwm"),
                     information = c("observed", "expected")) {
-  
+
   data <- as.numeric(data)
   n <- length(data)
-  if (is.na(nextremes) && is.na(threshold)) 
+  if (is.na(nextremes) && is.na(threshold))
     stop("Enter either a threshold or the number of upper extremes")
-  if (!is.na(nextremes) && !is.na(threshold)) 
+  if (!is.na(nextremes) && !is.na(threshold))
     stop("Enter EITHER a threshold or the number of upper extremes")
-  if (!is.na(nextremes)) 
+  if (!is.na(nextremes))
     threshold <- findthresh(data, nextremes)
   exceedances <- data[data > threshold]
   excess <- exceedances - threshold
   Nu <- length(excess)
   p.less.thresh <- 1 - Nu/n
   method <- match.arg(method)
-  xbar <- mean(excess) 
-  
+  xbar <- mean(excess)
+
   a0 <- xbar
   gamma <- -0.35
   delta <- 0
@@ -44,28 +44,28 @@ gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps
   shape0 <- 2 - a0/(a0 - 2 * a1)
   scale0 <- (2 * a0 * a1)/(a0 - 2 * a1)
   start <- c(scale0, shape0)
-  
+
   if (method == "pwm") {
     denom <- Nu * (1 - 2 * shape0) * (3 - 2 * shape0)
     if (shape0 > 0.5) {
       denom <- NA
-      warning("Asymptotic standard errors not available for", 
+      warning("Asymptotic standard errors not available for",
               "PWM Method when shape > 0.5")
     }
     one <- (7 - 18 * shape0 + 11 * shape0^2 - 2 * shape0^3) * scale0^2
     two <- (1 - shape0) * (1 - shape0 + 2 * shape0^2) * (2 - shape0)^2
-    cov <- scale0 * (2 - shape0) * (2 - 6 * shape0 + 7 * shape0^2 - 2 * 
+    cov <- scale0 * (2 - shape0) * (2 - 6 * shape0 + 7 * shape0^2 - 2 *
                                 shape0^3)
     varcov <- matrix(c(one, cov, cov, two), 2)/denom
     par.ses <- sqrt(diag(varcov))
     information <- "expected"
-    out <- list(n = length(data), data = exceedances, threshold = threshold, 
-                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method, 
-                par.ests = start, par.ses = par.ses, varcov = varcov, 
+    out <- list(n = length(data), data = exceedances, threshold = threshold,
+                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method,
+                par.ests = start, par.ses = par.ses, varcov = varcov,
                 information = information)
   }
 
-  if (method == "mle") {  
+  if (method == "mle") {
     mle_est <- function(theta, dat) {
       scale <- theta[1]
       shape <- theta[2]
@@ -81,28 +81,28 @@ gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps
       out
     }
     fit <- optim(start, mle_est, hessian = TRUE, dat = excess)
-    if (fit$convergence) 
+    if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
     converged <- fit$convergence
     nllh.final <- fit$value
     information <- match.arg(information)
-    if (information == "observed") 
+    if (information == "observed")
       varcov <- solve(fit$hessian)
     if (information == "expected") {
-      one <- (1 + par.ests[2])^2/Nu
-      two <- (2 * (1 + par.ests[2]) * par.ests[1]^2)/Nu
+      one <- (2 * (1 + par.ests[2]) * par.ests[1]^2)/Nu
+      two <- (1 + par.ests[2])^2/Nu
       cov <- -((1 + par.ests[2]) * par.ests[1])/Nu
       varcov <- matrix(c(one, cov, cov, two), 2)
     }
     par.ses <- sqrt(diag(varcov))
-    out <- list(n = length(data), data = exceedances, threshold = threshold, 
-                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method, 
-                par.ests = par.ests, par.ses = par.ses, varcov = varcov, 
+    out <- list(n = length(data), data = exceedances, threshold = threshold,
+                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method,
+                par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                 information = information, converged = converged, nllh.final = nllh.final)
   }
-  
-  if (method == "mps") {  
+
+  if (method == "mps") {
     mps_est <- function(theta, dat) {
       scale <- theta[1]
       shape <- theta[2]
@@ -116,36 +116,38 @@ gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps
         cdf <- sort(cdf)
         cdf <- c(0, cdf, 1)
         D <- diff(cdf)
+        ## Check if any values are zero due to rounding and adjust
+        len <- num.decimals.max(cdf)
+        D <- ifelse(D==0, 1/(2*(10^len)), D)
         out <- - sum(log(D))
       }
       out
     }
     fit <- optim(start, mps_est, hessian = TRUE, dat = excess)
-    if (fit$convergence) 
+    if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
     converged <- fit$convergence
     nllh.final <- fit$value
     information <- match.arg(information)
-    if (information == "observed") 
+    if (information == "observed")
       varcov <- solve(fit$hessian)
     if (information == "expected") {
-      one <- (1 + par.ests[2])^2/Nu
-      two <- (2 * (1 + par.ests[2]) * par.ests[1]^2)/Nu
+      one <- (2 * (1 + par.ests[2]) * par.ests[1]^2)/Nu
+      two <- (1 + par.ests[2])^2/Nu
       cov <- -((1 + par.ests[2]) * par.ests[1])/Nu
       varcov <- matrix(c(one, cov, cov, two), 2)
     }
     par.ses <- sqrt(diag(varcov))
-    out <- list(n = length(data), data = exceedances, threshold = threshold, 
-                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method, 
-                par.ests = par.ests, par.ses = par.ses, varcov = varcov, 
+    out <- list(n = length(data), data = exceedances, threshold = threshold,
+                p.less.thresh = p.less.thresh, n.exceed = Nu, method = method,
+                par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                 information = information, converged = converged, moran = fit$value)
   }
-  
+
   names(out$par.ests) <- c("Scale", "Shape")
   names(out$par.ses) <- c("Scale", "Shape")
   out
-  
+
 }
-  
-  
+

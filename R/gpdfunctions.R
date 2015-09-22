@@ -6,10 +6,10 @@ gpd.ind <- function(data, theta) {
   w <- 1 + (1/shape)
   z <- 1 + (shape*data/scale)
   p12 <- - data/(shape*(scale^2)*z) + (w*data)/((scale^2)*z) - (w*(data^2)*shape)/((scale^3)*(z^2))
-  p11 <- - (2*log(z))/(shape^3) + (2*data)/((shape^2)*scale*z) + (w*(data^2))/((scale^2)*(z^2))
-  p22 <- (1/(scale^2)) - (2*w*shape*data)/((scale^3)*z) + (w*(shape^2)*(data^2))/((scale^4)*(z^2))
-  p1 <- log(z)/(shape^2) - (w*data)/(scale*z)
-  p2 <- - (1/scale) + (w*shape*data)/((scale^2)*z)
+  p22 <- - (2*log(z))/(shape^3) + (2*data)/((shape^2)*scale*z) + (w*(data^2))/((scale^2)*(z^2))
+  p11 <- (1/(scale^2)) - (2*w*shape*data)/((scale^3)*z) + (w*(shape^2)*(data^2))/((scale^4)*(z^2))
+  p2 <- log(z)/(shape^2) - (w*data)/(scale*z)
+  p1 <- - (1/scale) + (w*shape*data)/((scale^2)*z)
   D11 <- p1*p1 + p11
   D12 <- p1*p2 + p12
   D22 <- p2*p2 + p22
@@ -96,8 +96,8 @@ gpdfisher <- function(data, theta) {
   scale <- theta[1]
   shape <- theta[2]
   n <- length(data)
-  one <- (1 + shape)^2/n
-  two <- (2 * (1 + shape) * scale^2)/n
+  one <- (2 * (1 + shape) * scale^2)/n
+  two <- (1 + shape)^2/n
   cov <- -((1 + shape) * scale)/n
   varcov <- matrix(c(one, cov, cov, two), 2)
   varcov
@@ -111,8 +111,8 @@ gpdfisherobs <- function(data, theta) {
   w <- 1 + (1/shape)
   z <- 1 + (shape*data/scale)
   p12 <- - data/(shape*(scale^2)*z) + (w*data)/((scale^2)*z) - (w*(data^2)*shape)/((scale^3)*(z^2))
-  p11 <- - (2*log(z))/(shape^3) + (2*data)/((shape^2)*scale*z) + (w*(data^2))/((scale^2)*(z^2))
-  p22 <- (1/(scale^2)) - (2*w*shape*data)/((scale^3)*z) + (w*(shape^2)*(data^2))/((scale^4)*(z^2))
+  p22 <- - (2*log(z))/(shape^3) + (2*data)/((shape^2)*scale*z) + (w*(data^2))/((scale^2)*(z^2))
+  p11 <- (1/(scale^2)) - (2*w*shape*data)/((scale^3)*z) + (w*(shape^2)*(data^2))/((scale^4)*(z^2))
   p11 <- sum(p11)
   p12 <- sum(p12)
   p22 <- sum(p22)
@@ -130,8 +130,8 @@ gpdscorectb <- function(data, theta) {
   n <- length(data)
   w <- 1 + (1/shape)
   z <- 1 + (shape*data/scale)
-  p1 <- log(z)/(shape^2) - (w*data)/(scale*z)
-  p2 <- - (1/scale) + (w*shape*data)/((scale^2)*z)
+  p1 <- - (1/scale) + (w*shape*data)/((scale^2)*z)
+  p2 <- log(z)/(shape^2) - (w*data)/(scale*z)
   w <- matrix(0, n, 2)
   w[, 1] <- p1
   w[, 2] <- p2
