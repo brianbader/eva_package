@@ -16,6 +16,7 @@ gpd.cvmgen <- function(n, theta) {
     i <- seq(1, n, 1)
     teststat <- sum((newdata1 - (2*i - 1)/(2*n))^2) + (1/(12*n))
   }
+  teststat
 }
 
 

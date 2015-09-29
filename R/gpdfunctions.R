@@ -140,9 +140,8 @@ gpdscorectb <- function(data, theta) {
 
 
 ## Returns test statistic for the score test
-gpdteststat <- function(data, theta, information = c("observed", "expected")) {
+gpdteststat <- function(data, theta, information) {
   n <- length(data)
-  information <- match.arg(information)
   w <- gpdscorectb(data, theta)
   w <- colSums(w)
   if(information == "observed") {

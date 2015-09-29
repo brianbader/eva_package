@@ -20,6 +20,7 @@ gpd.imgen <- function(n, theta, inner)
     teststat <-  (1/n) * t(d) %*% v %*% d
     teststat <- as.vector(teststat)
   }
+  teststat
 }
 
 
@@ -46,7 +47,7 @@ gpd.impb <- function(data, inner, outer, allowParallel=FALSE, numCores=1)
 {
   n <- length(data)
   fit <- 9999
-  try(fit <- gpdfit(data, nextremes=n, method="mle", information="expected"), silent = TRUE)
+  try(fit <- gpdfit(data, nextremes=n, method="mle"), silent = TRUE)
   if (!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- c(fit$par.ests[1], fit$par.ests[2])

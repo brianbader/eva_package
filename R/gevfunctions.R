@@ -69,10 +69,9 @@ gevscorectb <- function(dat, theta) {
 }
 
 ## Calculates the score test statistic
-gevteststat <- function(dat, theta, information=c("observed", "expected")) {  
+gevteststat <- function(dat, theta, information) {  
   R <- ncol(dat)
   N <- nrow(dat)  
-  information <-  match.arg(information)
   u <- gevscorectb(dat, theta)
   u <- colSums(u)
   if(information == "observed"){

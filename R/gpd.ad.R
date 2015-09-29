@@ -16,6 +16,7 @@ gpd.adgen <- function(n, theta) {
     i <- seq(1, n, 1)
     teststat <- -n - (1/n)*sum((2*i - 1)*(log(newdata1) + log(1 - rev(newdata1))))
   }
+  teststat
 }
 
 

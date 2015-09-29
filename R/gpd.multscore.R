@@ -4,7 +4,7 @@
 #'@param data Data should be in vector form. 
 #'@param theta Estimate for theta in the vector form (scale, shape). If NULL, uses probability weighted moments as an initial estimate.
 #'@param B Number of bootstrap replicates.
-#'@param information To use observed or expected (default) information in the test.
+#'@param information To use observed (default) or expected information in the test.
 #'@examples
 #'data <- rgpd(100, 0, 1, 0.25)
 #'gpd.multscore(data, 1000)
@@ -12,7 +12,7 @@
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
 #'@export
-gpd.multscore <- function(data, B, theta = NULL, information = c("expected", "observed")) {
+gpd.multscore <- function(data, B, theta = NULL, information = c("observed", "expected")) {
   n <- length(data)
   information <-  match.arg(information)
   if(is.null(theta)) {

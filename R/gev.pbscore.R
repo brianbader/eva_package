@@ -10,6 +10,7 @@ gev.pbgen <- function(n, R, theta, information) {
     theta1 <- y1$mle
     teststat <- gevteststat(data1, theta1, information)
   }
+  teststat
 }
 
 
@@ -18,7 +19,7 @@ gev.pbgen <- function(n, R, theta, information) {
 #'Parametric bootstrap score test procedure to assess goodness-of-fit to the GEVr distribution.
 #'@param data Data should be contain n rows, each a GEVr observation.
 #'@param B Number of bootstrap replicates.
-#'@param information To use observed or expected (default) information in the test.
+#'@param information To use observed (default) or expected information in the test.
 #'@param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
@@ -32,7 +33,7 @@ gev.pbgen <- function(n, R, theta, information) {
 #'@importFrom ismev rlarg.fit
 #'@import parallel
 #'@export
-gev.pbscore <- function(data, B, information=c("expected", "observed"), allowParallel=FALSE, numCores=1) {
+gev.pbscore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)

@@ -4,7 +4,7 @@
 #'@param data Data should be contain n rows, each a GEVr observation.
 #'@param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, an initial estimate is provided using PWM.
 #'@param B Number of bootstrap replicates.
-#'@param information To use observed or expected (default) information in the test.
+#'@param information To use observed (default) or expected information in the test.
 #'@examples
 #'data <- rgevr(500, 5, loc=0.5, scale=1, shape=0.3)
 #'result <- gev.multscore(data, 1000)
@@ -15,7 +15,7 @@
 #'@importFrom ismev rlarg.fit
 #'@export
 
-gev.multscore <- function(data, B, theta = NULL, information=c("expected", "observed"))
+gev.multscore <- function(data, B, theta = NULL, information=c("observed", "expected"))
 {
   data <- as.matrix(data)
   n <- nrow(data)

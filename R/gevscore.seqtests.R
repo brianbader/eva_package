@@ -4,7 +4,7 @@
 #'@param data Data should be contain n rows, each a GEVr observation.
 #'@param nsim Number of bootstrap simulations.
 #'@param method Which test to run, multiplier or parametric (default) bootstrap.
-#'@param information To use observed or expected (default) information in the test.
+#'@param information To use observed (default) or expected information in the test.
 #'@param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, uses the MLE.
 #'@param allowParallel Should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
@@ -16,7 +16,7 @@
 #'@importFrom ismev rlarg.fit
 #'@export
 
-gevscore.seqtests <- function(data, nsim, method=c("pb", "mult"), information=c("expected", "observed"),
+gevscore.seqtests <- function(data, nsim, method=c("pb", "mult"), information=c("observed", "expected"),
                               allowParallel=FALSE, numCores=1)
 {
   data <- as.matrix(data)

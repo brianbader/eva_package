@@ -20,7 +20,7 @@ gev.spatpbgen <- function(rkmat, n, m, loc_est, scale_est, shape_est){
 #'@param data Data should contain m columns, each data from a marginal GEV1 distribution. The number of rows 
 #'corresponds to the number of observations.
 #'@param B Number of bootstrap replicates.
-#'@param information To use observed or expected (default) information in the test.
+#'@param information To use observed (default) or expected information in the test.
 #'@param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
@@ -45,7 +45,7 @@ gev.spatpbgen <- function(rkmat, n, m, loc_est, scale_est, shape_est){
 #'Journal of the Royal Statistical Society: Series B (Statistical Methodology), 66(3), 497-546.
 #'@import parallel
 #'@export
-gev.spatpbscore <- function(data, B, information=c("expected", "observed"), allowParallel=FALSE, numCores=1) {
+gev.spatpbscore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
   m <- ncol(data)
   n <- nrow(data)
   information <- match.arg(information)

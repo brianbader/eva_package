@@ -8,13 +8,13 @@
 #'@param nsim Number of boostrap replicates for the 'cvm', 'ad', 'pbscore', 'multscore', and 'imasym' tests.
 #'@param inner Number of inner boostrap replicates if 'impb' test is chosen.
 #'@param outer Number of outer boostrap replicates if 'impb' test is chosen.
-#'@param information To use observed or expected (default) information for the 'pbscore' and 'multscore' tests.
+#'@param information To use observed (default) or expected information for the 'pbscore' and 'multscore' tests.
 #'@param allowParallel If selected, should the 'cvm', 'ad', 'pbscore', or 'impb' procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@return A matrix containing the thresholds used, the number of observations above each threshold, and the corresponding test statistics and p-values.
 #'@export
 gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"), 
-                               nsim = NULL, inner = NULL, outer = NULL, information=c("expected", "observed"), 
+                               nsim = NULL, inner = NULL, outer = NULL, information=c("observed", "expected"), 
                                allowParallel=FALSE, numCores=1)
 {
   if (is.na(nextremes) && is.na(thresholds))
