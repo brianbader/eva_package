@@ -1,5 +1,7 @@
 ## **To Do:** ##
 
+* Implement MLE difference test
+
 * Need to check MPS estimators for gpdfit function (gives weird results when shape < 0)
 
 * Need to fix gevspatscore code (may crash sometimes since it relies on gpd.pbscore)
