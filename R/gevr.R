@@ -1,7 +1,10 @@
 ## Helper function for the rgevr function
 qgev <- function(p, loc, scale, shape) {
-  if (shape == 0) -1 * scale * log(log(1 / p)) + loc
-  else scale * ((log(1 / p))^(-1 * shape) - 1) / shape + loc
+  if (shape == 0) -1 * scale * log(-log(p)) + loc
+  else {
+    gev.stand <- expm1(-shape * log(-log(p))) / shape
+    scale * gev.stand + loc
+  }
 }
 
 
@@ -35,7 +38,7 @@ dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE)
   }
   else {
     log.density <- rowSums( -log(scale) - ((1/shape) + 1) * log1p(z) )
-    log.density <- log.density - (1 + z[,R])^(-1 / shape)
+    log.density <- log.density - exp(- log1p(z[,R]) / shape)
     log.density[is.nan(log.density)] <- -Inf
   }
   if(!log.d) {
