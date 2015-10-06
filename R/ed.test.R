@@ -28,13 +28,10 @@ ed.test <- function(data, theta = NULL) {
       stop("Maximum likelihood failed to converge at initial step")
     theta <- y$mle
   }
-  loc <- theta[1]
-  scale <- theta[2]
-  shape <- theta[3]
-  z <- (shape / scale) * (data - loc)
-  Diff <- -log(scale) - (1 + z[,R])^(-1 / shape) + (1 + z[,R-1])^(-1 / shape) - ((1/shape) + 1) * log(1 + z[,R])
+  Diff <- dgevr(data[, 1:R], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE) -
+          dgevr(data[, 1:(R-1)], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE)
   EstVar <- sum( (Diff - mean(Diff))^2 ) / (n-1)
-  FirstMom  <- - log(scale) - 1 + (1 + shape)*digamma(R)
+  FirstMom  <- - log(theta[2]) - 1 + (1 + theta[3])*digamma(R)
   Diff <- sum(Diff) / n
   Diff <- sqrt(n)*(Diff  - FirstMom) / sqrt(EstVar)
   p.value <- 2*(1-pnorm(abs(Diff)))
