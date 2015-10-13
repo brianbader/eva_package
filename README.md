@@ -4,7 +4,7 @@
 
 * Add pgev function for the univariate case and export qgev as a function
 
-* Implement MLE difference test
+* Make sure outputs are dataframes, not matrices
 
 * Need to check MPS estimators for gpdfit function (gives weird results when shape < 0)
 
