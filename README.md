@@ -10,8 +10,6 @@
 
 * Need to fix gevspatscore code (may crash sometimes since it relies on gev.pbscore)
 
-* Add pvalue adjustment function (give example from code, and cite paper)
-
 * Combine the ed and score sequential tests for GEV into one function
 
 * Change fortmax data to sealevel data (just create the top ten, with tau=60) to demonstrate the difference in CIs from r=1 to 10

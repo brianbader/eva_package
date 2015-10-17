@@ -31,6 +31,6 @@ ed.seqtests <- function(data, theta = NULL) {
     result[i-1, 2] <- z$p.value
     result[i-1, 3] <- z$statistic
   }
-  colnames(result) <- c("r", "p.value", "statistic")
+  colnames(result) <- c("r", "p.values", "statistic")
   as.data.frame(result)
 }
