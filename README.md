@@ -4,15 +4,11 @@
 
 * Add pgev function for the univariate case and export qgev as a function
 
-* Make sure outputs are dataframes, not matrices
-
 * Need to check MPS estimators for gpdfit function (gives weird results when shape < 0)
 
 * Need to fix gevspatscore code (may crash sometimes since it relies on gev.pbscore)
 
 * Combine the ed and score sequential tests for GEV into one function
-
-* Change fortmax data to sealevel data (just create the top ten, with tau=60) to demonstrate the difference in CIs from r=1 to 10
 
 * Add gpd return levels (profile likelihood and delta method)
 

@@ -13,8 +13,8 @@
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@return A matrix containing the thresholds used, the number of observations above each threshold, and the corresponding test statistics and p-values.
 #'@export
-gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"), 
-                               nsim = NULL, inner = NULL, outer = NULL, information=c("observed", "expected"), 
+gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"),
+                               nsim = NULL, inner = NULL, outer = NULL, information=c("observed", "expected"),
                                allowParallel=FALSE, numCores=1)
 {
   if (is.na(nextremes) && is.na(thresholds))
@@ -23,14 +23,14 @@ gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c
     stop("Enter EITHER a set of thresholds or number of upper extremes")
   information <- match.arg(information)
   method <- match.arg(method)
-  if (((method == "cvm" || method == "ad" || method == "pbscore" || method == "multscore" || method == "imasym") & is.null(nsim)) || 
+  if (((method == "cvm" || method == "ad" || method == "pbscore" || method == "multscore" || method == "imasym") & is.null(nsim)) ||
        (method == "impb"  && (is.null(inner) || is.null(outer))))
     stop("Need to specify the number of bootstrap replicates")
-  if (any(!is.na(nextremes))) 
+  if (any(!is.na(nextremes)))
     thresholds <- findthresh(data, nextremes)
   num <- length(thresholds)
   result <- matrix(0, num, 5)
-  for(i in 1:num) { 
+  for(i in 1:num) {
     x <- data[data>thresholds[i]]
     result[i, 1] <- i
     if(method == "cvm")       fit <- gpd.cvm(x, nsim, allowParallel, numCores)
@@ -44,6 +44,6 @@ gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c
     result[i, 4] <- fit$p.value
     result[i, 5] <- fit$statistic
   }
-  colnames(result) <- c("test", "threshold", "# above threshold", "p.value", "statistic")
-  result 
+  colnames(result) <- c("test", "threshold", "# above threshold", "p.values", "statistic")
+  as.data.frame(result)
 }

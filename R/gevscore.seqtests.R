@@ -37,6 +37,6 @@ gevscore.seqtests <- function(data, nsim, method=c("pb", "mult"), information=c(
     result[i, 2] <- fit$p.value
     result[i, 3] <- fit$statistic
   }
-  colnames(result) <- c("r", "p.value", "statistic")
-  result
+  colnames(result) <- c("r", "p.values", "statistic")
+  as.data.frame(result)
 }
