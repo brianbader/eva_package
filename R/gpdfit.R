@@ -148,6 +148,5 @@ gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps
   names(out$par.ests) <- c("Scale", "Shape")
   names(out$par.ses) <- c("Scale", "Shape")
   out
-
 }
 
