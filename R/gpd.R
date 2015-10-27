@@ -2,7 +2,8 @@
 #'
 #'Density, distribution function, quantile function and random number generation for the Generalized Pareto
 #'distribution with location, scale, and shape parameters.
-#'@param x, q Vector of quantiles.
+#'@param x Vector of observations.
+#'@param q Vector of quantiles.
 #'@param p Vector of probabilities.
 #'@param n Number of observations.
 #'@param loc, scale, shape Location, scale and shape parameters, respectively; the shape argument cannot be a vector (must have length one).
@@ -20,23 +21,19 @@
 #'@details The Genralized Pareto distribution function is given (Pickands, 1975)
 #'by \deqn{H(y) = 1 - \Big[1 + \frac{\xi (y - \mu)}{\sigma}\Big]^{-1/\xi}} defined
 #'on \deqn{\{y : y > 0, (1 + \xi (y - \mu) / \sigma) > 0 \}}, with location \deqn{\mu},
-#'scale \deqn{\sigma}, and shape parameter \deqn{\xi}. On an unrelated note, the core
-#'basis for these functions come from R package 'evd' (Stephenson, 2010).
+#'scale \deqn{\sigma}, and shape parameter \deqn{\xi}.
 #'
 #'@references Pickands III, J. (1975). Statistical inference using extreme order statistics. Annals of Statistics, 119-131.
-#'@references Stephenson, A. (2010). Package 'evd', Functions for extreme value distributions.
 #'
 #'@rdname gpd
 #'@export
 rgpd <- function (n, loc = 0, scale = 1, shape = 0)
 {
-  if (min(scale) < 0)
+  if (min(scale) <= 0)
     stop("invalid scale")
-  if (length(shape) != 1)
+  if (length(loc) != 1 | length(scale) != 1 | length(shape) != 1)
     stop("invalid shape")
-  if (shape == 0)
-    return(loc - scale * log(runif(n)))
-  else return(loc + scale * (runif(n)^(-shape) - 1)/shape)
+  qgpd(runif(n), loc, scale, shape)
 }
 
 
@@ -48,13 +45,8 @@ pgpd <- function (q, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = F
     stop("invalid scale")
   if (length(shape) != 1)
     stop("invalid shape")
-  q <- pmax(q - loc, 0)/scale
-  if (shape == 0)
-    p <- 1 - exp(-q)
-  else {
-    p <- pmax(1 + shape * q, 0)
-    p <- 1 - p^(-1/shape)
-  }
+  w <- (q - loc) / scale
+  p <- 1 - xix(w, shape)
   if (!lower.tail)
     p <- 1 - p
   if (log.p)
@@ -71,21 +63,12 @@ dgpd <- function (x, loc = 0, scale = 1, shape = 0, log.d = FALSE)
     stop("invalid scale")
   if (length(shape) != 1)
     stop("invalid shape")
-  d <- (x - loc)/scale
-  nn <- length(d)
-  scale <- rep(scale, length.out = nn)
-  index <- (d > 0 & ((1 + shape * d) > 0)) | is.na(d)
-  if (shape == 0) {
-    d[index] <- log(1/scale[index]) - d[index]
-    d[!index] <- -Inf
-  }
-  else {
-    d[index] <- log(1/scale[index]) - (1/shape + 1) * log(1 + shape * d[index])
-    d[!index] <- -Inf
-  }
+  w <- (x - loc) / scale
+  log.density <- -log(scale) + log(xix(w, shape))
+  log.density[is.nan(log.density) | is.infinite(log.density)] <- -Inf
   if (!log.d)
-    d <- exp(d)
-  d
+    log.density <- exp(log.density)
+  log.density
 }
 
 
@@ -97,13 +80,15 @@ qgpd <- function (p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = F
     p <- exp(p)
   if (min(p, na.rm = TRUE) <= 0 || max(p, na.rm = TRUE) >= 1)
     stop("`p' must contain probabilities in (0,1)")
-  if (min(scale) < 0)
+  if (min(scale) <= 0)
     stop("invalid scale")
   if (length(shape) != 1)
     stop("invalid shape")
-  if (!lower.tail)
+  if (lower.tail)
     p <- 1 - p
-  if (shape == 0)
-    return(loc - scale * log(p))
-  else return(loc + scale * (p^(-shape) - 1)/shape)
+  if (shape == 0) loc - scale * log(p)
+  else {
+    gpd.stand <- expm1(-shape * log(p)) / shape
+    loc + scale * gpd.stand
+  }
 }
