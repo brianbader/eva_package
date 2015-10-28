@@ -1,6 +1,7 @@
 #'GEVr Entropy Difference Test
 #'
-#'Goodness-of-fit test for GEVr using the difference in likelihood between GEVr and GEV(r-1). This can be used sequentially to test for the choice of r.
+#'Goodness-of-fit test for GEVr using the difference in likelihood between GEVr and GEV(r-1).
+#'This can be used sequentially to test for the choice of r.
 #'@param data Data should be contain n rows, each a GEVr observation.
 #'@param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, uses the MLE from the largest (r-1) order statistics.
 #'@examples
@@ -12,7 +13,7 @@
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
-#'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
+#'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
 #'@importFrom ismev rlarg.fit
 #'@export
 ed.test <- function(data, theta = NULL) {
@@ -30,7 +31,7 @@ ed.test <- function(data, theta = NULL) {
   }
   Diff <- dgevr(data[, 1:R], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE) -
           dgevr(data[, 1:(R-1)], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE)
-  EstVar <- sum( (Diff - mean(Diff))^2 ) / (n-1)
+  EstVar <- sum((Diff - mean(Diff))^2) / (n-1)
   FirstMom  <- - log(theta[2]) - 1 + (1 + theta[3])*digamma(R)
   Diff <- sum(Diff) / n
   Diff <- sqrt(n)*(Diff  - FirstMom) / sqrt(EstVar)
