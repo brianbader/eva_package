@@ -108,7 +108,7 @@ gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps
       shape <- theta[2]
       z <- 1 + shape*(dat / scale)
       cond1 <- scale <= 0
-      cond2 <- z <= 0
+      cond2 <- (shape <= 0) && (max(dat) > (-scale/shape))
       if (cond1 || cond2)
         out <- 1e+06
       else {

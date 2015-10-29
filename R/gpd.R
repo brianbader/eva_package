@@ -6,7 +6,9 @@
 #'@param q Vector of quantiles.
 #'@param p Vector of probabilities.
 #'@param n Number of observations.
-#'@param loc, scale, shape Location, scale and shape parameters, respectively; the shape argument cannot be a vector (must have length one).
+#'@param loc Location parameter.
+#'@param scale Scale parameter.
+#'@param shape Shape parameter.
 #'@param log.d Logical; if TRUE, the log density is returned.
 #'@param lower.tail Logical; if TRUE (default), probabilities are P[X <= x], otherwise, P[X > x].
 #'@param log.p Logical; if TRUE, probabilities p are given as log(p).

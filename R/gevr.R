@@ -1,18 +1,3 @@
-## Accurately computes log(1 - exp(-a))
-log1mexp <- function(a){
-  if(a <= log(2)) out <- log(-expm1(-a))
-  else out <-log1p(-exp(-a))
-  out
-}
-
-## Accurately computes log(1 + exp(a))
-log1pexp <- function(a){
-  if(a <= -37) out <- exp(a)
-  if(a > - 37 & a <= 18) out <- log1p(exp(a))
-  if(a > 18 & a <= 33.3) out <- a + exp(-a)
-  if(a > 33.3) out <- a
-  out
-}
 
 ## Handles the limit (1 + shape*w)^(-1/shape) as shape -> 0
 xix <- function(w, shape){
@@ -45,7 +30,7 @@ xix <- function(w, shape){
 #'@param n Number of observations
 #'@param r Number of order statistics for each observation.
 #'@param log.d Logical: Whether or not to return the log density. (FALSE by default)
-#'@param lower.tail Logical: If TRUE (default), probabilities are P[X ≤ x] otherwise, P[X > x].
+#'@param lower.tail Logical: If TRUE (default), probabilities are P[X <= x] otherwise, P[X > x].
 #'@param log.p Logical: If TRUE, probabilities p are given as log(p). (FALSE by default)
 #'@param loc Location parameter.
 #'@param scale Scale parameter.

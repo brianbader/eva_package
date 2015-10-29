@@ -1,8 +1,8 @@
 #' Top Ten Annual Precipitation: Fort Collins, Colorado
-#' 
-#' 
-#' Top ten annual precipitation events (inches) for one rain gauge 
-#' in Fort Collins, Colorado from 1900 through 1999. See 
+#'
+#'
+#' Top ten annual precipitation events (inches) for one rain gauge
+#' in Fort Collins, Colorado from 1900 through 1999. See
 #' Katz et al. (2002) Sec. 2.3.1 for more information and analyses.
 #'
 #' @docType data
@@ -21,5 +21,5 @@
 #' @examples
 #' data(fortmax)
 #' y <- fortmax[, -1]
-#' ed.seqtests(y)
+#' gev.seqtests(y, method = "ed")
 NULL

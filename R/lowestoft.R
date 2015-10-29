@@ -23,7 +23,7 @@
 #'
 #' @examples
 #' data(lowestoft)
-#' ed.seqtests(lowestoft)
+#' gev.seqtests(lowestoft, method = "ed")
 #' ## Not run
 #' ## Look at the difference in confidence intervals between r=1 and r=10
 #' #gevr.returnlevel(lowestoft[,1], 50, method = "profile")
