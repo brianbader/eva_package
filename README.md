@@ -2,6 +2,8 @@
 
 * ~~Add better handling for the likelihood and data generation as shape -> 0~~
 
+* Need to vectorize gevr and gpd functions (at least for shape parameter)
+
 * Add interpolation option for AD and CVM tests
 
 * ~~Add pgev function for the univariate case and export qgev as a function~~

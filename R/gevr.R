@@ -1,21 +1,18 @@
 
 ## Handles the limit (1 + shape*w)^(-1/shape) as shape -> 0
-xix <- function(w, shape){
-  z <- pmax((1 + shape*w), 0)
-  out <- z^(-1/shape)
-  eps <- 1e-3
-  if (abs(shape) < eps & shape != 0){
-    shape1 <- shape + eps
-    shape2 <- shape - eps
-    check <- z^(-1/shape)
-    check1 <- (1 + shape1*w)^(-1/shape1)
-    check2 <- (1 + shape2*w)^(-1/shape2)
-    if((check1 < check & check < check2) || (check2 < check & check < check1))
-      out <- z^(-1/shape)
-    else
-      out <- exp(-w)
+xix <- function(w, shape, terms = 100){
+  x <- pmax(w*shape, -1)
+  n <- -1/shape
+  if(shape == 0){
+    out <- exp(-w)
   }
-  if (shape == 0) out <- exp(-w)
+  else{
+    out <- 1
+    for(i in 1:terms){
+      if(choose(n,i) != Inf & choose(n,i) != -Inf) out <- out + choose(n,i)*x^i
+    }
+    out <- ifelse(abs(x) < 1, out, (1 + x)^n)
+  }
   out
 }
 
