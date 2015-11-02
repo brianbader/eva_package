@@ -2,7 +2,7 @@
 
 * ~~Add better handling for the likelihood and data generation as shape -> 0~~
 
-* Need to vectorize gevr and gpd functions (at least for shape parameter)
+* ~~Need to vectorize gevr and gpd functions (at least for shape parameter)~~
 
 * Add interpolation option for AD and CVM tests
 
@@ -16,8 +16,10 @@
 
 * Add gpd return levels (profile likelihood and delta method)
 
-* Make sure likelihood density function is being referred to in all function
+* Make sure likelihood density function is being referred to in all functions
 
 * Add more examples and descriptions
 
 * Incorporate non-stationarity into the fitting and PB/ED tests
+
+* Make class objects for fits, and provide diagnostic plots

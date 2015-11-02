@@ -33,8 +33,10 @@ rgpd <- function (n, loc = 0, scale = 1, shape = 0)
 {
   if (min(scale) <= 0)
     stop("invalid scale")
-  if (length(loc) != 1 | length(scale) != 1 | length(shape) != 1)
-    stop("invalid shape")
+  if ((length(loc) != 1 & length(scale) != 1) | (length(loc) != 1 & length(shape) != 1) | (length(scale) != 1 & length(shape) != 1))
+    stop("only one parameter argument can be a vector")
+  if (n > 1 & (length(loc) != 1 | length(scale) != 1 | length(shape) != 1))
+    stop("cannot have a vector of parameters AND observations")
   qgpd(runif(n), loc, scale, shape)
 }
 
@@ -45,10 +47,15 @@ pgpd <- function (q, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = F
 {
   if (min(scale) <= 0)
     stop("invalid scale")
-  if (length(shape) != 1)
-    stop("invalid shape")
+  if ((length(loc) != 1 & length(scale) != 1) | (length(loc) != 1 & length(shape) != 1) | (length(scale) != 1 & length(shape) != 1))
+    stop("only one parameter argument can be a vector")
+  if (length(q) > 1 & (length(loc) != 1 | length(scale) != 1 | length(shape) != 1))
+    stop("cannot have vectorized parameters and quantiles")
+  if(length(shape) == 1) shape <- rep(shape, max(length(q), length(loc), length(scale)))
+  q <- pmax(q, loc)
+  q <- ifelse(shape >= 0, q, pmin(q, (loc - scale/shape)))
   w <- (q - loc) / scale
-  p <- 1 - xix(w, shape)
+  p <- ifelse(shape == 0, 1 - exp(-w), 1 - exp((-1/shape)*log1p(w*shape)))
   if (!lower.tail)
     p <- 1 - p
   if (log.p)
@@ -63,11 +70,17 @@ dgpd <- function (x, loc = 0, scale = 1, shape = 0, log.d = FALSE)
 {
   if (min(scale) <= 0)
     stop("invalid scale")
-  if (length(shape) != 1)
-    stop("invalid shape")
+  if ((length(loc) != 1 & length(scale) != 1) | (length(loc) != 1 & length(shape) != 1) | (length(scale) != 1 & length(shape) != 1))
+    stop("only one parameter argument can be a vector")
+  if (length(x) > 1 & (length(loc) != 1 | length(scale) != 1 | length(shape) != 1))
+    stop("cannot have a vector of parameters AND observations")
+  if(length(shape) == 1) shape <- rep(shape, max(length(x), length(loc), length(scale)))
+  below.support <- x < loc
+  x <- pmax(x, loc)
+  x <- ifelse(shape >= 0, x, pmin(x, (loc - scale/shape)))
   w <- (x - loc) / scale
-  log.density <- -log(scale) + log(xix(w, shape))
-  log.density[is.nan(log.density) | is.infinite(log.density)] <- -Inf
+  log.density <- -log(scale) - ifelse(shape == 0, w, ((1/shape) + 1) * log1p(w*shape))
+  log.density[is.nan(log.density) | is.infinite(log.density) | below.support] <- -Inf
   if (!log.d)
     log.density <- exp(log.density)
   log.density
@@ -84,13 +97,17 @@ qgpd <- function (p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = F
     stop("`p' must contain probabilities in (0,1)")
   if (min(scale) <= 0)
     stop("invalid scale")
-  if (length(shape) != 1)
-    stop("invalid shape")
+  if ((length(loc) != 1 & length(scale) != 1) | (length(loc) != 1 & length(shape) != 1) | (length(scale) != 1 & length(shape) != 1))
+    stop("only one parameter argument can be a vector")
+  if (length(p) > 1 & (length(loc) != 1 | length(scale) != 1 | length(shape) != 1))
+    stop("cannot have vectorized parameters and probabilities")
   if (lower.tail)
     p <- 1 - p
-  if (shape == 0) loc - scale * log(p)
-  else {
-    gpd.stand <- expm1(-shape * log(p)) / shape
-    loc + scale * gpd.stand
-  }
+  if(length(shape) == 1) shape <- rep(shape, max(length(p), length(loc), length(scale)))
+  ifelse(shape == 0, loc - scale * log(p), loc + scale * expm1(-shape * log(p)) / shape)
 }
+
+
+
+
+
