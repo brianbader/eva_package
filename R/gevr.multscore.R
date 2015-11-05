@@ -12,7 +12,6 @@
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
-#'@importFrom ismev rlarg.fit
 #'@export
 
 gevr.multscore <- function(data, B, theta = NULL, information=c("observed", "expected"))
@@ -30,10 +29,10 @@ gevr.multscore <- function(data, B, theta = NULL, information=c("observed", "exp
       theta <- y$par.ests
     }
     else{
-      try(y <- rlarg.fit(as.matrix(data[, 1:(R-1)]), show = FALSE), silent = TRUE)
+      try(y <- gevr.fit(as.matrix(data[, 1:(R-1)]), method = "mle"), silent = TRUE)
       if (!is.list(y))
         stop("Maximum likelihood failed to converge at initial step")
-      theta <- y$mle
+      theta <- y$par.ests
     }
   }
   u <- gevrscorectb(data, theta)

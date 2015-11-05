@@ -14,7 +14,6 @@
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
-#'@importFrom ismev rlarg.fit
 #'@export
 gevr.edtest <- function(data, theta = NULL) {
   data <- as.matrix(data)
@@ -24,10 +23,10 @@ gevr.edtest <- function(data, theta = NULL) {
   if(is.null(theta)) {
     data1 <- as.matrix(data[, 1:(R-1)])
     y <- 9999
-    try(y <- rlarg.fit(data1, show = FALSE), silent = TRUE)
+    try(y <- gevr.fit(data1, method = "mle"), silent = TRUE)
     if (!is.list(y))
       stop("Maximum likelihood failed to converge at initial step")
-    theta <- y$mle
+    theta <- y$par.ests
   }
   Diff <- dgevr(data[, 1:R], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE) -
           dgevr(data[, 1:(R-1)], loc = theta[1], scale = theta[2], shape = theta[3], log.d = TRUE)

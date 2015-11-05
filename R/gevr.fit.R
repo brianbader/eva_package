@@ -10,23 +10,25 @@ num.decimals.max <- function(x) {
 #'@param data Data should be a numeric vector from the GEV distribution.
 #'@param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
 #'@examples
-#'data <- rgevr(500, 1,loc=0.5, scale=1, shape=0.3)
+#'data <- rgevr(500, 1, loc=0.5, scale=1, shape=0.3)
 #'result <- gevr.fit(data, "mps")
 #'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods.
 #'@export
 
 gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
-  data <- as.numeric(data)
-  n <- length(data)
-  data <- sort(data)
+  data <- as.matrix(data)
+  n <- nrow(data)
+  R <- ncol(data)
   method <- match.arg(method)
+  if(R > 1 & (method == "mps" | method == "pwm"))
+     stop("If R > 1, MLE must be used")
   ## Probability Weighted Moments.
   ## Also use this as the intial estimates for other methods.
   y <- function(x, w0, w1, w2) {
     (3^x - 1)/(2^x - 1) - (3 * w2 - w0)/(2 * w1 - w0)
   }
   nmom <- 3
-  x <- rev(data)
+  x <- rev(sort(as.vector(data[,1])))
   moments <- rep(0, nmom)
   moments[1] <- mean(x)
   for (i in 1:n) {
@@ -46,6 +48,7 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   theta <- c(loc, scale, shape)
 
   if(method == "pwm"){
+    data <- sort(as.vector(data))
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA)
@@ -55,10 +58,10 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   if(method == "mle"){
     negloglik <- function(theta, x) {
       loc <- theta[1]
-      sigma <- theta[2]
+      scale <- theta[2]
       shape <- theta[3]
-      z <- (shape / sigma) * (x - loc)
-      if ((sigma < 0) || (min(1+z) < 0))
+      z <- (shape / scale) * (x - loc)
+      if ((scale < 0) || (min(1+z) < 0))
         out <- 1e+06
       else {
         out <- - sum(dgevr(x, loc = loc, scale = scale, shape = shape, log.d = TRUE))
@@ -79,12 +82,13 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   }
 
   if(method == "mps"){
+    data <- sort(as.vector(data))
     negloglik <- function(theta, x) {
       loc <- theta[1]
-      sigma <- theta[2]
+      scale <- theta[2]
       shape <- theta[3]
-      z <- (shape / sigma) * (x - loc)
-      if ((sigma < 0) || (min(1+z) < 0))
+      z <- (shape / scale) * (x - loc)
+      if ((scale < 0) || (min(1+z) < 0))
         out <- 1e+06
       else {
         cdf <- exp(-(1 + z)^(-1 / shape))

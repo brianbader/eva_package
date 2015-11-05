@@ -17,7 +17,6 @@
 #'@return CI Confidence interval for the m-period return level.
 #'@return Period The period length used.
 #'@details Caution: The profile likelihood optimization may be slow (on the order of minutes).
-#'@importFrom ismev rlarg.fit
 #'@export
 
 gevr.returnlevel <- function(data, period, conf=.95, method=c("delta", "profile"),
@@ -26,11 +25,11 @@ gevr.returnlevel <- function(data, period, conf=.95, method=c("delta", "profile"
   method <- match.arg(method)
   data <- as.matrix(data)
   y <- NA
-  try(y <- rlarg.fit(data, show = FALSE), silent = TRUE)
+  try(y <- gevr.fit(data, method = "mle"), silent = TRUE)
   if (!is.list(y))
     stop("Maximum likelihood failed to converge at initial step")
-  cov <- y$cov
-  theta <- y$mle
+  cov <- y$varcov
+  theta <- y$par.ests
   z <- -log1p(-(1/period))
   est <- theta[1] - (theta[2]/theta[3])*(-expm1(-theta[3]*log(z)))
   if(method == "delta") {

@@ -2,12 +2,12 @@ gevr.pbgen <- function(n, R, theta, information) {
   data1 <- rgevr(n, R, theta[1], theta[2], theta[3])
   data1 <- as.matrix(data1)
   y1 <- 9999
-  try(y1 <- rlarg.fit(data1, show = FALSE), silent = TRUE)
+  try(y1 <- gevr.fit(data1, method = "mle"), silent = TRUE)
   if(!is.list(y1)){
     teststat <- NA
   }
   else{
-    theta1 <- y1$mle
+    theta1 <- y1$par.ests
     teststat <- gevrteststat(data1, theta1, information)
   }
   teststat
@@ -30,7 +30,6 @@ gevr.pbgen <- function(n, R, theta, information) {
 #'@return p.value P-value for the test.
 #'@return theta Initial value of theta used in the test.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
-#'@importFrom ismev rlarg.fit
 #'@import parallel
 #'@export
 gevr.pbscore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
@@ -39,10 +38,10 @@ gevr.pbscore <- function(data, B, information=c("observed", "expected"), allowPa
   R <- ncol(data)
   information <-  match.arg(information)
   y <- 9999
-  try(y <- rlarg.fit(data, show = FALSE), silent = TRUE)
+  try(y <- gevr.fit(data, method = "mle"), silent = TRUE)
   if (!is.list(y))
     stop("Maximum likelihood failed to converge at initial step")
-  theta <- y$mle
+  theta <- y$par.ests
   stat <- gevrteststat(data, theta, information)
   if(allowParallel==TRUE){
     cl <- makeCluster(numCores)
