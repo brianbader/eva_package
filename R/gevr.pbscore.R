@@ -1,4 +1,4 @@
-gev.pbgen <- function(n, R, theta, information) {
+gevr.pbgen <- function(n, R, theta, information) {
   data1 <- rgevr(n, R, theta[1], theta[2], theta[3])
   data1 <- as.matrix(data1)
   y1 <- 9999
@@ -8,7 +8,7 @@ gev.pbgen <- function(n, R, theta, information) {
   }
   else{
     theta1 <- y1$mle
-    teststat <- gevteststat(data1, theta1, information)
+    teststat <- gevrteststat(data1, theta1, information)
   }
   teststat
 }
@@ -25,7 +25,7 @@ gev.pbgen <- function(n, R, theta, information) {
 #'@examples
 #'## Generate some data from GEVr
 #'dat <- rgevr(200, 5, loc=0.5, scale=1, shape=0.5)
-#'gev.pbscore(dat, 99)
+#'gevr.pbscore(dat, 99)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Initial value of theta used in the test.
@@ -33,7 +33,7 @@ gev.pbgen <- function(n, R, theta, information) {
 #'@importFrom ismev rlarg.fit
 #'@import parallel
 #'@export
-gev.pbscore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
+gevr.pbscore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
@@ -43,17 +43,17 @@ gev.pbscore <- function(data, B, information=c("observed", "expected"), allowPar
   if (!is.list(y))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- y$mle
-  stat <- gevteststat(data, theta, information)
+  stat <- gevrteststat(data, theta, information)
   if(allowParallel==TRUE){
     cl <- makeCluster(numCores)
     fun <- function(cl){
-      parSapply(cl, 1:B, function(i,...) {gev.pbgen(n, R, theta, information)})
+      parSapply(cl, 1:B, function(i,...) {gevr.pbgen(n, R, theta, information)})
     }
     teststat <- fun(cl)
-    stopCluster(cl)    
+    stopCluster(cl)
   }
   else{
-    teststat <- replicate(B, gev.pbgen(n, R, theta, information))
+    teststat <- replicate(B, gevr.pbgen(n, R, theta, information))
   }
   teststat <- teststat[!is.na(teststat)]
   B <- length(teststat)

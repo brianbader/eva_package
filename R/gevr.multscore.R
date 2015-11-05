@@ -7,7 +7,7 @@
 #'@param information To use observed (default) or expected information in the test.
 #'@examples
 #'data <- rgevr(500, 5, loc=0.5, scale=1, shape=0.3)
-#'result <- gev.multscore(data, 1000)
+#'result <- gevr.multscore(data, 1000)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
@@ -15,7 +15,7 @@
 #'@importFrom ismev rlarg.fit
 #'@export
 
-gev.multscore <- function(data, B, theta = NULL, information=c("observed", "expected"))
+gevr.multscore <- function(data, B, theta = NULL, information=c("observed", "expected"))
 {
   data <- as.matrix(data)
   n <- nrow(data)
@@ -24,7 +24,7 @@ gev.multscore <- function(data, B, theta = NULL, information=c("observed", "expe
   if(is.null(theta)) {
     y <- 9999
     if(R == 1) {
-      try(y <- gevfit(data, method = "pwm"), silent = TRUE)
+      try(y <- gevr.fit(data, method = "pwm"), silent = TRUE)
       if (!is.list(y))
         stop("PWM failed to converge at initial step")
       theta <- y$par.ests
@@ -36,13 +36,13 @@ gev.multscore <- function(data, B, theta = NULL, information=c("observed", "expe
       theta <- y$mle
     }
   }
-  u <- gevscorectb(data, theta)
+  u <- gevrscorectb(data, theta)
   w <- colSums(u)
   if(information == "observed"){
-    info <- gevfisherobs(data, theta)
+    info <- gevrfisherobs(data, theta)
   }
   else{
-    info <- gevfisher(data, theta)
+    info <- gevrfisher(data, theta)
   }
   stat <- (1/n) * t(w) %*% info %*% w
   stat <- as.vector(stat)

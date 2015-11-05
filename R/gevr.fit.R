@@ -11,11 +11,11 @@ num.decimals.max <- function(x) {
 #'@param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
 #'@examples
 #'data <- rgevr(500, 1,loc=0.5, scale=1, shape=0.3)
-#'result <- gevfit(data, "mps")
+#'result <- gevr.fit(data, "mps")
 #'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods.
 #'@export
 
-gevfit <- function (data, method = c("mle", "mps", "pwm")) {
+gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   data <- as.numeric(data)
   n <- length(data)
   data <- sort(data)

@@ -9,12 +9,12 @@
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
 #'data <- rgevr(200, 3, loc=0.5, scale=1, shape=0.5)
-#'gev.seqtests(data, method = "ed")
+#'gevr.seqtests(data, method = "ed")
 #'@return A matrix containing the test statistics and p-value results of the sequential tests.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #'@export
 
-gev.seqtests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("observed", "expected"),
+gevr.seqtests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("observed", "expected"),
                               allowParallel = FALSE, numCores = 1)
 {
   data <- as.matrix(data)
@@ -26,8 +26,8 @@ gev.seqtests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multsco
     result <- matrix(0, R, 6)
     for(i in 1:R){
       result[i, 1] <- i
-      if(method == "multscore") fit <- gev.multscore(data[, 1:i], nsim, NULL, information)
-      if(method == "pbscore") fit <- gev.pbscore(data[, 1:i], nsim, information, allowParallel, numCores)
+      if(method == "multscore") fit <- gevr.multscore(data[, 1:i], nsim, NULL, information)
+      if(method == "pbscore") fit <- gevr.pbscore(data[, 1:i], nsim, information, allowParallel, numCores)
       result[i, 2] <- fit$p.value
       result[i, 3] <- fit$statistic
       result[i, 4:6] <- fit$theta
@@ -38,7 +38,7 @@ gev.seqtests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multsco
     result <- matrix(0, R-1, 6)
     for(i in 2:R){
       result[i-1, 1] <- i
-      fit <- ed.test(data[, 1:i])
+      fit <- gevr.edtest(data[, 1:i])
       result[i-1, 2] <- fit$p.value
       result[i-1, 3] <- fit$statistic
       result[i-1, 4:6] <- fit$theta

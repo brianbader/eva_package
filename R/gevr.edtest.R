@@ -9,14 +9,14 @@
 #'dat <- rgevr(100, 2, loc=0.5, scale=1, shape=0.5)
 #'
 #'## Use the MLE from the GEV1 data by leaving theta input NULL.
-#'result <- ed.test(dat)
+#'result <- gevr.edtest(dat)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
 #'@importFrom ismev rlarg.fit
 #'@export
-ed.test <- function(data, theta = NULL) {
+gevr.edtest <- function(data, theta = NULL) {
   data <- as.matrix(data)
   R <- ncol(data)
   if(R==1) stop("R must be at least two")

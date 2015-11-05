@@ -21,5 +21,5 @@
 #' @examples
 #' data(fortmax)
 #' y <- fortmax[, -1]
-#' gev.seqtests(y, method = "ed")
+#' gevr.seqtests(y, method = "ed")
 NULL
