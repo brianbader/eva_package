@@ -1,4 +1,3 @@
-
 #'The GEVr Distribution
 #'
 #'Random number generation (rgevr) and density (dgevr) functions for the GEVr distribution with parameters loc, scale, and shape.

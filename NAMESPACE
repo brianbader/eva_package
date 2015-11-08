@@ -2,6 +2,7 @@
 
 export(dgevr)
 export(dgpd)
+export(gevr.diag)
 export(gevr.edtest)
 export(gevr.fit)
 export(gevr.multscore)

@@ -12,7 +12,7 @@ num.decimals.max <- function(x) {
 #'@examples
 #'data <- rgevr(500, 1, loc=0.5, scale=1, shape=0.3)
 #'result <- gevr.fit(data, "mps")
-#'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods.
+#'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevr.fit' to be used with diagnostic plots.
 #'@export
 
 gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
@@ -48,10 +48,9 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   theta <- c(loc, scale, shape)
 
   if(method == "pwm"){
-    data <- sort(as.vector(data))
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta, par.ses = NA, varcov = NA,
-                converged = NA, nllh.final = NA)
+                converged = NA, nllh.final = NA, R = R)
     names(out$par.ests) <- c("Location", "Scale", "Shape")
   }
 
@@ -76,7 +75,7 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
     par.ses <- sqrt(diag(varcov))
     out <- list(n = n, data = data, type = "mle",
                 par.ests = par.ests, par.ses = par.ses, varcov = varcov,
-                converged = fit$convergence, nllh.final = fit$value)
+                converged = fit$convergence, nllh.final = fit$value, R = R)
     names(out$par.ests) <- c("Location", "Scale", "Shape")
     names(out$par.ses) <- c("Location", "Scale", "Shape")
   }
@@ -107,11 +106,12 @@ gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
     par.ests <- fit$par
     varcov <- solve(fit$hessian)
     par.ses <- sqrt(diag(varcov))
-    out <- list(n = n, data = data, type = "mps",
+    out <- list(n = n, data = as.matrix(data), type = "mps",
                 par.ests = par.ests, par.ses = par.ses, varcov = varcov,
-                converged = fit$convergence, moran = fit$value)
+                converged = fit$convergence, moran = fit$value, R = R)
     names(out$par.ests) <- c("Location", "Scale", "Shape")
     names(out$par.ses) <- c("Location", "Scale", "Shape")
   }
+  class(out) <- "gevr.fit"
   out
 }

@@ -1,3 +1,8 @@
+## Helper function to handle (1 + x*shape)^(-1/shape) as shape -> 0
+nzsh <- function(x, shape){
+  exp((-1/shape) * log1p(x*shape))
+}
+
 ## Returns expected inverse fisher information matrix for GEV distribution.
 gevrfisher <- function(dat, theta) {
   R <- ncol(dat)
