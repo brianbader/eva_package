@@ -11,7 +11,7 @@ gpd.adgen <- function(n, theta) {
     theta1 <- c(scale1, shape1)
     thresh1 <- min(data1)
     data1 <- data1 - thresh1 + 0.000001
-    newdata1 <- 1 - (1 + ((data1*shape1)/scale1))^(-1/shape1)
+    newdata1 <- pgpd(data1, loc = 0, scale = scale1, shape = shape1)
     newdata1 <- sort(newdata1)
     i <- seq(1, n, 1)
     teststat <- -n - (1/n)*sum((2*i - 1)*(log(newdata1) + log(1 - rev(newdata1))))
@@ -48,7 +48,7 @@ gpd.ad <- function(data, B, allowParallel=FALSE, numCores=1) {
   theta <- c(scale, shape)
   thresh <- min(data)
   data <- data - thresh + 0.000001
-  newdata <- 1 - (1 + ((data*shape)/scale))^(-1/shape)
+  newdata <- pgpd(data, loc = 0, scale = scale, shape = shape)
   newdata <- sort(newdata)
   i <- seq(1, n, 1)
   stat <- -n - (1/n)*sum((2*i - 1)*(log(newdata) + log(1 - rev(newdata))))
@@ -58,7 +58,7 @@ gpd.ad <- function(data, B, allowParallel=FALSE, numCores=1) {
       parSapply(cl, 1:B, function(i,...) {gpd.adgen(n, theta)})
     }
     teststat <- fun(cl)
-    stopCluster(cl)   
+    stopCluster(cl)
   }
   else{
     teststat <- replicate(B, gpd.adgen(n, theta))
