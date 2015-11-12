@@ -3,7 +3,7 @@ findthresh <- function (data, ne) {
   thresholds <- unique(data)
   indices <- match(data[ne], thresholds)
   indices <- pmin(indices + 1, length(thresholds))
-  thresholds[indices]
+  thresholds[indices] - min(c(1e-10, abs(diff(data))))
 }
 
 #'Fits the generalized pareto distribution to data
@@ -18,7 +18,7 @@ findthresh <- function (data, ne) {
 #'@references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
 #'@export
 
-gpdfit <- function (data, threshold = NA, nextremes = NA, method = c("mle", "mps", "pwm"),
+gpd.fit <- function(data, threshold = NA, nextremes = NA, method = c("mle", "mps", "pwm"),
                     information = c("observed", "expected")) {
 
   data <- as.numeric(data)

@@ -1,16 +1,15 @@
 gpd.pbgen <- function(n, theta, information) {
-  data1 <- rgpd(n, loc=0, scale=theta[1], shape=theta[2])
+  data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- 9999
-  try(fit1 <- gpdfit(data1, nextremes=n, method="mle"), silent = TRUE)
+  try(fit1 <- gpd.fit(data1, nextremes = n, method = "mle"), silent = TRUE)
   if(!is.list(fit1)){
     teststat <- NA
-  }
-  else{
+  } else {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
-    thresh1 <- min(data1)
-    data1 <- data1 - thresh1 + 0.000001
+    thresh1 <- findthresh(data1, n)
+    data1 <- data1 - thresh1
     teststat <- gpdteststat(data1, theta1, information)
   }
   teststat
@@ -34,28 +33,27 @@ gpd.pbgen <- function(n, theta, information) {
 #'@return theta Estimated value of theta for the initial data.
 #'@import parallel
 #'@export
-gpd.pbscore <- function(data, B, information = c("observed", "expected"), allowParallel=FALSE, numCores=1) {
+gpd.pbscore <- function(data, B, information = c("observed", "expected"), allowParallel = FALSE, numCores = 1) {
   n <- length(data)
   information <-  match.arg(information)
   fit <- 9999
-  try(fit <- gpdfit(data, nextremes=n, method="mle"), silent = TRUE)
+  try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
   if (!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
   theta <- c(scale, shape)
-  thresh <- min(data)
-  data <- data - thresh + 0.000001
+  thresh <- findthresh(data, n)
+  data <- data - thresh
   stat <- gpdteststat(data, theta, information)
-  if(allowParallel==TRUE){
+  if(allowParallel==TRUE) {
     cl <- makeCluster(numCores)
     fun <- function(cl){
       parSapply(cl, 1:B, function(i,...) {gpd.pbgen(n, theta, information)})
     }
     teststat <- fun(cl)
-    stopCluster(cl)   
-  }
-  else{
+    stopCluster(cl)
+  } else {
     teststat <- replicate(B, gpd.pbgen(n, theta, information))
   }
   teststat <- teststat[!is.na(teststat)]

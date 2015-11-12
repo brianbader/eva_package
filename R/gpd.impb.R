@@ -1,19 +1,17 @@
-gpd.imgen <- function(n, theta, inner)
-{
+gpd.imgen <- function(n, theta, inner) {
   scale <- theta[1]
   shape <- theta[2]
-  x <- rgpd(n, loc=0, scale=scale, shape=shape)
+  x <- rgpd(n, loc = 0, scale = scale, shape = shape)
   fit1 <- 9999
-  try(fit1 <- gpdfit(x, nextremes=n, method="mle", information="expected"), silent = TRUE)
+  try(fit1 <- gpd.fit(x, nextremes = n, method = "mle", information = "expected"), silent = TRUE)
   if(!is.list(fit1)){
     teststat <- NA
-  }
-  else{
+  } else {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
-    thresh1 <- min(x)
-    x <- x - thresh1 + 0.000001
+    thresh1 <- findthresh(x, n)
+    x <- x - thresh1
     v <- gpd.imcov(x, inner, theta1)$cov
     u <- gpd.ind(x, theta1)
     d <- colSums(u)
@@ -35,7 +33,7 @@ gpd.imgen <- function(n, theta, inner)
 #'@references Dhaene, G., & Hoorelbeke, D. (2004). The information matrix test with bootstrap-based covariance matrix estimation. Economics Letters, 82(3), 341-347.
 #'@examples
 #'## Generate some data from GPD
-#'dat <- rgpd(200, 0, 1, -0.2)
+#'dat <- rgpd(200, 0, 1, 0.2)
 #'gpd.impb(dat, 50, 99)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
@@ -43,16 +41,15 @@ gpd.imgen <- function(n, theta, inner)
 #'@return effective_bootnum Effective number of outer bootstrap replicates used (if some did not converge).
 #'@import parallel
 #'@export
-gpd.impb <- function(data, inner, outer, allowParallel=FALSE, numCores=1)
-{
+gpd.impb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   n <- length(data)
   fit <- 9999
-  try(fit <- gpdfit(data, nextremes=n, method="mle"), silent = TRUE)
+  try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
   if (!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- c(fit$par.ests[1], fit$par.ests[2])
-  thresh <- min(data)
-  data <- data - thresh + 0.000001
+  thresh <- findthresh(data, n)
+  data <- data - thresh
   v <- gpd.imcov(data, inner, theta)$cov
   u <- gpd.ind(data, theta)
   d <- colSums(u)
@@ -65,8 +62,7 @@ gpd.impb <- function(data, inner, outer, allowParallel=FALSE, numCores=1)
     }
     teststat <- fun(cl)
     stopCluster(cl)
-  }
-  else{
+  } else {
     teststat <- replicate(outer, gpd.imgen(n, theta, inner))
   }
   teststat <- teststat[!is.na(teststat)]

@@ -8,35 +8,37 @@
 #'@param allowParallel If method equals 'pbscore', should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
-#'data <- rgevr(200, 3, loc=0.5, scale=1, shape=0.5)
+#'data <- rgevr(200, 3, loc = 0.5, scale = 1, shape = 0.5)
 #'gevr.seqtests(data, method = "ed")
 #'@return A matrix containing the test statistics and p-value results of the sequential tests.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #'@export
 
 gevr.seqtests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("observed", "expected"),
-                              allowParallel = FALSE, numCores = 1)
-{
+                              allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)
   R <- ncol(data)
   method <- match.arg(method)
   if(method != "ed"){
-    if(is.null(nsim)) stop("Must enter the number of bootstrap replicates!")
+    if(is.null(nsim))
+      stop("Must enter the number of bootstrap replicates!")
     information <- match.arg(information)
     result <- matrix(0, R, 6)
-    for(i in 1:R){
+    for(i in 1:R) {
       result[i, 1] <- i
-      if(method == "multscore") fit <- gevr.multscore(data[, 1:i], nsim, NULL, information)
-      if(method == "pbscore") fit <- gevr.pbscore(data[, 1:i], nsim, information, allowParallel, numCores)
+      if(method == "multscore")
+        fit <- gevr.multscore(data[, 1:i], nsim, NULL, information)
+      if(method == "pbscore")
+        fit <- gevr.pbscore(data[, 1:i], nsim, information, allowParallel, numCores)
       result[i, 2] <- fit$p.value
       result[i, 3] <- fit$statistic
       result[i, 4:6] <- fit$theta
     }
-  }
-  else{
-    if(R==1) stop("R must be at least two")
+  } else {
+    if(R==1)
+      stop("R must be at least two")
     result <- matrix(0, R-1, 6)
-    for(i in 2:R){
+    for(i in 2:R) {
       result[i-1, 1] <- i
       fit <- gevr.edtest(data[, 1:i])
       result[i-1, 2] <- fit$p.value

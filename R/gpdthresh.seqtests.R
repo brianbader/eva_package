@@ -15,30 +15,35 @@
 #'@export
 gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"),
                                nsim = NULL, inner = NULL, outer = NULL, information=c("observed", "expected"),
-                               allowParallel=FALSE, numCores=1)
-{
-  if (is.na(nextremes) && is.na(thresholds))
+                               allowParallel=FALSE, numCores=1) {
+  if(is.na(nextremes) && is.na(thresholds))
     stop("Enter either a set of thresholds or number of upper extremes")
-  if (!is.na(nextremes) && !is.na(thresholds))
+  if(!is.na(nextremes) && !is.na(thresholds))
     stop("Enter EITHER a set of thresholds or number of upper extremes")
   information <- match.arg(information)
   method <- match.arg(method)
-  if (((method == "cvm" || method == "ad" || method == "pbscore" || method == "multscore" || method == "imasym") & is.null(nsim)) ||
+  if(((method == "cvm" || method == "ad" || method == "pbscore" || method == "multscore" || method == "imasym") & is.null(nsim)) ||
        (method == "impb"  && (is.null(inner) || is.null(outer))))
     stop("Need to specify the number of bootstrap replicates")
-  if (any(!is.na(nextremes)))
+  if(any(!is.na(nextremes)))
     thresholds <- findthresh(data, nextremes)
   num <- length(thresholds)
   result <- matrix(0, num, 5)
   for(i in 1:num) {
     x <- data[data>thresholds[i]]
     result[i, 1] <- i
-    if(method == "cvm")       fit <- gpd.cvm(x, nsim, allowParallel, numCores)
-    if(method == "ad")        fit <- gpd.ad(x, nsim, allowParallel, numCores)
-    if(method == "pbscore")   fit <- gpd.pbscore(x, nsim, information = information, allowParallel, numCores)
-    if(method == "multscore") fit <- gpd.multscore(x, nsim, information = information)
-    if(method == "imasym")    fit <- gpd.imasym(x, nsim)
-    if(method == "impb")      fit <- gpd.impb(x, inner, outer, allowParallel, numCores)
+    if(method == "cvm")
+      fit <- gpd.cvm(x, nsim, allowParallel, numCores)
+    if(method == "ad")
+      fit <- gpd.ad(x, nsim, allowParallel, numCores)
+    if(method == "pbscore")
+      fit <- gpd.pbscore(x, nsim, information = information, allowParallel, numCores)
+    if(method == "multscore")
+      fit <- gpd.multscore(x, nsim, information = information)
+    if(method == "imasym")
+      fit <- gpd.imasym(x, nsim)
+    if(method == "impb")
+      fit <- gpd.impb(x, inner, outer, allowParallel, numCores)
     result[i, 2] <- thresholds[i]
     result[i, 3] <- length(x)
     result[i, 4] <- fit$p.value

@@ -1,11 +1,12 @@
 Package: eva
 Title: Extreme Value Goodness-of-Fit Testing
-Date: November 2, 2015
+Date: 2015-11-12
 Version: 0.1-1
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brian.bader@uconn.edu"), person(given = "Jun", family = "Yan", role = "aut"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order statistics (GEVr) model. Goodness-of-fit tests for threshold selection in the univariate generalized pareto model. Random number generation and density functions for the GEVr distribution.
 Imports: parallel
-Suggests: knitr
+Depends: R(>= 2.10.0)
+Suggests: knitr, ggplot2
 License: GPL (>= 2)
 Repository: CRAN
 Reference: Bader B., Jun Y., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.

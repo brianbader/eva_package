@@ -1,0 +1,16 @@
+citHeader("To cite package 'eva' in publications use:")
+
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s", meta$Version)
+
+citEntry(entry="Manual",
+         title = "eva: Extreme Value Analysis",
+         author = personList(as.person("Brian Bader"),
+                             as.person("Jun Yan")),
+         year = year,
+	       vers = vers,
+
+         textVersion =
+         paste("Brian Bader, Jun Yan (",year,"), ",
+               "eva: Extreme Value Analysis. ",
+			          vers, ".", sep=""))

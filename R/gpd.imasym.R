@@ -19,23 +19,23 @@ gpd.imasym <- function(data, B, theta = NULL) {
   n <- length(data)
   if(is.null(theta)) {
     fit <- 9999
-    try(fit <- gpdfit(data, nextremes=n, method="mle"), silent = TRUE)
+    try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
     if (!is.list(fit))
       stop("Maximum likelihood failed to converge at initial step")
     scale <- fit$par.ests[1]
     shape <- fit$par.ests[2]
     theta <- c(scale, shape)
   }
-  thresh <- min(data)
-  data <- data - thresh + 0.000001
+  thresh <- findthresh(data, n)
+  data <- data - thresh
   v <- gpd.imcov(data, B, theta)
   B <- v$boot_adj
   v <- v$cov
   u <- gpd.ind(data, theta)
   d <- colSums(u)
-  stat <-  (1/n) * t(d) %*% v %*% d
+  stat <- (1/n) * t(d) %*% v %*% d
   stat <- as.vector(stat)
-  stat <- stat*(B-3)/(3*B-3)
+  stat <- stat*(B-3) / (3*B-3)
   p <- 1 - pf(stat, 3, (B-3))
   names(theta) <- c("scale", "shape")
   out <- list(stat, p, theta, B)

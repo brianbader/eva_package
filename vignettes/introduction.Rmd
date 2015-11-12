@@ -1,0 +1,109 @@
+---
+title: "Introduction to 'eva' and its capabilities"
+author: Brian Bader
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to 'eva' and its capabilities}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+
+# The eva Package
+
+The `eva' package, short for extreme value analysis, provides functionality that allows data analysis of extremes from beginning to end, with model fitting and a slew of newly available tests for diagnostics. In particular, some highlights are:
+
+* Implementation of the $r$ largest order statistics (GEV$_r$) model - data generation, fitting, and return levels.
+
+* Efficient handling of the near-zero shape parameter.
+
+* Maximum product spacings (MPS) estimation for parameters in the block maxima (GEV$_1$) and generalized pareto distributions.
+
+* Sequential tests for the choice of $r$ in the GEV$_r$ model, as well as tests for the selection of threshold in the peaks-over-threshold (POT) approach. For the boostrap based tests, the option to run in parallel is provided.
+
+* P-value adjustments to control for the false discover rate (FDR) and family-wise error rate (FWER) in the sequential testing setting.
+
+## Efficient handling of near-zero shape parameter
+
+
+```{r shape}
+# load package
+library(eva)
+
+# A naive implementation of the GEV cumulative density function
+pgev_naive <- function(q, loc = 0, scale = 1, shape = 1) {
+    exp(-(1 + (shape * (q - loc))/scale)^(-1/shape))
+}
+
+
+curve(pgev_naive(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
+curve(eva:::pgev(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
+
+# Similarly for the GPD cdf
+pgpd_naive <- function(q, loc = 0, scale = 1, shape = 1) {
+    (1 - (1 + (shape * (q - loc))/scale)^(-1/shape))
+}
+
+curve(pgpd_naive(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
+curve(eva:::pgpd(1, 0, 1, x),  1e-20, .01, log = "x", n = 1025)
+
+
+```
+
+## The GEV$_r$ distribution
+
+The GEV$_r$ distribution has the density function $$f_r (x_1, x_2, ..., x_r | \mu, \sigma, \xi) = \sigma^{-r}\exp\left\{-(1+\xi z_r)^{-\frac{1}{\xi}} - \left(\frac{1}{\xi}+1\right)\sum_{j=1}^{r}\log(1+\xi z_j)\right\}$$ for some location parameter $\mu$, scale parameter $\sigma > 0$
+and shape parameter $\xi$, where $x_1 >  \cdots> x_r$, $z_j = (x_j - \mu) / \sigma$, and $1 + \xi z_j > 0$ for $j=1, \ldots, r$. When $r = 1$,  this distribution is exactly the GEV distribution or block maxima.
+
+This package includes data generation (rgevr), density function (dgevr), fitting (gevr.fit), and return levels (gevr.returnlevel) for this distribution. If one wants to choose $r > 1$, goodness-of-fit must be tested. This can be done using function gevr.seqtests. Take, for example, the dataset Lowestoft, which includes the top ten sea levels at Lowestoft harbor from 1984 - 2014. Two available tests are available to run in sequence - the entropy difference and score test.
+
+```{r seqtesting}
+data(lowestoft)
+gevr.seqtests(lowestoft, method = "ed")
+```
+
+The entropy difference test fails to reject for any value of $r$ from 1 to 10. A common quantity of interest in extreme value analysis are the $m$-year return levels, which can be thought of as the average maximum value that will be seen over a period of $m$ years. For the Lowestoft data, the 250 year sea level return levels, with 95% confidence intervals are plotting using for $r$ from 1 to 10. The advantage of using more top order statistics can be seen in the plots below. The width of the intervals decrease by over two-thirds from $r=1$ to $r=10$. Similarly decreases can be seen in the estimated parameters.
+
+```{r returnlevel, fig.height = 6, fig.width = 7}
+
+# Make 250 year return level plot using gevr for r = 1 to 10 with the LoweStoft data
+
+data(lowestoft)
+result <- matrix(0, 20, 4)
+period <- 250
+
+for(i in 1:10) {
+  y1 <- gevr.returnlevel(as.matrix(lowestoft[, 1:i]), period, conf = 0.95, method = "delta")
+  y2 <- gevr.returnlevel(as.matrix(lowestoft[, 1:i]), period, conf = 0.95, method = "profile")
+  result[i, 1] <- i
+  result[i, 2] <- y1$Estimate
+  result[i, 3:4] <- y1$CI
+  result[(i + 10), 1] <- i
+  result[(i + 10), 2] <- y2$Estimate
+  result[(i + 10), 3:4] <- y2$CI
+}
+
+result <- cbind.data.frame(result, c(rep("Delta", 10), rep("Profile", 10)))
+colnames(result) <- c("r", "Est", "Lower", "Upper", "Method")
+result <- as.data.frame(result)
+
+library(ggplot2)
+
+ggplot(result, aes(x = r, y = Est,)) +
+  geom_ribbon(data = result ,aes(ymin = Lower, ymax = Upper), alpha = 0.3) + 
+  facet_grid(Method ~ .) + 
+  geom_line() +
+  geom_point(size = 3) +
+  scale_x_continuous(breaks = seq(0, 10, by=1)) + 
+  xlab("r") +
+  ylab("250 Year Return Level") +
+  theme(text = element_text(size=15))
+
+```
+
+In addition, the profile likelihood confidence intervals are compared with the delta method intervals. The advantage of using profile likelihood over the delta method is the allowance for asymmetric intervals. This is especially useful at high quantiles, or large return level periods. In the Lowestoft plots directly above, the asymmetry can be seen in the stable lower bound across values of $r$, while the upper bound decreases.
+
+
+
+
+
+

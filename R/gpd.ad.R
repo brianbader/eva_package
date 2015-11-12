@@ -1,7 +1,7 @@
 gpd.adgen <- function(n, theta) {
-  data1 <- rgpd(n, loc=0, scale=theta[1], shape=theta[2])
+  data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- 9999
-  try(fit1 <- gpdfit(data1, nextremes=n, method="mle"), silent = TRUE)
+  try(fit1 <- gpd.fit(data1, nextremes = n, method="mle"), silent = TRUE)
   if(!is.list(fit1)){
     teststat <- NA
   }
@@ -9,9 +9,8 @@ gpd.adgen <- function(n, theta) {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
-    thresh1 <- min(data1)
-    data1 <- data1 - thresh1 + 0.000001
-    newdata1 <- pgpd(data1, loc = 0, scale = scale1, shape = shape1)
+    thresh1 <- findthresh(data1, n)
+    newdata1 <- pgpd(data1, loc = thresh1, scale = scale1, shape = shape1)
     newdata1 <- sort(newdata1)
     i <- seq(1, n, 1)
     teststat <- -n - (1/n)*sum((2*i - 1)*(log(newdata1) + log(1 - rev(newdata1))))
@@ -24,6 +23,7 @@ gpd.adgen <- function(n, theta) {
 #'
 #'Anderson-Darling goodness-of-fit test for the Generalized Pareto distribution. Critical values are generated via parametric bootstrap.
 #'@param data Data should be in vector form, assumed to be from the GP distribution.
+#'@param bootstrap Should bootstrap be used to obtain pvalues for the test? By default, a table of critical values is used via interpolation. See details.
 #'@param B Number of bootstrap replicates.
 #'@param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
@@ -31,41 +31,73 @@ gpd.adgen <- function(n, theta) {
 #'@examples
 #'## Generate some data from GPD
 #'dat <- rgpd(200, 0, 1, 0.2)
-#'gpd.ad(dat, 100)
+#'gpd.ad(dat)
+#'@details A table of critical values were generated via Monte Carlo simulation for shape
+#'parameters -0.4 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
+#'.001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
+#'on the critical values for the tail of the distribution (.950 to .999 upper percentiles). This
+#'regression provides a method to extrapolate to arbitrarily small p-values.
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Estimated value of theta for the initial data.
 #'@import parallel
 #'@export
-gpd.ad <- function(data, B, allowParallel=FALSE, numCores=1) {
+gpd.ad <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
+  if(bootstrap == TRUE & is.null(B))
+    stop("Must specify some number of boostrap samples")
   n <- length(data)
   fit <- 9999
-  try(fit <- gpdfit(data, nextremes=n, method="mle"), silent = TRUE)
+  try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
   if (!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
   theta <- c(scale, shape)
-  thresh <- min(data)
-  data <- data - thresh + 0.000001
-  newdata <- pgpd(data, loc = 0, scale = scale, shape = shape)
+  if(bootstrap == FALSE & (shape < -0.4 | shape > 1))
+    stop("Estimated parameters are outside the table range, please use the bootstrap version")
+  thresh <- findthresh(data, n)
+  newdata <- pgpd(data, loc = thresh, scale = scale, shape = shape)
   newdata <- sort(newdata)
   i <- seq(1, n, 1)
   stat <- -n - (1/n)*sum((2*i - 1)*(log(newdata) + log(1 - rev(newdata))))
-  if(allowParallel==TRUE){
-    cl <- makeCluster(numCores)
-    fun <- function(cl){
-      parSapply(cl, 1:B, function(i,...) {gpd.adgen(n, theta)})
+  if(bootstrap == TRUE) {
+    if(allowParallel==TRUE){
+      cl <- makeCluster(numCores)
+      fun <- function(cl){
+        parSapply(cl, 1:B, function(i,...) {gpd.adgen(n, theta)})
+      }
+      teststat <- fun(cl)
+      stopCluster(cl)
     }
-    teststat <- fun(cl)
-    stopCluster(cl)
+    else{
+      teststat <- replicate(B, gpd.adgen(n, theta))
+    }
+    teststat <- teststat[!is.na(teststat)]
+    B <- length(teststat)
+    p <- (sum(teststat > stat) + 1) / (B + 2)
   }
   else{
-    teststat <- replicate(B, gpd.adgen(n, theta))
+    row <- which(rownames(ADQuantiles) == round(shape, 2))
+    if(stat > ADQuantiles[row, 999]) {
+      pvals <- -log(as.numeric(colnames(ADQuantiles[950:999])))
+      x <- as.numeric(ADQuantiles[row, 950:999])
+      y <- lm(pvals ~ x)
+      stat <- as.data.frame(stat)
+      colnames(stat) <- c("x")
+      p <- as.numeric(exp(-predict(y, stat)))
+    }
+    else{
+      bound <- as.numeric(colnames(ADQuantiles)[which.max(stat < ADQuantiles[row,])])
+      if(bound == .999) p <- .999
+      else{
+        lower <- ADQuantiles[row, which(colnames(ADQuantiles) == bound + 0.001)]
+        upper <- ADQuantiles[row, which(colnames(ADQuantiles) == bound)]
+        dif <- (upper - stat) / (upper - lower)
+        val <- (dif * (-log(bound) - -log(bound + 0.001))) + log(bound)
+        p <- exp(val)
+      }
+    }
   }
-  teststat <- teststat[!is.na(teststat)]
-  B <- length(teststat)
-  p <- (sum(teststat > stat) + 1) / (B + 2)
   names(theta) <- c("scale", "shape")
   out <- list(stat, p, theta)
   names(out) <- c("statistic", "p.value", "theta")

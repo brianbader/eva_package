@@ -22,8 +22,8 @@ pgev.marg <- function(data, theta, j){
   data <- as.matrix(data)
   n <- nrow(data)
   p <- rep(0, n)
-  for(i in 1:n){
-    for(k in 0:(j-1)){
+  for(i in 1:n) {
+    for(k in 0:(j-1)) {
       p[i] <- p[i] + nzsh((data[i, 1] - theta[1])/theta[2], theta[3])^k / gamma(k+1)
     }
     p[i] <- p[i] * exp(-nzsh((data[i, 1] - theta[1])/theta[2], theta[3]))
@@ -33,10 +33,9 @@ pgev.marg <- function(data, theta, j){
 
 
 ## Provide it the fitted object and which marginal statistic to plot (j)
-gevr.pp <- function(z, j){
+gevr.pp <- function(z, j) {
   n <- z$n
-  Series <- rep(0, n)
-  for(i in 1:n) Series[i] <- i / (n+1)
+  Series <- seq(1, n, 1) / (n+1)
   p <- pgev.marg(z$data[,j], z$par.ests, j)
   p <- sort(p)
   plot(p, Series, xlab = "Empirical", ylab = "Model", xlim = c(0,1), ylim = c(0,1))
@@ -45,15 +44,14 @@ gevr.pp <- function(z, j){
 }
 
 
-gevr.qq <- function(z, j){
+gevr.qq <- function(z, j) {
   n <- z$n
-  qgev.marg <- function(x, q){
+  qgev.marg <- function(x, q) {
     q - pgev.marg(x, z$par.ests, j)
   }
   emp <- rep(0, n)
-  Series <- rep(0, n)
-  for(i in 1:n){
-    Series[i] <- i / (n+1)
+  Series <- seq(1, n, 1) / (n+1)
+  for(i in 1:n) {
     emp[i] <- uniroot(qgev.marg, interval = c(min(z$data[, j]) - 2, max(z$data[, j]) + 2), q = Series[i])$root
   }
   plot(sort(z$data[, j]), emp, xlab = "Empirical", ylab = "Model",
@@ -63,24 +61,26 @@ gevr.qq <- function(z, j){
 }
 
 
-dgev.marg <- function(x, j, loc = loc, scale = scale, shape = shape){
-  if(length(shape) == 1) shape <- rep(shape, max(length(x), length(loc), length(scale)))
+dgev.marg <- function(x, j, loc = loc, scale = scale, shape = shape) {
+  if(length(shape) == 1)
+    shape <- rep(shape, max(length(x), length(loc), length(scale)))
   w <- (x - loc) / scale
   ifelse(shape == 0,   exp(-exp(-w) - j*w) / (scale * factorial(j-1)),
          (nzsh(w, shape)^j / (scale * gamma(j))) * exp(-nzsh(w, shape)))
 }
 
 
-gevr.hist <- function(z, j)
-{
+gevr.hist <- function(z, j) {
   h <- hist(z$data[, j], plot = FALSE)
   x <- seq(min(h$breaks), max(h$breaks), (max(h$breaks) - min(h$breaks))/1000)
-  if(j == 1) y <- dgevr(x, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
-  if(j > 1) y <- dgev.marg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
+  if(j == 1)
+    y <- dgevr(x, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
+  if(j > 1)
+    y <- dgev.marg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
   hist(z$data[, j], freq = FALSE, ylim = c(0, max(max(h$density), max(y))),
        xlab = "x", ylab = "Density", main = paste("Density Plot, j=", j, sep = ""))
   points(z$data[, j], rep(0, length(z$data[, j])))
-  lines(x, y)
+  lines(x, y, col = 4)
 }
 
 
@@ -99,12 +99,11 @@ gevr.hist <- function(z, j)
 #'@references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #'@references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
 #'@export
-gevr.diag <- function(z, conf = 0.95, method = c("delta", "profile"))
-{
+gevr.diag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
   oldpar <- par(ask = TRUE, mfcol = c(2, 2))
   try(gevr.rlplot(z, conf, method), silent = TRUE)
-  for(i in 1:z$R){
+  for(i in 1:z$R) {
     try(gevr.hist(z, i), silent = TRUE)
     try(gevr.pp(z, i), silent = TRUE)
     try(gevr.qq(z, i), silent = TRUE)

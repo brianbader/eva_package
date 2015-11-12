@@ -54,7 +54,7 @@ gpd.imcov.gen <- function(n, theta)
   shape <- theta[2]
   y <- rgpd(n, loc=0, scale=scale, shape=shape)
   fit1 <- 9999
-  try(fit1 <- gpdfit(y, nextremes=n, method="mle", information="expected"), silent = TRUE)
+  try(fit1 <- gpd.fit(y, nextremes=n, method="mle", information="expected"), silent = TRUE)
   if(!is.list(fit1)){
     temp <- rep(NA, 3)
   }
