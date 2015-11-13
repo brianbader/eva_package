@@ -4,7 +4,7 @@ gevr.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
   levels <- matrix(0, length(p), 3)
   for(i in 1:nrow(levels)) {
-    y <- gevr.returnlevel(z$data, 1/p[i], conf = conf, method = method)
+    y <- gevr.returnlevel(z, 1/p[i], conf = conf, method = method)
     levels[i, 1] <- y$Estimate
     levels[i, 2:3] <- y$CI
   }
@@ -91,8 +91,8 @@ gevr.hist <- function(z, j) {
 #'@param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
 #'@examples
 #'## Not run
-#'# data <- rgevr(500, 2, loc=0.5, scale=1, shape=0.1)
-#'# z <- gevr.fit(data)
+#'# x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
+#'# z <- gevr.fit(x)
 #'# gevr.diag(z)
 #'@return Provides return level plot and density, probability, and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal density for the estimated parameters.
 #'@details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.

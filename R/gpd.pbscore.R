@@ -2,7 +2,7 @@ gpd.pbgen <- function(n, theta, information) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- 9999
   try(fit1 <- gpd.fit(data1, nextremes = n, method = "mle"), silent = TRUE)
-  if(!is.list(fit1)){
+  if(!is.list(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -26,8 +26,8 @@ gpd.pbgen <- function(n, theta, information) {
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
 #'## Generate some data from GPD
-#'dat <- rgpd(200, 0, 1, 0.2)
-#'gpd.pbscore(dat, 100)
+#'x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
+#'gpd.pbscore(x, 100)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Estimated value of theta for the initial data.
@@ -38,7 +38,7 @@ gpd.pbscore <- function(data, B, information = c("observed", "expected"), allowP
   information <-  match.arg(information)
   fit <- 9999
   try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
-  if (!is.list(fit))
+  if(!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
@@ -48,7 +48,7 @@ gpd.pbscore <- function(data, B, information = c("observed", "expected"), allowP
   stat <- gpdteststat(data, theta, information)
   if(allowParallel==TRUE) {
     cl <- makeCluster(numCores)
-    fun <- function(cl){
+    fun <- function(cl) {
       parSapply(cl, 1:B, function(i,...) {gpd.pbgen(n, theta, information)})
     }
     teststat <- fun(cl)

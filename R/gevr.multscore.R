@@ -6,8 +6,8 @@
 #'@param B Number of bootstrap replicates.
 #'@param information To use observed (default) or expected information in the test.
 #'@examples
-#'data <- rgevr(500, 5, loc=0.5, scale=1, shape=0.3)
-#'result <- gevr.multscore(data, 1000)
+#'x <- rgevr(500, 5, loc = 0.5, scale = 1, shape = 0.3)
+#'result <- gevr.multscore(x, 1000)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.

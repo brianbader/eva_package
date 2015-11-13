@@ -2,10 +2,9 @@ gpd.adgen <- function(n, theta) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- 9999
   try(fit1 <- gpd.fit(data1, nextremes = n, method="mle"), silent = TRUE)
-  if(!is.list(fit1)){
+  if(!is.list(fit1)) {
     teststat <- NA
-  }
-  else{
+  } else {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
@@ -30,8 +29,8 @@ gpd.adgen <- function(n, theta) {
 #'@references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the generalized Pareto distribution. Technometrics, 43(4), 478-484.
 #'@examples
 #'## Generate some data from GPD
-#'dat <- rgpd(200, 0, 1, 0.2)
-#'gpd.ad(dat)
+#'x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
+#'gpd.ad(x)
 #'@details A table of critical values were generated via Monte Carlo simulation for shape
 #'parameters -0.4 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
 #'.001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
@@ -48,7 +47,7 @@ gpd.ad <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
   n <- length(data)
   fit <- 9999
   try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
-  if (!is.list(fit))
+  if(!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
@@ -61,22 +60,20 @@ gpd.ad <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
   i <- seq(1, n, 1)
   stat <- -n - (1/n)*sum((2*i - 1)*(log(newdata) + log(1 - rev(newdata))))
   if(bootstrap == TRUE) {
-    if(allowParallel==TRUE){
+    if(allowParallel==TRUE) {
       cl <- makeCluster(numCores)
-      fun <- function(cl){
+      fun <- function(cl) {
         parSapply(cl, 1:B, function(i,...) {gpd.adgen(n, theta)})
       }
       teststat <- fun(cl)
       stopCluster(cl)
-    }
-    else{
+    } else {
       teststat <- replicate(B, gpd.adgen(n, theta))
     }
     teststat <- teststat[!is.na(teststat)]
     B <- length(teststat)
     p <- (sum(teststat > stat) + 1) / (B + 2)
-  }
-  else{
+  } else {
     row <- which(rownames(ADQuantiles) == round(shape, 2))
     if(stat > ADQuantiles[row, 999]) {
       pvals <- -log(as.numeric(colnames(ADQuantiles[950:999])))
@@ -85,11 +82,11 @@ gpd.ad <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
       stat <- as.data.frame(stat)
       colnames(stat) <- c("x")
       p <- as.numeric(exp(-predict(y, stat)))
-    }
-    else{
+    } else {
       bound <- as.numeric(colnames(ADQuantiles)[which.max(stat < ADQuantiles[row,])])
-      if(bound == .999) p <- .999
-      else{
+      if(bound == .999) {
+        p <- .999
+      } else {
         lower <- ADQuantiles[row, which(colnames(ADQuantiles) == bound + 0.001)]
         upper <- ADQuantiles[row, which(colnames(ADQuantiles) == bound)]
         dif <- (upper - stat) / (upper - lower)

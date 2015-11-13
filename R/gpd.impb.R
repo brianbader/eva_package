@@ -4,7 +4,7 @@ gpd.imgen <- function(n, theta, inner) {
   x <- rgpd(n, loc = 0, scale = scale, shape = shape)
   fit1 <- 9999
   try(fit1 <- gpd.fit(x, nextremes = n, method = "mle", information = "expected"), silent = TRUE)
-  if(!is.list(fit1)){
+  if(!is.list(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -32,9 +32,9 @@ gpd.imgen <- function(n, theta, inner) {
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@references Dhaene, G., & Hoorelbeke, D. (2004). The information matrix test with bootstrap-based covariance matrix estimation. Economics Letters, 82(3), 341-347.
 #'@examples
-#'## Generate some data from GPD
-#'dat <- rgpd(200, 0, 1, 0.2)
-#'gpd.impb(dat, 50, 99)
+#'## Not run
+#'#x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
+#'#gpd.impb(x, 50, 99)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Estimate of theta for the initial dataset.
@@ -55,9 +55,9 @@ gpd.impb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   d <- colSums(u)
   stat <-  (1/n) * t(d) %*% v %*% d
   stat <- as.vector(stat)
-  if(allowParallel==TRUE){
+  if(allowParallel==TRUE) {
     cl <- makeCluster(numCores)
-    fun <- function(cl){
+    fun <- function(cl) {
       parSapply(cl, 1:outer, function(i,...) {gpd.imgen(n, theta, inner)})
     }
     teststat <- fun(cl)

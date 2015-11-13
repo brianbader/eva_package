@@ -14,8 +14,8 @@
 #'@return A matrix containing the thresholds used, the number of observations above each threshold, and the corresponding test statistics and p-values.
 #'@export
 gpdthresh.seqtests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"),
-                               nsim = NULL, inner = NULL, outer = NULL, information=c("observed", "expected"),
-                               allowParallel=FALSE, numCores=1) {
+                               nsim = NULL, inner = NULL, outer = NULL, information = c("observed", "expected"),
+                               allowParallel = FALSE, numCores = 1) {
   if(is.na(nextremes) && is.na(thresholds))
     stop("Enter either a set of thresholds or number of upper extremes")
   if(!is.na(nextremes) && !is.na(thresholds))

@@ -7,8 +7,8 @@
 #'@references Dhaene, G., & Hoorelbeke, D. (2004). The information matrix test with bootstrap-based covariance matrix estimation. Economics Letters, 82(3), 341-347.
 #'@examples
 #'## Generate some data from GPD
-#'dat <- rgpd(200, 0, 1, 0.2)
-#'gpd.imasym(dat, 50)
+#'x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
+#'gpd.imasym(x, 50)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.
@@ -20,7 +20,7 @@ gpd.imasym <- function(data, B, theta = NULL) {
   if(is.null(theta)) {
     fit <- 9999
     try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
-    if (!is.list(fit))
+    if(!is.list(fit))
       stop("Maximum likelihood failed to converge at initial step")
     scale <- fit$par.ests[1]
     shape <- fit$par.ests[2]

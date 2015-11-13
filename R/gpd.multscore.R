@@ -6,8 +6,8 @@
 #'@param theta Estimate for theta in the vector form (scale, shape). If NULL, uses probability weighted moments as an initial estimate.
 #'@param information To use observed (default) or expected information in the test.
 #'@examples
-#'data <- rgpd(100, 0, 1, 0.25)
-#'gpd.multscore(data, 1000)
+#'x <- rgpd(100, loc = 0, scale = 1, shape = 0.25)
+#'gpd.multscore(x, 1000)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.

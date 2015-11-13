@@ -10,8 +10,8 @@ num.decimals.max <- function(x) {
 #'@param data Data should be a numeric vector from the GEV distribution.
 #'@param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
 #'@examples
-#'data <- rgevr(500, 1, loc=0.5, scale=1, shape=0.3)
-#'result <- gevr.fit(data, "mps")
+#'x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
+#'result <- gevr.fit(x, "mps")
 #'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevr.fit' to be used with diagnostic plots.
 #'@export
 

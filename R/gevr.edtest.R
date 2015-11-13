@@ -6,10 +6,10 @@
 #'@param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, uses the MLE from the largest (r-1) order statistics.
 #'@examples
 #'## This will test if the GEV2 distribution fits the data.
-#'dat <- rgevr(100, 2, loc=0.5, scale=1, shape=0.5)
+#'x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.5)
 #'
 #'## Use the MLE from the GEV1 data by leaving theta input NULL.
-#'result <- gevr.edtest(dat)
+#'result <- gevr.edtest(x)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Value of theta used in the test.

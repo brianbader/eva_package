@@ -8,8 +8,8 @@
 #'@param allowParallel If method equals 'pbscore', should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
-#'data <- rgevr(200, 3, loc = 0.5, scale = 1, shape = 0.5)
-#'gevr.seqtests(data, method = "ed")
+#'x <- rgevr(200, 3, loc = 0.5, scale = 1, shape = 0.5)
+#'gevr.seqtests(x, method = "ed")
 #'@return A matrix containing the test statistics and p-value results of the sequential tests.
 #'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #'@export

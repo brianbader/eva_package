@@ -3,10 +3,9 @@ gevr.pbgen <- function(n, R, theta, information) {
   data1 <- as.matrix(data1)
   y1 <- 9999
   try(y1 <- gevr.fit(data1, method = "mle"), silent = TRUE)
-  if(!is.list(y1)){
+  if(!is.list(y1)) {
     teststat <- NA
-  }
-  else{
+  } else {
     theta1 <- y1$par.ests
     teststat <- gevrteststat(data1, theta1, information)
   }
@@ -23,9 +22,10 @@ gevr.pbgen <- function(n, R, theta, information) {
 #'@param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #'@param numCores If allowParallel is true, specify the number of cores to use.
 #'@examples
+#'## Not run
 #'## Generate some data from GEVr
-#'dat <- rgevr(200, 5, loc=0.5, scale=1, shape=0.5)
-#'gevr.pbscore(dat, 99)
+#'#x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.5)
+#'#gevr.pbscore(x, 99)
 #'@return statistic Test statistic.
 #'@return p.value P-value for the test.
 #'@return theta Initial value of theta used in the test.
@@ -43,15 +43,14 @@ gevr.pbscore <- function(data, B, information=c("observed", "expected"), allowPa
     stop("Maximum likelihood failed to converge at initial step")
   theta <- y$par.ests
   stat <- gevrteststat(data, theta, information)
-  if(allowParallel==TRUE){
+  if(allowParallel == TRUE) {
     cl <- makeCluster(numCores)
-    fun <- function(cl){
+    fun <- function(cl) {
       parSapply(cl, 1:B, function(i,...) {gevr.pbgen(n, R, theta, information)})
     }
     teststat <- fun(cl)
     stopCluster(cl)
-  }
-  else{
+  } else {
     teststat <- replicate(B, gevr.pbgen(n, R, theta, information))
   }
   teststat <- teststat[!is.na(teststat)]
