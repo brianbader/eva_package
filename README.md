@@ -4,7 +4,7 @@
 
 * ~~Need to vectorize gevr and gpd functions (at least for shape parameter)~~
 
-* Add interpolation option for AD and CVM tests
+* ~~Add interpolation option for AD and CVM tests~~
 
 * ~~Add pgev function for the univariate case and export qgev as a function~~
 
@@ -12,7 +12,7 @@
 
 * ~~Combine the ed and score sequential tests for GEV into one function~~
 
-* Add gpd return levels (profile likelihood and delta method)
+* ~~Add gpd return levels (profile likelihood and delta method)~~
 
 * Make sure likelihood density function is being referred to in all functions
 
@@ -20,4 +20,4 @@
 
 * Incorporate non-stationarity into the fitting and PB/ED tests
 
-* Make class objects for fits, and provide diagnostic plots
+* ~~Make class objects for fits, and provide diagnostic plots~~
