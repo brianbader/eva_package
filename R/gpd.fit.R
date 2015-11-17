@@ -111,7 +111,7 @@ gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c(
       if(cond1 || cond2) {
         out <- 1e+06
       } else {
-        cdf <- 1 - z^(-1/shape)
+        cdf <- pgpd(x, loc = 0, scale = scale, shape = shape)
         cdf <- sort(cdf)
         cdf <- c(0, cdf, 1)
         D <- diff(cdf)
