@@ -3,7 +3,7 @@ findthresh <- function(data, ne) {
   thresholds <- unique(data)
   indices <- match(data[ne], thresholds)
   indices <- pmin(indices + 1, length(thresholds))
-  thresholds[indices] - min(c(1e-10, abs(diff(data))))
+  thresholds[indices] - min(c(1e-10, 1/(10^num.decimals.max(data))))
 }
 
 #'Fits the generalized pareto distribution to data

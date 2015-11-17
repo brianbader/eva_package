@@ -1,8 +1,11 @@
 num.decimals.max <- function(x) {
-  stopifnot(class(x)=="numeric")
-  x <- sub("0+$","",x)
-  x <- sub("^.+[.]","",x)
-  max(nchar(x))
+  n <- length(x)
+  out <- rep(0, n)
+  for(i in 1:n) {
+    if((x[i] %% 1) != 0)
+      out[i] <- nchar(strsplit(sub('0+$', '', as.character(x[i])), ".", fixed=TRUE)[[1]][[2]])
+  }
+  max(out)
 }
 
 #'Fits generalized extreme value distribution (GEV) to block maxima data.
