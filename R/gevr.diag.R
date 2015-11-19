@@ -4,7 +4,7 @@ gevr.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
   levels <- matrix(0, length(p), 3)
   for(i in 1:nrow(levels)) {
-    y <- gevr.returnlevel(z, 1/p[i], conf = conf, method = method)
+    y <- gevr.rl(z, 1/p[i], conf = conf, method = method)
     levels[i, 1] <- y$Estimate
     levels[i, 2:3] <- y$CI
   }
@@ -84,21 +84,21 @@ gevr.hist <- function(z, j) {
 }
 
 
-#'Diagnostic plots for a fit to the GEVr distribution.
+#' Diagnostic plots for a fit to the GEVr distribution.
 #'
-#'@param z A class object returned from gevr.fit.
-#'@param conf Confidence level used in the return level plot.
-#'@param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
-#'@examples
-#'## Not run
-#'# x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
-#'# z <- gevr.fit(x)
-#'# gevr.diag(z)
-#'@return Provides return level plot and density, probability, and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal density for the estimated parameters.
-#'@details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
-#'@references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
-#'@references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
-#'@export
+#' @param z A class object returned from gevr.fit.
+#' @param conf Confidence level used in the return level plot.
+#' @param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
+#' @examples
+#' ## Not run
+#' # x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
+#' # z <- gevr.fit(x)
+#' # gevr.diag(z)
+#' @return Provides return level plot and density, probability, and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal density for the estimated parameters.
+#' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
+#' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
+#' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
+#' @export
 gevr.diag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
   oldpar <- par(ask = TRUE, mfcol = c(2, 2))

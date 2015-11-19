@@ -8,16 +8,17 @@ num.decimals.max <- function(x) {
   max(out)
 }
 
-#'Fits generalized extreme value distribution (GEV) to block maxima data.
+#' Parameter estimation for the GEVr distribution model
 #'
-#'@param data Data should be a numeric vector from the GEV distribution.
-#'@param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
-#'@examples
-#'x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
-#'result <- gevr.fit(x, "mps")
-#'@return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevr.fit' to be used with diagnostic plots.
-#'@export
-
+#' This function provides maximum likelihood estimation for the GEVr model, with the option of probability weighted moment and maximum product
+#' spacing estimation for block maxima (GEV1) data.
+#' @param data Data should be a matrix from the GEVr distribution.
+#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default. For r > 1, only mle can be used.
+#' @examples
+#' x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
+#' result <- gevr.fit(x, method = "mps")
+#' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevr.fit' to be used with diagnostic plots.
+#' @export
 gevr.fit <- function (data, method = c("mle", "mps", "pwm")) {
   data <- as.matrix(data)
   n <- nrow(data)

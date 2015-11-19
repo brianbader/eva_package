@@ -4,7 +4,7 @@ gpd.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, .999, seq(1, 100, by = 10))
   levels <- matrix(0, length(p), 3)
   for(i in 1:nrow(levels)) {
-    y <- gpd.returnlevel(z, 1/p[i], conf = conf, method = method)
+    y <- gpd.rl(z, 1/p[i], conf = conf, method = method)
     levels[i, 1] <- y$Estimate
     levels[i, 2:3] <- y$CI
   }
@@ -55,20 +55,20 @@ gpd.qq <- function(z) {
 }
 
 
-#'Diagnostic plots for a fit to the Generalized Pareto distribution
+#' Diagnostic plots for a fit to the Generalized Pareto distribution
 #'
-#'@param z A class object returned from gpd.fit.
-#'@param conf Confidence level used in the return level plot.
-#'@param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
-#'@examples
-#'## Not run
-#'# x <- rgpd(10000, loc = 0.5, scale = 1, shape = 0.1)
-#'# z <- gpd.fit(x, nextremes = 500)
-#'# gpd.diag(z)
-#'@return Provides return level, density, probability, and quantile plots for the GPD exceedances. The overlaid density is the 'true' density for the estimated parameters.
-#'@details See the reference for details on how return levels are calculated.
-#'@references Coles, S., Bawa, J., Trenner, L., & Dorazio, P. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
-#'@export
+#' @param z A class object returned from gpd.fit.
+#' @param conf Confidence level used in the return level plot.
+#' @param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
+#' @examples
+#' ## Not run
+#' # x <- rgpd(10000, loc = 0.5, scale = 1, shape = 0.1)
+#' # z <- gpd.fit(x, nextremes = 500)
+#' # gpd.diag(z)
+#' @return Provides return level, density, probability, and quantile plots for the GPD exceedances. The overlaid density is the 'true' density for the estimated parameters.
+#' @details See the reference for details on how return levels are calculated.
+#' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
+#' @export
 gpd.diag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
   oldpar <- par(ask = TRUE, mfcol = c(2, 2))

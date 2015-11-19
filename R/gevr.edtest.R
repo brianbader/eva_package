@@ -1,20 +1,20 @@
-#'GEVr Entropy Difference Test
+#' GEVr Entropy Difference Test
 #'
-#'Goodness-of-fit test for GEVr using the difference in likelihood between GEVr and GEV(r-1).
-#'This can be used sequentially to test for the choice of r.
-#'@param data Data should be contain n rows, each a GEVr observation.
-#'@param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, uses the MLE from the largest (r-1) order statistics.
-#'@examples
-#'## This will test if the GEV2 distribution fits the data.
-#'x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.5)
+#' Goodness-of-fit test for GEVr using the difference in likelihood between GEVr and GEV(r-1).
+#' This can be used sequentially to test for the choice of r.
+#' @param data Data should be contain n rows, each a GEVr observation.
+#' @param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, uses the MLE from the largest (r-1) order statistics.
+#' @examples
+#' ## This will test if the GEV2 distribution fits the data.
+#' x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.5)
 #'
-#'## Use the MLE from the GEV1 data by leaving theta input NULL.
-#'result <- gevr.edtest(x)
-#'@return statistic Test statistic.
-#'@return p.value P-value for the test.
-#'@return theta Value of theta used in the test.
-#'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
-#'@export
+#' ## Use the MLE from the GEV1 data by leaving theta input NULL.
+#' result <- gevr.edtest(x)
+#' @return statistic Test statistic.
+#' @return p.value P-value for the test.
+#' @return theta Value of theta used in the test.
+#' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
+#' @export
 gevr.edtest <- function(data, theta = NULL) {
   data <- as.matrix(data)
   R <- ncol(data)

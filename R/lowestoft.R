@@ -25,7 +25,9 @@
 #' data(lowestoft)
 #' gevr.seqtests(lowestoft, method = "ed")
 #' ## Not run
-#' ## Look at the difference in confidence intervals between r=1 and r=10
-#' #gevr.returnlevel(lowestoft[,1], 50, method = "profile")
-#' #gevr.returnlevel(lowestoft, 50, method = "profile")
+#' ## Look at the difference in confidence intervals between r = 1 and r = 10
+#' # z1 <- gevr.fit(lowestoft[, 1])
+#' # z2 <- gevr.fit(lowestoft)
+#' # gevr.rl(z1, 50, method = "profile")
+#' # gevr.rl(z2, 50, method = "profile")
 NULL

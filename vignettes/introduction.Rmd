@@ -73,8 +73,8 @@ period <- 250
 
 for(i in 1:10) {
   z <- gevr.fit(as.matrix(lowestoft[, 1:i]))
-  y1 <- gevr.returnlevel(z, period, conf = 0.95, method = "delta")
-  y2 <- gevr.returnlevel(z, period, conf = 0.95, method = "profile")
+  y1 <- gevr.rl(z, period, conf = 0.95, method = "delta")
+  y2 <- gevr.rl(z, period, conf = 0.95, method = "profile")
   result[i, 1] <- i
   result[i, 2] <- y1$Estimate
   result[i, 3:4] <- y1$CI

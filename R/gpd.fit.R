@@ -1,10 +1,8 @@
 findthresh <- function(data, ne) {
   data <- rev(sort(as.numeric(data)))
-  thresholds <- unique(data)
-  indices <- match(data[ne], thresholds)
-  indices <- pmin(indices + 1, length(thresholds))
-  thresholds[indices] - min(c(1e-10, 1/(10^num.decimals.max(data))))
+  data[ne] - min(min(abs(diff(data))[abs(diff(data)) > 0]), 1e-6)
 }
+
 
 #'Fits the generalized pareto distribution to data
 #'
@@ -111,7 +109,7 @@ gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c(
       if(cond1 || cond2) {
         out <- 1e+06
       } else {
-        cdf <- pgpd(x, loc = 0, scale = scale, shape = shape)
+        cdf <- pgpd(dat, loc = 0, scale = scale, shape = shape)
         cdf <- sort(cdf)
         cdf <- c(0, cdf, 1)
         D <- diff(cdf)
