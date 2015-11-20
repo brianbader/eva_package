@@ -1,5 +1,11 @@
+## S3 plot function for class gpdFit
+plot.gpdFit <- function(x, ...) {
+  gpdDiag(x, ...)
+}
+
+
 ## Returns matrix of indicators needed for the GPD IM Test
-gpd.ind <- function(data, theta) {
+gpdInd <- function(data, theta) {
   scale <- theta[1]
   shape <- theta[2]
   n <- length(data)
@@ -48,23 +54,22 @@ solve3by3 <- function(V) {
 }
 
 ## Helper function for gpd.imcov
-gpd.imcov.gen <- function(n, theta)
+gpdImCovGen <- function(n, theta)
 {
   scale <- theta[1]
   shape <- theta[2]
-  y <- rgpd(n, loc=0, scale=scale, shape=shape)
+  y <- rgpd(n, loc = 0, scale = scale, shape = shape)
   fit1 <- 9999
-  try(fit1 <- gpd.fit(y, nextremes=n, method="mle", information="expected"), silent = TRUE)
-  if(!is.list(fit1)){
+  try(fit1 <- gpdFit(y, nextremes = n, method = "mle", information = "expected"), silent = TRUE)
+  if(!is.list(fit1)) {
     temp <- rep(NA, 3)
-  }
-  else{
+  } else {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
     thresh1 <- min(y)
     y <- y - thresh1 + 0.000001
-    D1 <- gpd.ind(y, theta1)
+    D1 <- gpdInd(y, theta1)
     D1 <- colSums(D1) / sqrt(n)
     temp <- D1
   }
@@ -73,10 +78,9 @@ temp
 
 
 ## Function returns GPD bootstrapped indicator covariance matrix
-gpd.imcov <- function(data, B, theta)
-{
+gpdImCov<- function(data, B, theta) {
   n <- length(data)
-  temp <- t(replicate(B, gpd.imcov.gen(n, theta)))
+  temp <- t(replicate(B, gpdImCovGen(n, theta)))
   temp <- temp[complete.cases(temp),]
   B <- nrow(temp)
   Dbar <- colMeans(temp)
@@ -92,7 +96,7 @@ gpd.imcov <- function(data, B, theta)
 
 
 ## Returns expected inverse fisher information matrix
-gpdfisher <- function(data, theta) {
+gpdFisher <- function(data, theta) {
   scale <- theta[1]
   shape <- theta[2]
   n <- length(data)
@@ -105,7 +109,7 @@ gpdfisher <- function(data, theta) {
 
 
 ## Returns observed inverse fisher information matrix
-gpdfisherobs <- function(data, theta) {
+gpdFisherObs <- function(data, theta) {
   scale <- theta[1]
   shape <- theta[2]
   w <- 1 + (1/shape)
@@ -124,7 +128,7 @@ gpdfisherobs <- function(data, theta) {
 
 
 ## Outputs matrix with row contributions to score. Need to sum over the columns to get full score.
-gpdscorectb <- function(data, theta) {
+gpdScore <- function(data, theta) {
   scale <- theta[1]
   shape <- theta[2]
   n <- length(data)
@@ -140,15 +144,15 @@ gpdscorectb <- function(data, theta) {
 
 
 ## Returns test statistic for the score test
-gpdteststat <- function(data, theta, information) {
+gpdTestStat <- function(data, theta, information) {
   n <- length(data)
-  w <- gpdscorectb(data, theta)
+  w <- gpdScore(data, theta)
   w <- colSums(w)
   if(information == "observed") {
-    info <- gpdfisherobs(data, theta)
+    info <- gpdFisherObs(data, theta)
   }
   else{
-    info <- gpdfisher(data, theta)
+    info <- gpdFisher(data, theta)
   }
   score <- t(w) %*% info %*% w
   score <- as.vector(score)

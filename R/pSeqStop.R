@@ -6,13 +6,13 @@
 #' @references Bader B., Jun Y., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
 #' @examples
 #' x <- rgevr(500, 10, loc = 0.5, scale = 1, shape = 0.5)
-#' y <- gevr.seqtests(x, method = "ed")
-#' p.seqstop(rev(y$p.values))
+#' y <- gevrSeqTests(x, method = "ed")
+#' pSeqStop(rev(y$p.values))
 #' @return StrongStop Vector of ordered p-values adjusted for the familywise error rate.
 #' @return ForwardStop Vector of ordered p-values adjusted for the false discovery rate.
 #' @return UnAdjusted Vector of non-transformed p-values.
 #' @export
-p.seqstop <- function(p) {
+pSeqStop <- function(p) {
   m <- length(p)
   int <- seq(1, m, 1)
   pFDR <- cumsum(-log(1-p[int])) / int

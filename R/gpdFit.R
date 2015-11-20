@@ -4,20 +4,20 @@ findthresh <- function(data, ne) {
 }
 
 
-#'Fits the generalized pareto distribution to data
+# 'Fits the generalized pareto distribution to data
 #'
-#'The base code for this function is taken from the R package evir. See citation below. The addition here includes estimation via Maximum Product Spacings (MPS).
-#'@param data Data should be a numeric vector from the GPD distribution.
-#'@param threshold A threshold value (either this or the number of extremes must be given, but not both).
-#'@param nextremes Number of upper extremes to be used.
-#'@param npp Length of each period (typically year). Is used in return level estimation. Defaults to 365.
-#'@param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
-#'@param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
-#'@return A list describing the fit, including parameter estimates and standard errors.
-#'@references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
-#'@export
+#' The base code for this function is taken from the R package evir. See citation below. The addition here includes estimation via Maximum Product Spacings (MPS).
+#' @param data Data should be a numeric vector from the GPD distribution.
+#' @param threshold A threshold value (either this or the number of extremes must be given, but not both).
+#' @param nextremes Number of upper extremes to be used.
+#' @param npp Length of each period (typically year). Is used in return level estimation. Defaults to 365.
+#' @param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
+#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
+#' @return A class object 'gpdFit' describing the fit, including parameter estimates and standard errors.
+#' @references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
+#' @export
 
-gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("mle", "mps", "pwm"),
+gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("mle", "mps", "pwm"),
                     information = c("observed", "expected")) {
   data <- as.numeric(data)
   n <- length(data)
@@ -70,7 +70,7 @@ gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c(
       cond1 <- scale <= 0
       cond2 <- (shape <= 0) && (max(dat) > (-scale/shape))
       if (cond1 || cond2) {
-        out <- 1e+06
+        out <- .Machine$double.xmax
       } else {
         out <- - sum(dgpd(dat, loc = 0, scale = scale, shape = shape, log.d = TRUE))
       }
@@ -107,15 +107,14 @@ gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c(
       cond1 <- scale <= 0
       cond2 <- (shape <= 0) && (max(dat) > (-scale/shape))
       if(cond1 || cond2) {
-        out <- 1e+06
+        out <- .Machine$double.xmax
       } else {
         cdf <- pgpd(dat, loc = 0, scale = scale, shape = shape)
         cdf <- sort(cdf)
         cdf <- c(0, cdf, 1)
         D <- diff(cdf)
-        ## Check if any values are zero due to rounding and adjust
-        len <- num.decimals.max(cdf)
-        D <- ifelse(D==0, 1/(2*(10^len)), D)
+        ## Check if any differences are zero due to rounding and adjust
+        D <- ifelse(D == 0, .Machine$double.eps, D)
         out <- - sum(log(D))
       }
       out
@@ -145,7 +144,7 @@ gpd.fit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c(
 
   names(out$par.ests) <- c("Scale", "Shape")
   names(out$par.ses) <- c("Scale", "Shape")
-  class(out) <- "gpd.fit"
+  class(out) <- "gpdFit"
   out
 }
 

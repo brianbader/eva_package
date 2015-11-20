@@ -58,7 +58,7 @@ This package includes data generation (rgevr), density function (dgevr), fitting
 
 ```{r seqtesting}
 data(lowestoft)
-gevr.seqtests(lowestoft, method = "ed")
+gevrSeqTests(lowestoft, method = "ed")
 ```
 
 The entropy difference test fails to reject for any value of $r$ from 1 to 10. A common quantity of interest in extreme value analysis are the $m$-year return levels, which can be thought of as the average maximum value that will be seen over a period of $m$ years. For the Lowestoft data, the 250 year sea level return levels, with 95% confidence intervals are plotting using for $r$ from 1 to 10. The advantage of using more top order statistics can be seen in the plots below. The width of the intervals decrease by over two-thirds from $r=1$ to $r=10$. Similarly decreases can be seen in the estimated parameters.
@@ -72,9 +72,9 @@ result <- matrix(0, 20, 4)
 period <- 250
 
 for(i in 1:10) {
-  z <- gevr.fit(as.matrix(lowestoft[, 1:i]))
-  y1 <- gevr.rl(z, period, conf = 0.95, method = "delta")
-  y2 <- gevr.rl(z, period, conf = 0.95, method = "profile")
+  z <- gevrFit(as.matrix(lowestoft[, 1:i]))
+  y1 <- gevrRl(z, period, conf = 0.95, method = "delta")
+  y2 <- gevrRl(z, period, conf = 0.95, method = "profile")
   result[i, 1] <- i
   result[i, 2] <- y1$Estimate
   result[i, 3:4] <- y1$CI

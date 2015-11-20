@@ -1,10 +1,10 @@
-gpd.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
+gpdRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
   p <- c(seq(0.001, 0.01, by = 0.005), seq(0.01, 0.09, by = 0.01), 0.1, 0.2, 0.3, 0.4, 0.5,
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, .999, seq(1, 100, by = 10))
   levels <- matrix(0, length(p), 3)
   for(i in 1:nrow(levels)) {
-    y <- gpd.rl(z, 1/p[i], conf = conf, method = method)
+    y <- gpdRl(z, 1/p[i], conf = conf, method = method)
     levels[i, 1] <- y$Estimate
     levels[i, 2:3] <- y$CI
   }
@@ -19,7 +19,7 @@ gpd.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
 }
 
 
-gpd.hist <- function(z) {
+gpdHist <- function(z) {
   excess <- z$data[z$data > z$threshold]
   h <- hist(excess, plot = FALSE)
   x <- seq(min(h$breaks), max(h$breaks), (max(h$breaks) - min(h$breaks))/1000)
@@ -31,7 +31,7 @@ gpd.hist <- function(z) {
 }
 
 
-gpd.pp <- function(z) {
+gpdPP <- function(z) {
   excess <- z$data[z$data > z$threshold]
   n <- length(excess)
   Series <- seq(1, n, 1) / (n+1)
@@ -43,7 +43,7 @@ gpd.pp <- function(z) {
 }
 
 
-gpd.qq <- function(z) {
+gpdQQ <- function(z) {
   excess <- z$data[z$data > z$threshold]
   n <- length(excess)
   Series <- seq(1, n, 1) / (n+1)
@@ -63,19 +63,20 @@ gpd.qq <- function(z) {
 #' @examples
 #' ## Not run
 #' # x <- rgpd(10000, loc = 0.5, scale = 1, shape = 0.1)
-#' # z <- gpd.fit(x, nextremes = 500)
-#' # gpd.diag(z)
+#' # z <- gpdFit(x, nextremes = 500)
+#' # gpdDiag(z)
 #' @return Provides return level, density, probability, and quantile plots for the GPD exceedances. The overlaid density is the 'true' density for the estimated parameters.
 #' @details See the reference for details on how return levels are calculated.
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @export
-gpd.diag <- function(z, conf = 0.95, method = c("delta", "profile")) {
+gpdDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
-  oldpar <- par(ask = TRUE, mfcol = c(2, 2))
-  try(gpd.rlplot(z, conf, method), silent = TRUE)
-  try(gpd.hist(z), silent = TRUE)
-  try(gpd.pp(z), silent = TRUE)
-  try(gpd.qq(z), silent = TRUE)
+  opar <- par(ask = TRUE, mfcol = c(2, 2))
+  try(gpdRlPlot(z, conf, method), silent = TRUE)
+  try(gpdHist(z), silent = TRUE)
+  try(gpdPP(z), silent = TRUE)
+  try(gpdQQ(z), silent = TRUE)
+  par(opar)
 }
 
 

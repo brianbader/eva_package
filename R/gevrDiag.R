@@ -1,10 +1,10 @@
-gevr.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
+gevrRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
   p <- c(seq(0.001, 0.01, by = 0.005), seq(0.01, 0.09, by = 0.01), 0.1, 0.2, 0.3, 0.4, 0.5,
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
   levels <- matrix(0, length(p), 3)
   for(i in 1:nrow(levels)) {
-    y <- gevr.rl(z, 1/p[i], conf = conf, method = method)
+    y <- gevrRl(z, 1/p[i], conf = conf, method = method)
     levels[i, 1] <- y$Estimate
     levels[i, 2:3] <- y$CI
   }
@@ -18,7 +18,7 @@ gevr.rlplot <- function(z, conf = 0.95, method = c("delta", "profile")) {
 }
 
 
-pgev.marg <- function(data, theta, j){
+pgevMarg <- function(data, theta, j){
   data <- as.matrix(data)
   n <- nrow(data)
   p <- rep(0, n)
@@ -33,7 +33,7 @@ pgev.marg <- function(data, theta, j){
 
 
 ## Provide it the fitted object and which marginal statistic to plot (j)
-gevr.pp <- function(z, j) {
+gevrPP <- function(z, j) {
   n <- z$n
   Series <- seq(1, n, 1) / (n+1)
   p <- pgev.marg(z$data[,j], z$par.ests, j)
@@ -44,15 +44,15 @@ gevr.pp <- function(z, j) {
 }
 
 
-gevr.qq <- function(z, j) {
+gevrQQ <- function(z, j) {
   n <- z$n
-  qgev.marg <- function(x, q) {
-    q - pgev.marg(x, z$par.ests, j)
+  qgevMarg <- function(x, q) {
+    q - pgevMarg(x, z$par.ests, j)
   }
   emp <- rep(0, n)
   Series <- seq(1, n, 1) / (n+1)
   for(i in 1:n) {
-    emp[i] <- uniroot(qgev.marg, interval = c(min(z$data[, j]) - 2, max(z$data[, j]) + 2), q = Series[i])$root
+    emp[i] <- uniroot(qgevMarg, interval = c(min(z$data[, j]) - 2, max(z$data[, j]) + 2), q = Series[i])$root
   }
   plot(sort(z$data[, j]), emp, xlab = "Empirical", ylab = "Model",
        xlim = c(min(z$data[, j], emp), max(z$data[, j], emp)), ylim = c(min(z$data[, j], emp), max(z$data[, j], emp)))
@@ -61,7 +61,7 @@ gevr.qq <- function(z, j) {
 }
 
 
-dgev.marg <- function(x, j, loc = loc, scale = scale, shape = shape) {
+dgevMarg <- function(x, j, loc = loc, scale = scale, shape = shape) {
   if(length(shape) == 1)
     shape <- rep(shape, max(length(x), length(loc), length(scale)))
   w <- (x - loc) / scale
@@ -70,13 +70,13 @@ dgev.marg <- function(x, j, loc = loc, scale = scale, shape = shape) {
 }
 
 
-gevr.hist <- function(z, j) {
+gevrHist <- function(z, j) {
   h <- hist(z$data[, j], plot = FALSE)
   x <- seq(min(h$breaks), max(h$breaks), (max(h$breaks) - min(h$breaks))/1000)
   if(j == 1)
     y <- dgevr(x, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
   if(j > 1)
-    y <- dgev.marg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
+    y <- dgevMarg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
   hist(z$data[, j], freq = FALSE, ylim = c(0, max(max(h$density), max(y))),
        xlab = "x", ylab = "Density", main = paste("Density Plot, j=", j, sep = ""))
   points(z$data[, j], rep(0, length(z$data[, j])))
@@ -92,22 +92,23 @@ gevr.hist <- function(z, j) {
 #' @examples
 #' ## Not run
 #' # x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
-#' # z <- gevr.fit(x)
-#' # gevr.diag(z)
+#' # z <- gevrFit(x)
+#' # gevrDiag(z)
 #' @return Provides return level plot and density, probability, and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal density for the estimated parameters.
 #' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
 #' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
 #' @export
-gevr.diag <- function(z, conf = 0.95, method = c("delta", "profile")) {
+gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
-  oldpar <- par(ask = TRUE, mfcol = c(2, 2))
-  try(gevr.rlplot(z, conf, method), silent = TRUE)
+  opar <- par(ask = TRUE, mfcol = c(2, 2))
+  try(gevrRlPlot(z, conf, method), silent = TRUE)
   for(i in 1:z$R) {
-    try(gevr.hist(z, i), silent = TRUE)
-    try(gevr.pp(z, i), silent = TRUE)
-    try(gevr.qq(z, i), silent = TRUE)
+    try(gevrHist(z, i), silent = TRUE)
+    try(gevrPP(z, i), silent = TRUE)
+    try(gevrQQ(z, i), silent = TRUE)
   }
+  par(opar)
 }
 
 

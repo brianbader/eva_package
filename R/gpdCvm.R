@@ -1,7 +1,7 @@
-gpd.cvmgen <- function(n, theta) {
+gpdCvmGen <- function(n, theta) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- 9999
-  try(fit1 <- gpd.fit(data1, nextremes = n, method="mle"), silent = TRUE)
+  try(fit1 <- gpdFit(data1, nextremes = n, method="mle"), silent = TRUE)
   if(!is.list(fit1)) {
     teststat <- NA
   } else {
@@ -17,35 +17,36 @@ gpd.cvmgen <- function(n, theta) {
 }
 
 
-#'Generalized Pareto Distribution Cramer-von Mises Test
+#' Generalized Pareto Distribution Cramer-von Mises Test
 #'
-#'Cramer-von Mises goodness-of-fit test for the Generalized Pareto distribution. Critical values are generated via parametric bootstrap.
-#'@param data Data should be in vector form, assumed to be from the GP distribution.
-#'@param bootstrap Should bootstrap be used to obtain pvalues for the test? By default, a table of critical values is used via interpolation. See details.
-#'@param B Number of bootstrap replicates.
-#'@param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
-#'@param numCores If allowParallel is true, specify the number of cores to use.
-#'@references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the generalized Pareto distribution. Technometrics, 43(4), 478-484.
-#'@examples
-#'## Generate some data from GPD
-#'x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
-#'gpd.cvm(x)
-#'@details A table of critical values were generated via Monte Carlo simulation for shape
-#'parameters -0.4 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
-#'.001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
-#'on the critical values for the tail of the distribution (.950 to .999 upper percentiles). This
-#'regression provides a method to extrapolate to arbitrarily small p-values.
-#'@return statistic Test statistic.
-#'@return p.value P-value for the test.
-#'@return theta Estimated value of theta for the initial data.
-#'@import parallel
-#'@export
-gpd.cvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
+#' Cramer-von Mises goodness-of-fit test for the Generalized Pareto distribution. Critical values are generated via parametric bootstrap.
+#' @param data Data should be in vector form, assumed to be from the GP distribution.
+#' @param bootstrap Should bootstrap be used to obtain pvalues for the test? By default, a table of critical values is used via interpolation. See details.
+#' @param B Number of bootstrap replicates.
+#' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
+#' @param numCores If allowParallel is true, specify the number of cores to use.
+#' @references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the generalized Pareto distribution. Technometrics, 43(4), 478-484.
+#' @examples
+#' ## Generate some data from GPD
+#' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
+#' gpdCvm(x)
+#' @details A table of critical values were generated via Monte Carlo simulation for shape
+#' parameters -0.4 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
+#' .001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
+#' on the critical values for the tail of the distribution (.950 to .999 upper percentiles). This
+#' regression provides a method to extrapolate to arbitrarily small p-values.
+#' @return statistic Test statistic.
+#' @return p.value P-value for the test.
+#' @return theta Estimated value of theta for the initial data.
+#' @import parallel
+#' @export
+
+gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
   if(bootstrap == TRUE & is.null(B))
     stop("Must specify some number of boostrap samples")
   n <- length(data)
   fit <- 9999
-  try(fit <- gpd.fit(data, nextremes = n, method = "mle"), silent = TRUE)
+  try(fit <- gpdFit(data, nextremes = n, method = "mle"), silent = TRUE)
   if(!is.list(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
@@ -62,12 +63,12 @@ gpd.cvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, n
     if(allowParallel==TRUE) {
       cl <- makeCluster(numCores)
       fun <- function(cl) {
-        parSapply(cl, 1:B, function(i,...) {gpd.cvmgen(n, theta)})
+        parSapply(cl, 1:B, function(i,...) {gpdCvmGen(n, theta)})
       }
       teststat <- fun(cl)
       stopCluster(cl)
     } else {
-      teststat <- replicate(B, gpd.cvmgen(n, theta))
+      teststat <- replicate(B, gpdCvmGen(n, theta))
     }
     teststat <- teststat[!is.na(teststat)]
     B <- length(teststat)

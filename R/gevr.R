@@ -1,25 +1,25 @@
-#'The GEVr Distribution
+#' The GEVr Distribution
 #'
-#'Random number generation (rgevr) and density (dgevr) functions for the GEVr distribution with parameters loc, scale, and shape.
-#'Also, quantile function (qgev) and cumulative distribution function (pgev) for the GEV1 distribution.
-#'@param x Vector or matrix of observations. If x is a matrix, each row is taken to be a new observation.
-#'@param q Vector of quantiles.
-#'@param p Vector of probabilities.
-#'@param n Number of observations
-#'@param r Number of order statistics for each observation.
-#'@param log.d Logical: Whether or not to return the log density. (FALSE by default)
-#'@param lower.tail Logical: If TRUE (default), probabilities are P[X <= x] otherwise, P[X > x].
-#'@param log.p Logical: If TRUE, probabilities p are given as log(p). (FALSE by default)
-#'@param loc Location parameter.
-#'@param scale Scale parameter.
-#'@param shape Shape Parameter.
-#'@details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n. Note
-#'that currently the quantile and cdf functions are only for the GEV1 distribution.
+#' Random number generation (rgevr) and density (dgevr) functions for the GEVr distribution with parameters loc, scale, and shape.
+#' Also, quantile function (qgev) and cumulative distribution function (pgev) for the GEV1 distribution.
+#' @param x Vector or matrix of observations. If x is a matrix, each row is taken to be a new observation.
+#' @param q Vector of quantiles.
+#' @param p Vector of probabilities.
+#' @param n Number of observations
+#' @param r Number of order statistics for each observation.
+#' @param log.d Logical: Whether or not to return the log density. (FALSE by default)
+#' @param lower.tail Logical: If TRUE (default), probabilities are P[X <= x] otherwise, P[X > x].
+#' @param log.p Logical: If TRUE, probabilities p are given as log(p). (FALSE by default)
+#' @param loc Location parameter.
+#' @param scale Scale parameter.
+#' @param shape Shape Parameter.
+#' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n. Note
+#' that currently the quantile and cdf functions are only for the GEV1 distribution.
 #'
-#'@rdname gevr
-#'@export
-dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE)
-{
+#' @rdname gevr
+#' @export
+#'
+dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE) {
   x <- as.matrix(x)
   r <- ncol(x)
   if (min(scale) <= 0)
@@ -45,8 +45,7 @@ dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE)
 
 #'@rdname gevr
 #'@export
-rgevr <- function(n, r, loc = 0, scale = 1, shape = 0)
-{
+rgevr <- function(n, r, loc = 0, scale = 1, shape = 0) {
   if (min(scale) <= 0)
     stop("invalid scale")
   if ((length(loc) != 1 & length(scale) != 1) | (length(loc) != 1 & length(shape) != 1) | (length(scale) != 1 & length(shape) != 1))
@@ -63,8 +62,7 @@ rgevr <- function(n, r, loc = 0, scale = 1, shape = 0)
 
 #'@rdname gevr
 #'@export
-qgev <- function(p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE)
-{
+qgev <- function(p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE) {
   p <- as.vector(p)
   if (log.p)
     p <- exp(p)
@@ -85,8 +83,7 @@ qgev <- function(p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FA
 
 #'@rdname gevr
 #'@export
-pgev <- function (q, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE)
-{
+pgev <- function (q, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE) {
   q <- as.vector(q)
   if (min(scale) <= 0)
     stop("invalid scale")

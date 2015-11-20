@@ -9,13 +9,13 @@
 #' x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.5)
 #'
 #' ## Use the MLE from the GEV1 data by leaving theta input NULL.
-#' result <- gevr.edtest(x)
+#' result <- gevrEd(x)
 #' @return statistic Test statistic.
 #' @return p.value P-value for the test.
 #' @return theta Value of theta used in the test.
 #' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
 #' @export
-gevr.edtest <- function(data, theta = NULL) {
+gevrEd <- function(data, theta = NULL) {
   data <- as.matrix(data)
   R <- ncol(data)
   if(R==1) stop("R must be at least two")
@@ -23,7 +23,7 @@ gevr.edtest <- function(data, theta = NULL) {
   if(is.null(theta)) {
     data1 <- as.matrix(data[, 1:(R-1)])
     y <- 9999
-    try(y <- gevr.fit(data1, method = "mle"), silent = TRUE)
+    try(y <- gevrFit(data1, method = "mle"), silent = TRUE)
     if (!is.list(y))
       stop("Maximum likelihood failed to converge at initial step")
     theta <- y$par.ests

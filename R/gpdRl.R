@@ -12,14 +12,14 @@
 #' @examples
 #' x <- rgpd(5000, loc = 0, scale = 1, shape = 0.1)
 #' ## Compute 50-period return level.
-#' z <- gpd.fit(x, nextremes = 200)
-#' gpd.rl(z, 50, method = "delta")
+#' z <- gpdFit(x, nextremes = 200)
+#' gpdRl(z, 50, method = "delta")
 #' @return Estimate Estimated m-period return level.
 #' @return CI Confidence interval for the m-period return level.
 #' @return Period The period length used.
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
-gpd.rl <- function(z, period, conf = .95, method = c("delta", "profile"),
+gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
                              opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
   method <- match.arg(method)
   m <- period * z$npp
@@ -43,19 +43,19 @@ gpd.rl <- function(z, period, conf = .95, method = c("delta", "profile"),
   } else {
     opt <- match.arg(opt)
     sol <- z$par.ests[2]
-    gpd.lik <- function(shape, xp) {
+    gpdLik <- function(shape, xp) {
       if(shape == 0) {
         scale <- (xp - z$threshold) / log(m * z$rate)
       } else {
         scale <- ((xp - z$threshold) * shape) / ((m * z$rate)^shape - 1)
       }
       if(scale <= 0) {
-        out <- 1e6
+        out <- .Machine$double.xmax
       } else {
         out <- dgpd(z$data[z$data > z$threshold], loc = z$threshold, scale = scale, shape = shape, log.d = TRUE)
         out <- - sum(out)
         if(out == Inf)
-          out <- 1e6
+          out <- .Machine$double.xmax
       }
       out
     }
@@ -63,14 +63,14 @@ gpd.rl <- function(z, period, conf = .95, method = c("delta", "profile"),
     prof <- function(xp) {
       lmax <- dgpd(z$data[z$data > z$threshold], loc = z$threshold, scale = z$par.ests[1], shape = z$par.ests[2], log.d = TRUE)
       lmax <- sum(lmax)
-      yes <- optim(sol, gpd.lik, method = opt, xp = xp)
+      yes <- optim(sol, gpdLik, method = opt, xp = xp)
       sol <- yes$par
       lci <- -yes$value
       2*(lmax-lci) - cutoff
     }
     prof <- Vectorize(prof)
-    suppressWarnings(out1 <- uniroot(prof, c(est - 1e-6, est), extendInt="downX"))
-    suppressWarnings(out2 <- uniroot(prof, c(est, est + 1e-6), extendInt="upX"))
+    suppressWarnings(out1 <- uniroot(prof, c(est - (10 * .Machine$double.neg.eps), est), extendInt="downX"))
+    suppressWarnings(out2 <- uniroot(prof, c(est, est + (10 * .Machine$double.eps)), extendInt="upX"))
     CI <- c(min(out1$root, out2$root), max(out1$root, out2$root))
   }
   out <- list(est, CI, period)

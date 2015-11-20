@@ -8,9 +8,10 @@
 #' @param npoints The number of points to interpolate with. Defaults to 100.
 #' @examples ## Not run
 #' @examples ## x <- rgpd(500, loc = 0, scale = 1, shape = 0.1)
-#' @examples ## mrl.plot(x, thresholds = c(2))
+#' @examples ## mrlPlot(x, thresholds = c(2))
 #' @export
-mrl.plot <- function(data, thresholds = NULL, conf = .95, npoints = 100) {
+
+mrlPlot <- function(data, thresholds = NULL, conf = .95, npoints = 100) {
   umin <- min(data)
   umax <- findthresh(data, 2)
   y <- yu <- yl <- rep(0, npoints)

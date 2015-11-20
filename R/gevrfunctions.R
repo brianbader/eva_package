@@ -3,8 +3,15 @@ nzsh <- function(x, shape){
   exp((-1/shape) * log1p(x*shape))
 }
 
+
+## S3 plot function for class gevrFit
+plot.gevrFit <- function(x, ...) {
+  gevrDiag(x, ...)
+}
+
+
 ## Returns expected inverse fisher information matrix for GEV distribution.
-gevrfisher <- function(dat, theta) {
+gevrFisher <- function(dat, theta) {
   R <- ncol(dat)
   N <- nrow(dat)
   loc <- theta[1]
@@ -24,7 +31,7 @@ gevrfisher <- function(dat, theta) {
 }
 
 ## Returns observed inverse fisher information matrix for GEV distribution.
-gevrfisherobs <- function(dat, theta) {
+gevrFisherObs <- function(dat, theta) {
   R <- ncol(dat)
   N <- nrow(dat)
   loc <- theta[1]
@@ -56,7 +63,7 @@ gevrfisherobs <- function(dat, theta) {
 }
 
 ## Outputs matrix with row contributions to score. Need to sum over the columns to get full score.
-gevrscorectb <- function(dat, theta) {
+gevrScore <- function(dat, theta) {
   R <- ncol(dat)
   N <- nrow(dat)
   loc <- theta[1]
@@ -74,16 +81,16 @@ gevrscorectb <- function(dat, theta) {
 }
 
 ## Calculates the score test statistic
-gevrteststat <- function(dat, theta, information) {
+gevrTestStat <- function(dat, theta, information) {
   R <- ncol(dat)
   N <- nrow(dat)
-  u <- gevrscorectb(dat, theta)
+  u <- gevrScore(dat, theta)
   u <- colSums(u)
   if(information == "observed"){
-    info <- gevrfisherobs(dat, theta)
+    info <- gevrFisherObs(dat, theta)
   }
   else{
-    info <- gevrfisher(dat, theta)
+    info <- gevrFisher(dat, theta)
   }
   stat <- (1/N) * t(u) %*% info %*% u
   stat <- as.vector(stat)
