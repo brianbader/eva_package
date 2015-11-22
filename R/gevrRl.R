@@ -64,8 +64,8 @@ gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
       2*(lmax-lci) - cutoff
     }
     prof <- Vectorize(prof)
-    suppressWarnings(out1 <- uniroot(prof, c(est - (10 * .Machine$double.neg.eps), est), extendInt="downX"))
-    suppressWarnings(out2 <- uniroot(prof, c(est, est + (10 * .Machine$double.eps)), extendInt="upX"))
+    suppressWarnings(out1 <- uniroot(prof, c(est - 1e-6, est), extendInt="downX"))
+    suppressWarnings(out2 <- uniroot(prof, c(est, est + 1e-6), extendInt="upX"))
     CI <- c(min(out1$root, out2$root), max(out1$root, out2$root))
   }
   out <- list(est, CI, period)

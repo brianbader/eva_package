@@ -13,12 +13,13 @@ findthresh <- function(data, ne) {
 #' @param npp Length of each period (typically year). Is used in return level estimation. Defaults to 365.
 #' @param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
 #' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
+#' @param start Option to provide a set of starting parameters to optim; a vector of scale and shape. Otherwise, the routine attempts to find good starting parameters.
 #' @return A class object 'gpdFit' describing the fit, including parameter estimates and standard errors.
 #' @references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
 #' @export
 
 gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("mle", "mps", "pwm"),
-                    information = c("observed", "expected")) {
+                    information = c("expected", "observed"), start = NULL) {
   data <- as.numeric(data)
   n <- length(data)
   if(is.na(nextremes) && is.na(threshold))
@@ -41,7 +42,8 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
   a1 <- mean(sort(excess) * (1 - pvec))
   shape0 <- 2 - a0/(a0 - 2 * a1)
   scale0 <- (2 * a0 * a1)/(a0 - 2 * a1)
-  start <- c(scale0, shape0)
+  if(is.null(start))
+    start <- c(sqrt(6 * var(excess))/pi, 0.1)
 
   if(method == "pwm") {
     denom <- Nu * (1 - 2 * shape0) * (3 - 2 * shape0)
@@ -103,7 +105,6 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     mps_est <- function(theta, dat) {
       scale <- theta[1]
       shape <- theta[2]
-      z <- 1 + shape*(dat / scale)
       cond1 <- scale <= 0
       cond2 <- (shape <= 0) && (max(dat) > (-scale/shape))
       if(cond1 || cond2) {

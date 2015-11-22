@@ -36,7 +36,7 @@ pgevMarg <- function(data, theta, j){
 gevrPP <- function(z, j) {
   n <- z$n
   Series <- seq(1, n, 1) / (n+1)
-  p <- pgev.marg(z$data[,j], z$par.ests, j)
+  p <- pgevMarg(z$data[,j], z$par.ests, j)
   p <- sort(p)
   plot(p, Series, xlab = "Empirical", ylab = "Model", xlim = c(0,1), ylim = c(0,1))
   title(paste("Probability Plot, ", "j=", j, sep = ""))

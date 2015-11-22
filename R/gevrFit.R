@@ -4,12 +4,13 @@
 #' spacing estimation for block maxima (GEV1) data.
 #' @param data Data should be a matrix from the GEVr distribution.
 #' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default. For r > 1, only mle can be used.
+#' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts to find good starting parameters.
 #' @examples
 #' x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
 #' result <- gevrFit(x, method = "mps")
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevrFit' to be used with diagnostic plots.
 #' @export
-gevrFit <- function (data, method = c("mle", "mps", "pwm")) {
+gevrFit <- function (data, method = c("mle", "mps", "pwm"), start = NULL) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
@@ -35,15 +36,18 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm")) {
   w0 <- moments[1]
   w1 <- moments[2]
   w2 <- moments[3]
-  shape <- uniroot(f = y, interval = c(-5, +5), w0 = w0, w1 = w1,
+  shape0 <- uniroot(f = y, interval = c(-5, +5), w0 = w0, w1 = w1,
                 w2 = w2)$root
-  scale <- (2 * w1 - w0) * shape/gamma(1 - shape)/(2^shape - 1)
-  loc <- w0 + scale * (1 - gamma(1 - shape))/shape
-  theta <- c(loc, scale, shape)
+  scale0 <- (2 * w1 - w0) * shape0/gamma(1 - shape0)/(2^shape0 - 1)
+  loc0 <- w0 + scale0 * (1 - gamma(1 - shape0))/shape0
+  theta0 <- c(loc0, scale0, shape0)
+
+  if(is.null(start))
+    start <- theta0
 
   if(method == "pwm"){
     out <- list(n = n, data = data, type = "pwm",
-                par.ests = theta, par.ses = NA, varcov = NA,
+                par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R)
     names(out$par.ests) <- c("Location", "Scale", "Shape")
   }
@@ -61,7 +65,7 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm")) {
       }
       out
     }
-    fit <- optim(theta, negloglik, hessian = TRUE, x = data)
+    fit <- optim(start, negloglik, hessian = TRUE, x = data)
     if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
@@ -93,7 +97,7 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm")) {
       }
       out
     }
-    fit <- optim(theta, negloglik, hessian = TRUE, x = data)
+    fit <- optim(start, negloglik, hessian = TRUE, x = data)
     if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par

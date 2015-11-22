@@ -96,7 +96,7 @@ gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
     }
   }
   names(theta) <- c("scale", "shape")
-  out <- list(stat, p, theta)
+  out <- list(as.numeric(stat), as.numeric(p), theta)
   names(out) <- c("statistic", "p.value", "theta")
   out
 }
