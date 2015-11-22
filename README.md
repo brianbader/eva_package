@@ -1,23 +1,18 @@
 ## **To Do:** ##
 
-* ~~Add better handling for the likelihood and data generation as shape -> 0~~
+* Create summary method for gevrFit and gpdFit objects
 
-* ~~Need to vectorize gevr and gpd functions (at least for shape parameter)~~
+* Add Moran's and Northrop's score test (for GPD)
 
-* ~~Add interpolation option for AD and CVM tests~~
+* Add sequential threshold parameter plot
 
-* ~~Add pgev function for the univariate case and export qgev as a function~~
+* Update all other functions with 'nzsh' function to handle shape close to zero
 
-* ~~Need to check MPS estimators for gpdfit function (gives weird results when shape < 0)~~
-
-* ~~Combine the ed and score sequential tests for GEV into one function~~
-
-* ~~Add gpd return levels (profile likelihood and delta method)~~
+* Add expected covariance matrix for probability weighted moments estimation in GEV1 case
 
 * Make sure likelihood density function is being referred to in all functions
 
-* Add more examples and descriptions
+* Add more examples and descriptions, update vignette
 
 * Incorporate non-stationarity into the fitting and PB/ED tests
 
-* ~~Make class objects for fits, and provide diagnostic plots~~

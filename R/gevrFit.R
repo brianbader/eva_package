@@ -4,17 +4,20 @@
 #' spacing estimation for block maxima (GEV1) data.
 #' @param data Data should be a matrix from the GEVr distribution.
 #' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default. For r > 1, only mle can be used.
+#' @param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts to find good starting parameters.
 #' @examples
 #' x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
 #' result <- gevrFit(x, method = "mps")
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevrFit' to be used with diagnostic plots.
 #' @export
-gevrFit <- function (data, method = c("mle", "mps", "pwm"), start = NULL) {
+gevrFit <- function (data, method = c("mle", "mps", "pwm"),
+                     information = c("expected", "observed"), start = NULL) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
   method <- match.arg(method)
+  information <- match.arg(information)
   if(R > 1 & (method == "mps" | method == "pwm"))
      stop("If R > 1, MLE must be used")
   ## Probability Weighted Moments
@@ -45,7 +48,7 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm"), start = NULL) {
   if(is.null(start))
     start <- theta0
 
-  if(method == "pwm"){
+  if(method == "pwm") {
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R)
@@ -69,7 +72,11 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm"), start = NULL) {
     if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
-    varcov <- solve(fit$hessian)
+    if(information == "observed") {
+      varcov <- solve(fit$hessian)
+    } else {
+      varcov <- gevrFisher(data, par.ests) / n
+    }
     par.ses <- sqrt(diag(varcov))
     out <- list(n = n, data = data, type = "mle",
                 par.ests = par.ests, par.ses = par.ses, varcov = varcov,
@@ -101,7 +108,11 @@ gevrFit <- function (data, method = c("mle", "mps", "pwm"), start = NULL) {
     if (fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
-    varcov <- solve(fit$hessian)
+    if(information == "observed") {
+      varcov <- solve(fit$hessian)
+    } else {
+      varcov <- gevrFisher(data, par.ests) / n
+    }
     par.ses <- sqrt(diag(varcov))
     out <- list(n = n, data = as.matrix(data), type = "mps",
                 par.ests = par.ests, par.ses = par.ses, varcov = varcov,

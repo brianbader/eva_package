@@ -17,6 +17,7 @@
 #' @return Estimate Estimated m-period return level.
 #' @return CI Confidence interval for the m-period return level.
 #' @return Period The period length used.
+#' @return ConfLevel The confidence level used.
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
 gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
@@ -73,7 +74,7 @@ gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
     suppressWarnings(out2 <- uniroot(prof, c(est, est + 1e-6), extendInt="upX"))
     CI <- c(min(out1$root, out2$root), max(out1$root, out2$root))
   }
-  out <- list(est, CI, period)
-  names(out) <- c("Estimate", "CI", "Period")
+  out <- list(est, CI, period, conf)
+  names(out) <- c("Estimate", "CI", "Period", "ConfLevel")
   out
 }

@@ -11,9 +11,10 @@ plot.gevrFit <- function(x, ...) {
 
 
 ## Returns expected inverse fisher information matrix for GEV distribution.
-gevrFisher <- function(dat, theta) {
-  R <- ncol(dat)
-  N <- nrow(dat)
+gevrFisher <- function(data, theta) {
+  data <- as.matrix(data)
+  R <- ncol(data)
+  N <- nrow(data)
   loc <- theta[1]
   scale <- theta[2]
   shape <- theta[3]
@@ -31,13 +32,14 @@ gevrFisher <- function(dat, theta) {
 }
 
 ## Returns observed inverse fisher information matrix for GEV distribution.
-gevrFisherObs <- function(dat, theta) {
-  R <- ncol(dat)
-  N <- nrow(dat)
+gevrFisherObs <- function(data, theta) {
+  data <- as.matrix(data)
+  R <- ncol(data)
+  N <- nrow(data)
   loc <- theta[1]
   scale <- theta[2]
   shape <- theta[3]
-  z <- (dat - loc) / scale
+  z <- (data - loc) / scale
   A <- rowSums( -((1+shape)/scale)*((1+shape*z)^(-1)) - ((shape*(1+shape))/scale^2)*((1+shape*z)^(-2)) )
   A <- A + (1/scale)*((1+shape*z[,R])^((-1/shape)-1)) + (1/scale^2)*(1+shape)*((1+shape*z[,R])^((-1/shape)-2))
   A <- sum(A)
@@ -63,13 +65,14 @@ gevrFisherObs <- function(dat, theta) {
 }
 
 ## Outputs matrix with row contributions to score. Need to sum over the columns to get full score.
-gevrScore <- function(dat, theta) {
-  R <- ncol(dat)
-  N <- nrow(dat)
+gevrScore <- function(data, theta) {
+  data <- as.matrix(data)
+  R <- ncol(data)
+  N <- nrow(data)
   loc <- theta[1]
   scale <- theta[2]
   shape <- theta[3]
-  z <- (dat - loc) / scale
+  z <- (data - loc) / scale
   dLoc <- rowSums((((1/shape)+1)*shape) / (scale*(1+shape*z)))
   dLoc <- dLoc - ((1+(shape*z[,R]))^(-1/shape)) / (scale*(1+(shape*z[,R])))
   dScale <- rowSums((((1/shape)+1)*shape*z) / (scale*(1+shape*z)))
@@ -81,16 +84,17 @@ gevrScore <- function(dat, theta) {
 }
 
 ## Calculates the score test statistic
-gevrTestStat <- function(dat, theta, information) {
-  R <- ncol(dat)
-  N <- nrow(dat)
-  u <- gevrScore(dat, theta)
+gevrTestStat <- function(data, theta, information) {
+  data <- as.matrix(data)
+  R <- ncol(data)
+  N <- nrow(data)
+  u <- gevrScore(data, theta)
   u <- colSums(u)
   if(information == "observed"){
-    info <- gevrFisherObs(dat, theta)
+    info <- gevrFisherObs(data, theta)
   }
   else{
-    info <- gevrFisher(dat, theta)
+    info <- gevrFisher(data, theta)
   }
   stat <- (1/N) * t(u) %*% info %*% u
   stat <- as.vector(stat)
