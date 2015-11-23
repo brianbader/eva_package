@@ -65,13 +65,13 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
                 information = information, npp = npp, rate = 1 - p.less.thresh)
   }
 
-  if (method == "mle") {
+  if(method == "mle") {
     mle_est <- function(theta, dat) {
       scale <- theta[1]
       shape <- theta[2]
       cond1 <- scale <= 0
       cond2 <- (shape <= 0) && (max(dat) > (-scale/shape))
-      if (cond1 || cond2) {
+      if(cond1 || cond2) {
         out <- .Machine$double.xmax
       } else {
         out <- - sum(dgpd(dat, loc = 0, scale = scale, shape = shape, log.d = TRUE))
@@ -101,7 +101,7 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
                 npp = npp,  rate = 1 - p.less.thresh)
   }
 
-  if (method == "mps") {
+  if(method == "mps") {
     mps_est <- function(theta, dat) {
       scale <- theta[1]
       shape <- theta[2]
@@ -121,7 +121,7 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
       out
     }
     fit <- optim(start, mps_est, hessian = TRUE, dat = excess)
-    if (fit$convergence)
+    if(fit$convergence)
       warning("optimization may not have succeeded")
     par.ests <- fit$par
     converged <- fit$convergence

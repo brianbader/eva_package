@@ -4,9 +4,15 @@ nzsh <- function(x, shape){
 }
 
 
-## S3 plot function for class gevrFit
+## S3 functions for class gevrFit
 plot.gevrFit <- function(x, ...) {
   gevrDiag(x, ...)
+}
+
+
+summary.gevrFit <- function(object, ...) {
+  object$data <- NULL
+  object
 }
 
 

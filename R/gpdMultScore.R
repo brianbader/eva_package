@@ -13,7 +13,7 @@
 #' @return theta Value of theta used in the test.
 #' @export
 #'
-gpdMultScore <- function(data, B, theta = NULL, information = c("observed", "expected")) {
+gpdMultScore <- function(data, B, theta = NULL, information = c("expected", "observed")) {
   n <- length(data)
   information <-  match.arg(information)
   if(is.null(theta)) {

@@ -1,7 +1,5 @@
 ## **To Do:** ##
 
-* Create summary method for gevrFit and gpdFit objects
-
 * Add Moran's and Northrop's score test (for GPD)
 
 * Add sequential threshold parameter plot

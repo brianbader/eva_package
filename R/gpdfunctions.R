@@ -1,6 +1,12 @@
-## S3 plot function for class gpdFit
+## S3 functions for class gpdFit
 plot.gpdFit <- function(x, ...) {
   gpdDiag(x, ...)
+}
+
+
+summary.gpdFit <- function(object, ...) {
+  object$data <- NULL
+  object
 }
 
 
@@ -54,21 +60,18 @@ solve3by3 <- function(V) {
 }
 
 ## Helper function for gpd.imcov
-gpdImCovGen <- function(n, theta)
-{
+gpdImCovGen <- function(n, theta) {
   scale <- theta[1]
   shape <- theta[2]
   y <- rgpd(n, loc = 0, scale = scale, shape = shape)
-  fit1 <- 9999
-  try(fit1 <- gpdFit(y, nextremes = n, method = "mle", information = "expected"), silent = TRUE)
-  if(!is.list(fit1)) {
+  fit1 <- tryCatch(gpdFit(y, nextremes = n, method = "mle", information = "expected"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit1)) {
     temp <- rep(NA, 3)
   } else {
     scale1 <- fit1$par.ests[1]
     shape1 <- fit1$par.ests[2]
     theta1 <- c(scale1, shape1)
-    thresh1 <- min(y)
-    y <- y - thresh1 + 0.000001
+    y <- y - findthresh(y, n)
     D1 <- gpdInd(y, theta1)
     D1 <- colSums(D1) / sqrt(n)
     temp <- D1
@@ -81,7 +84,7 @@ temp
 gpdImCov<- function(data, B, theta) {
   n <- length(data)
   temp <- t(replicate(B, gpdImCovGen(n, theta)))
-  temp <- temp[complete.cases(temp),]
+  temp <- temp[complete.cases(temp), ]
   B <- nrow(temp)
   Dbar <- colMeans(temp)
   temp[,1] <- temp[,1] - Dbar[1]
@@ -150,8 +153,7 @@ gpdTestStat <- function(data, theta, information) {
   w <- colSums(w)
   if(information == "observed") {
     info <- gpdFisherObs(data, theta)
-  }
-  else{
+  } else {
     info <- gpdFisher(data, theta)
   }
   score <- t(w) %*% info %*% w

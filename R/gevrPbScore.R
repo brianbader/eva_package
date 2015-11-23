@@ -1,9 +1,8 @@
 gevrPbGen <- function(n, R, theta, information) {
   data1 <- rgevr(n, R, theta[1], theta[2], theta[3])
   data1 <- as.matrix(data1)
-  y1 <- 9999
-  try(y1 <- gevrFit(data1, method = "mle"), silent = TRUE)
-  if(!is.list(y1)) {
+  y1 <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(y1)) {
     teststat <- NA
   } else {
     theta1 <- y1$par.ests
@@ -33,14 +32,13 @@ gevrPbGen <- function(n, R, theta, information) {
 #' @import parallel
 #' @export
 
-gevrPbScore <- function(data, B, information=c("observed", "expected"), allowParallel=FALSE, numCores=1) {
+gevrPbScore <- function(data, B, information = c("observed", "expected"), allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
   information <- match.arg(information)
-  y <- 9999
-  try(y <- gevrFit(data, method = "mle"), silent = TRUE)
-  if (!is.list(y))
+  y <- tryCatch(gevrFit(data, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(y))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- y$par.ests
   stat <- gevrTestStat(data, theta, information)

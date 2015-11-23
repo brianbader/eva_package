@@ -1,8 +1,7 @@
 gpdPbGen <- function(n, theta, information) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
-  fit1 <- 9999
-  try(fit1 <- gpdFit(data1, nextremes = n, method = "mle"), silent = TRUE)
-  if(!is.list(fit1)) {
+  fit1 <- tryCatch(gpdFit(data1, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -34,12 +33,11 @@ gpdPbGen <- function(n, theta, information) {
 #' @import parallel
 #' @export
 
-gpdPbScore <- function(data, B, information = c("observed", "expected"), allowParallel = FALSE, numCores = 1) {
+gpdPbScore <- function(data, B, information = c("expected", "observed"), allowParallel = FALSE, numCores = 1) {
   n <- length(data)
   information <-  match.arg(information)
-  fit <- 9999
-  try(fit <- gpdFit(data, nextremes = n, method = "mle"), silent = TRUE)
-  if(!is.list(fit))
+  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
@@ -47,7 +45,7 @@ gpdPbScore <- function(data, B, information = c("observed", "expected"), allowPa
   thresh <- findthresh(data, n)
   data <- data - thresh
   stat <- gpdTestStat(data, theta, information)
-  if(allowParallel==TRUE) {
+  if(allowParallel == TRUE) {
     cl <- makeCluster(numCores)
     fun <- function(cl) {
       parSapply(cl, 1:B, function(i,...) {gpdPbGen(n, theta, information)})

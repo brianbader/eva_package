@@ -35,7 +35,7 @@ gevrSeqTests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multsco
       result[i, 4:6] <- fit$theta
     }
   } else {
-    if(R==1)
+    if(R == 1)
       stop("R must be at least two")
     result <- matrix(0, R-1, 6)
     for(i in 2:R) {

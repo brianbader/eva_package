@@ -14,32 +14,29 @@
 #' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #' @export
 
-gevrMultScore <- function(data, B, theta = NULL, information=c("observed", "expected")) {
+gevrMultScore <- function(data, B, theta = NULL, information = c("observed", "expected")) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
-  information <-  match.arg(information)
+  information <- match.arg(information)
   if(is.null(theta)) {
-    y <- 9999
     if(R == 1) {
-      try(y <- gevrFit(data, method = "pwm"), silent = TRUE)
-      if (!is.list(y))
+      y <- tryCatch(gevrFit(data, method = "pwm"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+      if(is.na(y))
         stop("PWM failed to converge at initial step")
       theta <- y$par.ests
-    }
-    else{
-      try(y <- gevrFit(as.matrix(data[, 1:(R-1)]), method = "mle"), silent = TRUE)
-      if (!is.list(y))
+    } else {
+      y <- tryCatch(gevrFit(as.matrix(data[, 1:(R-1)]), method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+      if(is.na(y))
         stop("Maximum likelihood failed to converge at initial step")
       theta <- y$par.ests
     }
   }
   u <- gevrScore(data, theta)
   w <- colSums(u)
-  if(information == "observed"){
+  if(information == "observed") {
     info <- gevrFisherObs(data, theta)
-  }
-  else{
+  } else {
     info <- gevrFisher(data, theta)
   }
   stat <- (1/n) * t(w) %*% info %*% w

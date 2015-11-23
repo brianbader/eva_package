@@ -1,8 +1,7 @@
 gpdAdGen <- function(n, theta) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
-  fit1 <- 9999
-  try(fit1 <- gpdFit(data1, nextremes = n, method="mle"), silent = TRUE)
-  if(!is.list(fit1)) {
+  fit1 <- tryCatch(gpdFit(data1, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -12,7 +11,7 @@ gpdAdGen <- function(n, theta) {
     newdata1 <- pgpd(data1, loc = thresh1, scale = scale1, shape = shape1)
     newdata1 <- sort(newdata1)
     i <- seq(1, n, 1)
-    teststat <- -n - (1/n)*sum((2*i - 1)*(log(newdata1) + log(1 - rev(newdata1))))
+    teststat <- -n - (1/n)*sum((2*i - 1)*(log(newdata1) + log1p(-rev(newdata1))))
   }
   teststat
 }
@@ -46,9 +45,8 @@ gpdAd <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, num
   if(bootstrap == TRUE & is.null(B))
     stop("Must specify some number of boostrap samples")
   n <- length(data)
-  fit <- 9999
-  try(fit <- gpdFit(data, nextremes = n, method = "mle"), silent = TRUE)
-  if(!is.list(fit))
+  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
@@ -59,7 +57,7 @@ gpdAd <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, num
   newdata <- pgpd(data, loc = thresh, scale = scale, shape = shape)
   newdata <- sort(newdata)
   i <- seq(1, n, 1)
-  stat <- -n - (1/n)*sum((2*i - 1)*(log(newdata) + log(1 - rev(newdata))))
+  stat <- -n - (1/n)*sum((2*i - 1)*(log(newdata) + log1p(-rev(newdata))))
   if(bootstrap == TRUE) {
     if(allowParallel==TRUE) {
       cl <- makeCluster(numCores)

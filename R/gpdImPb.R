@@ -2,9 +2,8 @@ gpdImGen <- function(n, theta, inner) {
   scale <- theta[1]
   shape <- theta[2]
   x <- rgpd(n, loc = 0, scale = scale, shape = shape)
-  fit1 <- 9999
-  try(fit1 <- gpdFit(x, nextremes = n, method = "mle", information = "expected"), silent = TRUE)
-  if(!is.list(fit1)) {
+  fit1 <- tryCatch(gpdFit(x, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -44,9 +43,8 @@ gpdImGen <- function(n, theta, inner) {
 
 gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   n <- length(data)
-  fit <- 9999
-  try(fit <- gpdFit(data, nextremes = n, method = "mle"), silent = TRUE)
-  if (!is.list(fit))
+  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+  if(is.na(fit))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- c(fit$par.ests[1], fit$par.ests[2])
   thresh <- findthresh(data, n)
@@ -56,7 +54,7 @@ gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   d <- colSums(u)
   stat <-  (1/n) * t(d) %*% v %*% d
   stat <- as.vector(stat)
-  if(allowParallel==TRUE) {
+  if(allowParallel == TRUE) {
     cl <- makeCluster(numCores)
     fun <- function(cl) {
       parSapply(cl, 1:outer, function(i,...) {gpdImGen(n, theta, inner)})

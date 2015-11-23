@@ -18,9 +18,8 @@
 gpdImAsym <- function(data, B, theta = NULL) {
   n <- length(data)
   if(is.null(theta)) {
-    fit <- 9999
-    try(fit <- gpdFit(data, nextremes = n, method = "mle"), silent = TRUE)
-    if(!is.list(fit))
+    fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
+    if(is.na(fit))
       stop("Maximum likelihood failed to converge at initial step")
     scale <- fit$par.ests[1]
     shape <- fit$par.ests[2]
