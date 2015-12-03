@@ -22,8 +22,8 @@ gevrEd <- function(data, theta = NULL) {
   n <- nrow(data)
   if(is.null(theta)) {
     data1 <- as.matrix(data[, 1:(R-1)])
-    y <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-    if(is.na(y))
+    y <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+    if(is.null(y))
       stop("Maximum likelihood failed to converge at initial step")
     theta <- y$par.ests
   }

@@ -1,7 +1,7 @@
 gpdPbGen <- function(n, theta, information) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
-  fit1 <- tryCatch(gpdFit(data1, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(fit1)) {
+  fit1 <- tryCatch(gpdFit(data1, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -20,7 +20,7 @@ gpdPbGen <- function(n, theta, information) {
 #' Parametric bootstrap score test procedure to assess goodness-of-fit to the Generalized Pareto distribution.
 #' @param data Data should be in vector form.
 #' @param B Number of bootstrap replicates.
-#' @param information To use observed (default) or expected information in the test.
+#' @param information To use expected (default) or observed information in the test.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @examples
@@ -36,8 +36,8 @@ gpdPbGen <- function(n, theta, information) {
 gpdPbScore <- function(data, B, information = c("expected", "observed"), allowParallel = FALSE, numCores = 1) {
   n <- length(data)
   information <-  match.arg(information)
-  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(fit))
+  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(fit))
     stop("Maximum likelihood failed to converge at initial step")
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]

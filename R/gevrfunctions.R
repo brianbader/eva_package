@@ -96,10 +96,9 @@ gevrTestStat <- function(data, theta, information) {
   N <- nrow(data)
   u <- gevrScore(data, theta)
   u <- colSums(u)
-  if(information == "observed"){
+  if(information == "observed") {
     info <- gevrFisherObs(data, theta)
-  }
-  else{
+  } else {
     info <- gevrFisher(data, theta)
   }
   stat <- (1/N) * t(u) %*% info %*% u

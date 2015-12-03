@@ -4,7 +4,7 @@
 #' @param data Data should be contain n rows, each a GEVr observation.
 #' @param theta Estimate for theta in the vector form (loc, scale, shape). If NULL, an initial estimate is provided using PWM.
 #' @param B Number of bootstrap replicates.
-#' @param information To use observed (default) or expected information in the test.
+#' @param information To use expected (default) or observed information in the test.
 #' @examples
 #' x <- rgevr(500, 5, loc = 0.5, scale = 1, shape = 0.3)
 #' result <- gevrMultScore(x, 1000)
@@ -14,20 +14,20 @@
 #' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #' @export
 
-gevrMultScore <- function(data, B, theta = NULL, information = c("observed", "expected")) {
+gevrMultScore <- function(data, B, theta = NULL, information = c("expected", "observed")) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
   information <- match.arg(information)
   if(is.null(theta)) {
     if(R == 1) {
-      y <- tryCatch(gevrFit(data, method = "pwm"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-      if(is.na(y))
+      y <- tryCatch(gevrFit(data, method = "pwm"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+      if(is.null(y))
         stop("PWM failed to converge at initial step")
       theta <- y$par.ests
     } else {
-      y <- tryCatch(gevrFit(as.matrix(data[, 1:(R-1)]), method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-      if(is.na(y))
+      y <- tryCatch(gevrFit(as.matrix(data[, 1:(R-1)]), method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+      if(is.null(y))
         stop("Maximum likelihood failed to converge at initial step")
       theta <- y$par.ests
     }

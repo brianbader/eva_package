@@ -64,8 +64,8 @@ gpdImCovGen <- function(n, theta) {
   scale <- theta[1]
   shape <- theta[2]
   y <- rgpd(n, loc = 0, scale = scale, shape = shape)
-  fit1 <- tryCatch(gpdFit(y, nextremes = n, method = "mle", information = "expected"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(fit1)) {
+  fit1 <- tryCatch(gpdFit(y, nextremes = n, method = "mle", information = "expected"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(fit1)) {
     temp <- rep(NA, 3)
   } else {
     scale1 <- fit1$par.ests[1]

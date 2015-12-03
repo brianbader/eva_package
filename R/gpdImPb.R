@@ -2,8 +2,8 @@ gpdImGen <- function(n, theta, inner) {
   scale <- theta[1]
   shape <- theta[2]
   x <- rgpd(n, loc = 0, scale = scale, shape = shape)
-  fit1 <- tryCatch(gpdFit(x, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(fit1)) {
+  fit1 <- tryCatch(gpdFit(x, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(fit1)) {
     teststat <- NA
   } else {
     scale1 <- fit1$par.ests[1]
@@ -43,8 +43,8 @@ gpdImGen <- function(n, theta, inner) {
 
 gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   n <- length(data)
-  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(fit))
+  fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(fit))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- c(fit$par.ests[1], fit$par.ests[2])
   thresh <- findthresh(data, n)

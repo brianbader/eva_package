@@ -1,8 +1,8 @@
 gevrPbGen <- function(n, R, theta, information) {
   data1 <- rgevr(n, R, theta[1], theta[2], theta[3])
   data1 <- as.matrix(data1)
-  y1 <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(y1)) {
+  y1 <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(y1)) {
     teststat <- NA
   } else {
     theta1 <- y1$par.ests
@@ -17,7 +17,7 @@ gevrPbGen <- function(n, R, theta, information) {
 #' Parametric bootstrap score test procedure to assess goodness-of-fit to the GEVr distribution.
 #' @param data Data should be contain n rows, each a GEVr observation.
 #' @param B Number of bootstrap replicates.
-#' @param information To use observed (default) or expected information in the test.
+#' @param information To use expected (default) or observed information in the test.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @examples
@@ -32,13 +32,13 @@ gevrPbGen <- function(n, R, theta, information) {
 #' @import parallel
 #' @export
 
-gevrPbScore <- function(data, B, information = c("observed", "expected"), allowParallel = FALSE, numCores = 1) {
+gevrPbScore <- function(data, B, information = c("expected", "observed"), allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
   information <- match.arg(information)
-  y <- tryCatch(gevrFit(data, method = "mle"), error = function(w) {return(NA)}, warning = function(w) {return(NA)})
-  if(is.na(y))
+  y <- tryCatch(gevrFit(data, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+  if(is.null(y))
     stop("Maximum likelihood failed to converge at initial step")
   theta <- y$par.ests
   stat <- gevrTestStat(data, theta, information)

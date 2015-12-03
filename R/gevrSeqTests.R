@@ -4,7 +4,7 @@
 #' @param data Data should be contain n rows, each a GEVr observation.
 #' @param method Which test to run: ED test (ed), multiplier (multscore) or parametric bootstrap (pbscore) score test.
 #' @param nsim If method equals 'pbscore' or 'multscore', the number of bootstrap simulations to use.
-#' @param information To use observed (default) or expected information in the score tests.
+#' @param information To use expected (default) or observed information in the score tests.
 #' @param allowParallel If method equals 'pbscore', should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @examples
@@ -14,7 +14,7 @@
 #' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
 #' @export
 
-gevrSeqTests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("observed", "expected"),
+gevrSeqTests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("expected", "observed"),
                               allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)
   R <- ncol(data)
