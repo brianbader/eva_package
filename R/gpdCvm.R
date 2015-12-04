@@ -30,7 +30,7 @@ gpdCvmGen <- function(n, theta) {
 #' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
 #' gpdCvm(x)
 #' @details A table of critical values were generated via Monte Carlo simulation for shape
-#' parameters -0.4 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
+#' parameters -0.5 to 1.0 by 0.1, which provides p-values via log-linear interpolation from
 #' .001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
 #' on the critical values for the tail of the distribution (.950 to .999 upper percentiles). This
 #' regression provides a method to extrapolate to arbitrarily small p-values.
@@ -50,7 +50,7 @@ gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
   scale <- fit$par.ests[1]
   shape <- fit$par.ests[2]
   theta <- c(scale, shape)
-  if(bootstrap == FALSE & (shape < -0.4 | shape > 1))
+  if(bootstrap == FALSE & shape > 1)
     stop("Estimated parameters are outside the table range, please use the bootstrap version")
   thresh <- findthresh(data, n)
   newdata <- pgpd(data, loc = thresh, scale = scale, shape = shape)
@@ -72,7 +72,7 @@ gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
     B <- length(teststat)
     p <- (sum(teststat > stat) + 1) / (B + 2)
   } else {
-    row <- which(rownames(CVMQuantiles) == round(shape, 2))
+    row <- which(rownames(CVMQuantiles) == max(round(shape, 2), -0.5))
     if(stat > CVMQuantiles[row, 999]) {
       pvals <- -log(as.numeric(colnames(CVMQuantiles[950:999])))
       x <- as.numeric(CVMQuantiles[row, 950:999])

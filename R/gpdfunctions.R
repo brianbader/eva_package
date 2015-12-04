@@ -1,3 +1,20 @@
+
+## Functions to generate system data
+# setwd("E:/MyPapers/GPD Tests/R Scripts")
+# ADQuantiles <- read.csv("AD_Quantiles.csv", header = TRUE)
+# CVMQuantiles <- read.csv("CVM_Quantiles.csv", header = TRUE)
+# ADQuantiles <- ADQuantiles[, -1]
+# CVMQuantiles <- CVMQuantiles[, -1]
+# colnames(ADQuantiles) <- round(rev(seq(.001, .999, .001)), 3)
+# colnames(CVMQuantiles) <- round(rev(seq(.001, .999, .001)), 3)
+# rownames(ADQuantiles) <- round(seq( -0.5, 1, 0.01), 2)
+# rownames(CVMQuantiles) <- round(seq( -0.5, 1, 0.01), 2)
+# setwd("E:/MyPapers/EVA Package")
+# devtools::use_data(ADQuantiles, CVMQuantiles, internal = TRUE)
+
+
+
+
 ## S3 functions for class gpdFit
 plot.gpdFit <- function(x, ...) {
   gpdDiag(x, ...)
