@@ -18,7 +18,7 @@ gevrRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
 }
 
 
-pgevMarg <- function(data, theta, j){
+pgevMarg <- function(data, theta, j) {
   data <- as.matrix(data)
   n <- nrow(data)
   p <- rep(0, n)

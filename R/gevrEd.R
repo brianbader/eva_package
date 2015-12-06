@@ -18,7 +18,8 @@
 gevrEd <- function(data, theta = NULL) {
   data <- as.matrix(data)
   R <- ncol(data)
-  if(R == 1) stop("R must be at least two")
+  if(R == 1)
+    stop("R must be at least two")
   n <- nrow(data)
   if(is.null(theta)) {
     data1 <- as.matrix(data[, 1:(R-1)])

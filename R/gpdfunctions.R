@@ -13,8 +13,6 @@
 # devtools::use_data(ADQuantiles, CVMQuantiles, internal = TRUE)
 
 
-
-
 ## S3 functions for class gpdFit
 plot.gpdFit <- function(x, ...) {
   gpdDiag(x, ...)

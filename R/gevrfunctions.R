@@ -1,6 +1,6 @@
 ## Helper function to handle (1 + x*shape)^(-1/shape) as shape -> 0
-nzsh <- function(x, shape){
-  exp((-1/shape) * log1p(x*shape))
+nzsh <- function(x, shape) {
+  exp((-1/shape) * log1p(x * shape))
 }
 
 
@@ -37,6 +37,7 @@ gevrFisher <- function(data, theta) {
   info
 }
 
+
 ## Returns observed inverse fisher information matrix for GEV distribution.
 gevrFisherObs <- function(data, theta) {
   data <- as.matrix(data)
@@ -47,28 +48,29 @@ gevrFisherObs <- function(data, theta) {
   shape <- theta[3]
   z <- (data - loc) / scale
   A <- rowSums( -((1+shape)/scale)*((1+shape*z)^(-1)) - ((shape*(1+shape))/scale^2)*((1+shape*z)^(-2)) )
-  A <- A + (1/scale)*((1+shape*z[,R])^((-1/shape)-1)) + (1/scale^2)*(1+shape)*((1+shape*z[,R])^((-1/shape)-2))
+  A <- A + (1/scale) * nzsh(z[,R], shape)^(-1) + (1/scale^2) * (1+shape) * nzsh(z[,R], shape)^(-2)
   A <- sum(A)
   B <- rowSums( ((1+shape)/(scale^2))*((1+shape*z)^(-1)) - ((shape*(1+shape))/scale^2)*z*((1+shape*z)^(-2)) )
-  B <- B - (1/(scale^2))*((1+shape*z[,R])^((-1/shape)-1)) + (1/scale^2)*(1+shape)*z[,R]*((1+shape*z[,R])^((-1/shape)-2))
+  B <- B - (1/(scale^2)) * nzsh(z[,R], shape)^(-1) + (1/scale^2) * (1+shape) * z[,R] * nzsh(z[,R], shape)^(-2)
   B <- sum(B)
   C <- rowSums( (scale^(-1))*((1+shape*z)^(-1)) - ((1+shape)/scale)*z*((1+shape*z)^(-2)) )
-  C <- C - (1/scale)*(1/shape^2)*((1+shape*z[,R])^((-1/shape)-1))*log(1+shape*z[,R]) - ((1+shape)/(-1*scale*shape))*z[,R]*((1+shape*z[,R])^((-1/shape)-2))
+  C <- C - (1/scale) * (1/shape^2) * nzsh(z[,R], shape)^(-1) * log(1+shape*z[,R]) - ((1+shape)/(-1*scale*shape)) * z[,R] * nzsh(z[,R], shape)^(-2)
   C <- sum(C)
   D <- rowSums( (2*(1+shape)/scale^2)*(z/(1+shape*z)) - (shape*(1+shape)/scale^2)*((z/(1+shape*z))^2) )
-  D <- D - (R/scale^2) - (2/scale^2)*z[,R]*((1+shape*z[,R])^((-1/shape)-1)) +  ((1+shape)/scale^2)*(z[,R]^2)*((1+shape*z[,R])^((-1/shape)-2))
+  D <- D - (R/scale^2) - (2/scale^2) * z[,R] * nzsh(z[,R], shape)^(-1) +  ((1+shape)/scale^2) * z[,R]^2 * nzsh(z[,R], shape)^(-2)
   D <- sum(D)
   E <- rowSums( (1/scale)*(z/(1+shape*z)) - ((1+shape)/scale)*((z/(1+shape*z))^2) )
-  E <- E - (1/scale)*(1/shape^2)*((1+shape*z[,R])^((-1/shape)-1))*z[,R]*log(1+shape*z[,R]) - ((1+shape)/(-1*scale*shape))*(z[,R]^2)*((1+shape*z[,R])^((-1/shape)-2))
+  E <- E - (1/scale) * (1/shape^2) * nzsh(z[,R], shape)^(-1) * z[,R] * log(1+shape*z[,R]) - ((1+shape)/(-1*scale*shape)) * z[,R]^2 * nzsh(z[,R], shape)^(-2)
   E <- sum(E)
-  F <- rowSums(  (2/shape^3)*log(1+shape*z) - (2/shape^2)*(z/(1+shape*z)) - ((1+shape)/shape)*((z/(1+shape*z))^2)  )
-  F <- F - (2/shape^3)*((1+shape*z[,R])^(-1/shape))*log(1+shape*z[,R]) + (2/shape^2)*z[,R]*((1+shape*z[,R])^((-1/shape)-1)) + ((1+shape)/shape^2)*(z[,R]^2)*((1+shape*z[,R])^((-1/shape)-2)) + (1/shape^4)*((1+shape*z[,R])^(-1/shape))*((log(1+shape*z[,R]))^2)  - (2/shape^3)*z[,R]*((1+shape*z[,R])^((-1/shape)-1))*log(1+shape*z[,R])
+  F <- rowSums( (2/shape^3)*log(1+shape*z) - (2/shape^2)*(z/(1+shape*z)) - ((1+shape)/shape)*((z/(1+shape*z))^2) )
+  F <- F - (2/shape^3) * nzsh(z[,R], shape) * log(1+shape*z[,R]) + (2/shape^2) * z[,R] * nzsh(z[,R], shape)^(-1) + ((1+shape)/shape^2) * z[,R]^2 * nzsh(z[,R], shape)^(-2) + (1/shape^4) * nzsh(z[,R], shape) * log(1+shape*z[,R])^2  - (2/shape^3) * z[,R] * nzsh(z[,R], shape)^(-1) * log(1+shape*z[,R])
   F <- sum(F)
-  info <- matrix(c(A, B, C, B, D, E, C, E, F), nrow=3, ncol=3)
-  info <- (1/N)*info
+  info <- matrix(c(A, B, C, B, D, E, C, E, F), nrow = 3, ncol = 3)
+  info <- (1/N) * info
   info <- solve3by3(info)
   info
 }
+
 
 ## Outputs matrix with row contributions to score. Need to sum over the columns to get full score.
 gevrScore <- function(data, theta) {
@@ -80,14 +82,15 @@ gevrScore <- function(data, theta) {
   shape <- theta[3]
   z <- (data - loc) / scale
   dLoc <- rowSums((((1/shape)+1)*shape) / (scale*(1+shape*z)))
-  dLoc <- dLoc - ((1+(shape*z[,R]))^(-1/shape)) / (scale*(1+(shape*z[,R])))
+  dLoc <- dLoc - nzsh(z[,R], shape) / (scale*(1+(shape*z[,R])))
   dScale <- rowSums((((1/shape)+1)*shape*z) / (scale*(1+shape*z)))
-  dScale <- dScale - (R/scale) - z[,R]*((1+shape*z[,R])^(-1/shape)) / (scale*(1+shape*z[,R]))
+  dScale <- dScale - (R/scale) - z[,R] * nzsh(z[,R], shape) / (scale*(1+shape*z[,R]))
   dShape <-  rowSums(log(1+shape*z) / shape^2 - (((1/shape)+1)*z) / (1+shape*z))
-  dShape <- dShape - ((1+shape*z[,R])^(-1/shape))*((log(1+shape*z[,R]) / shape^2) - z[,R] / (shape*(1+shape*z[,R])))
-  score <- matrix(c(dLoc, dScale, dShape), ncol=3)
+  dShape <- dShape - nzsh(z[,R], shape) * ((log(1+shape*z[,R]) / shape^2) - z[,R] / (shape*(1+shape*z[,R])))
+  score <- matrix(c(dLoc, dScale, dShape), ncol = 3)
   score
 }
+
 
 ## Calculates the score test statistic
 gevrTestStat <- function(data, theta, information) {
