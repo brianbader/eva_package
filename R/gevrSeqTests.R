@@ -37,10 +37,13 @@ gevrSeqTests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multsco
   } else {
     if(R == 1)
       stop("R must be at least two")
+    y <- tryCatch(gevrFit(data[, 1], method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
+    if(is.null(y))
+      stop("Maximum likelihood failed to converge at initial step")
     result <- matrix(0, R-1, 6)
     for(i in 2:R) {
       result[i-1, 1] <- i
-      fit <- gevrEd(data[, 1:i])
+      fit <- gevrEd(data[, 1:i], theta = y$par.ests)
       result[i-1, 2] <- fit$p.value
       result[i-1, 3] <- fit$statistic
       result[i-1, 4:6] <- fit$theta
