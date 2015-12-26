@@ -1,6 +1,7 @@
-#' GPD Asymptotic (Adjusted) Information Matrix Test
+#' GPD Asymptotic Adjusted Information Matrix (IM) Test
 #'
-#' Runs the IM Test using bootstrap estimated covariance matrix. Asymptotically (in sample size) follows an F(3, B-3) distribution (see reference for details).
+#' Runs the IM Test using bootstrap estimated covariance matrix. Asymptotically (in sample size) follows the F(3, B-3)
+#' distribution (see reference for details).
 #' @param data Data should be in vector form.
 #' @param B Number of bootstrap replicates for the covariance estimate.
 #' @param theta Estimate for theta in the vector form (scale, shape). If NULL, uses the MLE.
@@ -12,7 +13,8 @@
 #' @return statistic Test statistic.
 #' @return p.value P-value for the test.
 #' @return theta Value of theta used in the test.
-#' @return effective_bootnum Effective number of bootstrap replicates used for the covariance estimate (if some did not converge).
+#' @return effective_bootnum Effective number of bootstrap replicates used for the covariance estimate. If a
+#' replicate fails to converge, it will not be used in the estimation.
 #' @export
 
 gpdImAsym <- function(data, B, theta = NULL) {
@@ -36,7 +38,7 @@ gpdImAsym <- function(data, B, theta = NULL) {
   stat <- as.vector(stat)
   stat <- stat*(B-3) / (3*B-3)
   p <- 1 - pf(stat, 3, (B-3))
-  names(theta) <- c("scale", "shape")
+  names(theta) <- c("Scale", "Shape")
   out <- list(stat, p, theta, B)
   names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
   out

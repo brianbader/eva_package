@@ -21,9 +21,9 @@ gpdImGen <- function(n, theta, inner) {
 }
 
 
-#' GPD Bootstrapped Information Matrix Test
+#' GPD Bootstrapped Information Matrix (IM) Test
 #'
-#' Runs the IM Test using a two-step iterative procedure, to boostrap the covariance estimate and critical values. (See reference for details.)
+#' Runs the IM Test using a two-step iterative procedure, to boostrap the covariance estimate and critical values. See reference for details.
 #' @param data Data should be in vector form.
 #' @param inner Number of bootstrap replicates for the covariance estimate.
 #' @param outer Number of bootstrap replicates for critical values.
@@ -33,11 +33,13 @@ gpdImGen <- function(n, theta, inner) {
 #' @examples
 #' ## Not run
 #' # x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
-#' # gpdImPb(x, 50, 99)
+#' # gpdImPb(x, inner = 20, outer = 99)
 #' @return statistic Test statistic.
 #' @return p.value P-value for the test.
 #' @return theta Estimate of theta for the initial dataset.
-#' @return effective_bootnum Effective number of outer bootstrap replicates used (if some did not converge).
+#' @return effective_bootnum Effective number of outer bootstrap replicates used (only those that converged are used).
+#' @details Warning: This test can be very slow, since the covariance estimation is nested within the outer replicates. It would be
+#' recommended to use a small number of replicates for the covariance estimate (at most 50).
 #' @import parallel
 #' @export
 
@@ -67,7 +69,7 @@ gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   teststat <- teststat[!is.na(teststat)]
   outer <- length(teststat)
   p <- (sum(teststat > stat) + 1) / (outer + 2)
-  names(theta) <- c("scale", "shape")
+  names(theta) <- c("Scale", "Shape")
   out <- list(stat, p, theta, outer)
   names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
   out

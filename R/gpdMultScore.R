@@ -40,7 +40,7 @@ gpdMultScore <- function(data, B, theta = NULL, information = c("expected", "obs
   v <- t(u) %*% z
   teststat <- diag(t(v) %*% v)
   p <- (sum(teststat > stat) + 1) / (B + 2)
-  names(theta) <- c("scale", "shape")
+  names(theta) <- c("Scale", "Shape")
   out <- list(stat, p, theta)
   names(out) <- c("statistic", "p.value", "theta")
   out

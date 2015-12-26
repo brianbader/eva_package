@@ -4,17 +4,35 @@ findthresh <- function(data, ne) {
 }
 
 
-# 'Fits the generalized pareto distribution to data
+#' Parameter estimation for the Generalized Pareto Distribution (GPD)
 #'
-#' The base code for this function is taken from the R package evir. See citation below. The addition here includes estimation via Maximum Product Spacings (MPS).
-#' @param data Data should be a numeric vector from the GPD distribution.
+#' Fits exceedances above a chosen threshold to the generalized pareto model. Various estimation procedures can be used,
+#' including maximum likelihood, probability weighted moments, and maximum product spacing.
+#' @param data Data should be a numeric vector from the GPD.
 #' @param threshold A threshold value (either this or the number of extremes must be given, but not both).
 #' @param nextremes Number of upper extremes to be used.
 #' @param npp Length of each period (typically year). Is used in return level estimation. Defaults to 365.
 #' @param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
-#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default.
+#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacing (mps). Uses mle by default.
 #' @param start Option to provide a set of starting parameters to optim; a vector of scale and shape. Otherwise, the routine attempts to find good starting parameters.
 #' @return A class object 'gpdFit' describing the fit, including parameter estimates and standard errors.
+#' @details The base code for this function is taken from the R package evir. See citation.
+#' @examples
+#' ## Fit data using the three different estimation procedures
+#' set.seed(7)
+#' x <- rgpd(2000, loc = 0, scale = 2, shape = 0.2)
+#' ## Set threshold at 4
+#' mle_fit <- gpdFit(x, threshold = 4, method = "mle")
+#' pwm_fit <- gpdFit(x, threshold = 4, method = "pwm")
+#' mps_fit <- gpdFit(x, threshold = 4, method = "mps")
+#' ## Look at the difference in parameter estimates and errors
+#' mle_fit$par.ests
+#' pwm_fit$par.ests
+#' mps_fit$par.ests
+#'
+#' mle_fit$par.ses
+#' pwm_fit$par.ses
+#' mps_fit$par.ses
 #' @references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
 #' @export
 
@@ -61,7 +79,7 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     information <- "expected"
     out <- list(n = length(data), data = data, threshold = threshold,
                 p.less.thresh = p.less.thresh, n.exceed = Nu, method = method,
-                par.ests = start, par.ses = par.ses, varcov = varcov,
+                par.ests = c(scale0, shape0), par.ses = par.ses, varcov = varcov,
                 information = information, npp = npp, rate = 1 - p.less.thresh)
   }
 
