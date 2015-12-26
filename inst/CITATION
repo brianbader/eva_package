@@ -4,7 +4,7 @@ year <- sub("-.*", "", meta$Date)
 vers <- sprintf("R package version %s", meta$Version)
 
 citEntry(entry="Manual",
-         title = "eva: Extreme Value Analysis",
+         title = "eva: Extreme Value Analysis with Goodness-of-Fit Testing",
          author = personList(as.person("Brian Bader"),
                              as.person("Jun Yan")),
          year = year,
@@ -12,5 +12,5 @@ citEntry(entry="Manual",
 
          textVersion =
          paste("Brian Bader, Jun Yan (",year,"), ",
-               "eva: Extreme Value Analysis. ",
+               "eva: Extreme Value Analysis with Goodness-of-Fit Testing. ",
 			          vers, ".", sep=""))

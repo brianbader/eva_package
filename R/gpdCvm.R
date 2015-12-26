@@ -18,9 +18,9 @@ gpdCvmGen <- function(n, theta) {
 
 #' Generalized Pareto Distribution Cramer-von Mises Test
 #'
-#' Cramer-von Mises goodness-of-fit test for the Generalized Pareto distribution. Critical values are generated via parametric bootstrap.
-#' @param data Data should be in vector form, assumed to be from the GP distribution.
-#' @param bootstrap Should bootstrap be used to obtain pvalues for the test? By default, a table of critical values is used via interpolation. See details.
+#' Cramer-von Mises goodness-of-fit test for the Generalized Pareto (GPD) distribution.
+#' @param data Data should be in vector form, assumed to be from the GPD.
+#' @param bootstrap Should bootstrap be used to obtain p-values for the test? By default, a table of critical values is used via interpolation. See details.
 #' @param B Number of bootstrap replicates.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.

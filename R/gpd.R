@@ -22,8 +22,8 @@
 #'
 #' @details The Genralized Pareto distribution function is given (Pickands, 1975)
 #' by \deqn{H(y) = 1 - \Big[1 + \frac{\xi (y - \mu)}{\sigma}\Big]^{-1/\xi}} defined
-#' on \deqn{\{y : y > 0, (1 + \xi (y - \mu) / \sigma) > 0 \}}, with location \deqn{\mu},
-#' scale \deqn{\sigma}, and shape parameter \deqn{\xi}.
+#' on \eqn{\{y : y > 0, (1 + \xi (y - \mu) / \sigma) > 0 \}}, with location \eqn{\mu},
+#' scale \eqn{\sigma}, and shape parameter \eqn{\xi}.
 #'
 #' @references Pickands III, J. (1975). Statistical inference using extreme order statistics. Annals of Statistics, 119-131.
 #'

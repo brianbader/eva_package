@@ -3,8 +3,8 @@
 #' This function provides maximum likelihood estimation for the GEVr model, with the option of probability weighted moment and maximum product
 #' spacing estimation for block maxima (GEV1) data.
 #' @param data Data should be a matrix from the GEVr distribution.
-#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default. For r > 1, only mle can be used.
-#' @param information Whether standard errors should be calculated via observed or expected information. For probability weighted moments, only expected information will be used if possible.
+#' @param method Method of estimation - maximum likelihood (mle), probability weighted moments (pwm), and maximum product spacings (mps). Uses mle by default. For \deqn{r > 1}, only mle can be used.
+#' @param information Whether standard errors should be calculated via observed or expected (default) information. For probability weighted moments, only expected information will be used if possible.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts to find good starting parameters.
 #' @examples
 #' x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)

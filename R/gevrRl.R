@@ -8,12 +8,16 @@
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
 #' @param opt Optimization method to maximize the profile likelihood if that is selected. The default method is Nelder-Mead.
 #'
+#' @details It is generally accepted that profile likelihood confidence intervals provide better greater accuracy than the delta
+#' method, in particular for large return level periods. Also, by their nature, delta method confidence intervals must be symmetric
+#' which may be undesirable for return level estimation.
 #' @references http://www.mas.ncl.ac.uk/~nlf8/teaching/mas8391/background/chapter2.pdf
+#' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @examples
 #' x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.3)
 #' z <- gevrFit(x)
-#' ## Compute 50-period return level.
-#' gevrRl(z, 50, method = "delta")
+#' ## Compute 250-period return level.
+#' gevrRl(z, 250, method = "delta")
 #' @return Estimate Estimated m-period return level.
 #' @return CI Confidence interval for the m-period return level.
 #' @return Period The period length used.

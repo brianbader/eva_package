@@ -57,7 +57,7 @@ gpdQQ <- function(z) {
 
 #' Diagnostic plots for a fit to the Generalized Pareto distribution
 #'
-#' @param z A class object returned from gpd.fit.
+#' @param z A class object returned from 'gpdFit'.
 #' @param conf Confidence level used in the return level plot.
 #' @param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
 #' @examples

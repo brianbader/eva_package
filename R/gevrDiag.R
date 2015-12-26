@@ -86,15 +86,17 @@ gevrHist <- function(z, j) {
 
 #' Diagnostic plots for a fit to the GEVr distribution.
 #'
-#' @param z A class object returned from gevr.fit.
+#' @param z A class object returned from 'gevrFit'.
 #' @param conf Confidence level used in the return level plot.
-#' @param method The method to compute the return level confidence interval - either delta method (default) or profile likelihood. Choosing profile likelihood may be quite slow.
+#' @param method The method to compute the return level confidence interval - either delta method (default) or profile
+#' likelihood. Choosing profile likelihood may be quite slow.
 #' @examples
 #' ## Not run
 #' # x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
 #' # z <- gevrFit(x)
 #' # gevrDiag(z)
-#' @return Provides return level plot and density, probability, and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal density for the estimated parameters.
+#' @return Provides return level plot and density, probability, and quantile plots for each marginal order statistic.
+#' The overlaid density is the 'true' marginal density for the estimated parameters.
 #' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
 #' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.

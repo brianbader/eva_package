@@ -4,7 +4,7 @@
 #'
 #' @param z A class object returned from gevrFit.
 #' @param conf Confidence level to use. Defaults to 95 percent.
-#' @param opt Optimization method to maximize the profile likelihood if that is selected. The default method is Nelder-Mead.
+#' @param opt Optimization method to maximize the profile likelihood, passed to optim. The default method is Nelder-Mead.
 #'
 #' @examples
 #' ## Compare the length of the shape confidence intervals using GEV1 vs. GEV10

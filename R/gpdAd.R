@@ -19,10 +19,10 @@ gpdAdGen <- function(n, theta) {
 
 #' Generalized Pareto Distribution Anderson-Darling Test
 #'
-#' Anderson-Darling goodness-of-fit test for the Generalized Pareto distribution. Critical values are generated via parametric bootstrap.
-#' @param data Data should be in vector form, assumed to be from the GP distribution.
-#' @param bootstrap Should bootstrap be used to obtain pvalues for the test? By default, a table of critical values is used via interpolation. See details.
-#' @param B Number of bootstrap replicates.
+#' Anderson-Darling goodness-of-fit test for the Generalized Pareto (GPD) distribution.
+#' @param data Data should be in vector form, assumed to be from the GPD.
+#' @param bootstrap Should bootstrap be used to obtain p-values for the test? By default, a table of critical values is used via interpolation. See details.
+#' @param B Number of replicates if bootstrap is used.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the generalized Pareto distribution. Technometrics, 43(4), 478-484.

@@ -7,13 +7,17 @@
 #' @examples
 #' ## This will test if the GEV2 distribution fits the data.
 #' x <- rgevr(100, 2, loc = 0.5, scale = 1, shape = 0.5)
-#'
 #' ## Use the MLE from the GEV1 data by leaving theta input NULL.
 #' result <- gevrEd(x)
 #' @return statistic Test statistic.
 #' @return p.value P-value for the test.
 #' @return theta Estimate of theta using the top r order statistics.
-#' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i = 1, ..., n.
+#' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each
+#' observation \eqn{i = 1, \ldots, n}. The test uses an asymptotic normality result based on the expected
+#' entropy between the GEVr and GEV(r-1) likelihoods. See reference for detailed information. This test can be
+#' used to sequentially test for the choice of r, implemented in the function 'gevrSeqTests'.
+#'
+#' @references Bader B., Jun Y., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
 #' @export
 gevrEd <- function(data, theta = NULL) {
   data <- as.matrix(data)

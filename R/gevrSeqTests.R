@@ -8,7 +8,7 @@
 #' @param allowParallel If method equals 'pbscore', should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @examples
-#' x <- rgevr(200, 3, loc = 0.5, scale = 1, shape = 0.5)
+#' x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.25)
 #' gevrSeqTests(x, method = "ed")
 #' @return Function returns a matrix containing the test statistics, estimates, and p-value results of the sequential tests.
 #' @return r Value of r to be tested.
@@ -16,10 +16,10 @@
 #' @return ForwardStop Transformed p-values according to the ForwardStop stopping rule.
 #' @return StrongStop Transformed p-values according to the StrongStop stopping rule.
 #' @return statistic Returned test statistics of each individual test.
-#' @return est.loc Estimated locaton parameter for the given r.
+#' @return est.loc Estimated location parameter for the given r.
 #' @return est.scale Estimated scale parameter for the given r.
 #' @return est.shape Estimated shape parameter for the given r.
-#' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n. 
+#' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
 #' See function 'pSeqStop' for details on transformed p-values.
 #' @export
 

@@ -23,13 +23,14 @@ gevrPbGen <- function(n, R, theta, information) {
 #' @examples
 #' ## Not run
 #' ## Generate some data from GEVr
-#' # x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.5)
+#' # x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.25)
 #' # gevrPbScore(x, B = 99)
 #' @return statistic Test statistic.
 #' @return p.value P-value for the test.
 #' @return theta Initial value of theta used in the test.
-#' @details GEVr data (in matrix x) should be of the form x[i,1] > x[i, 2] > ... > x[i, r] for each observation i=1, ..., n.
+#' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
 #' @import parallel
+#' @references Bader B., Jun Y., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
 #' @export
 
 gevrPbScore <- function(data, B, information = c("expected", "observed"), allowParallel = FALSE, numCores = 1) {

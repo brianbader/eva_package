@@ -16,7 +16,7 @@
 #'
 #' @references Katz, R. W., Parlange, M. B. and Naveau, P. (2002) Statistics of extremes in hydrology. Advances in Water Resources, 25, 1287-1304.
 #'
-#' @source Colorado Climate Center, Colorado State University. This is the original data source containing daily precipitation data.
+#' @source Colorado Climate Center, Colorado State University. This is the original data source containing the daily precipitation data.
 #'
 #' @examples
 #' data(fortmax)
