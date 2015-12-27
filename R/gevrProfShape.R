@@ -1,4 +1,4 @@
-#' GEVr Shape Parameter Profile Likelihood
+#' GEVr Shape Parameter Profile Likelihood Estimation
 #'
 #' Computes the profile likelihood based confidence interval for the shape parameter of the GEVr model.
 #'

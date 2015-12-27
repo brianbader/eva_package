@@ -1,9 +1,10 @@
-#' GPD Multiple Threshold GoF Testing
+#' GPD Multiple Threshold Goodness-of-Fit Testing
 #'
-#' Wrapper functions to test multiple thresholds for goodness-of-fit to the Generalized Pareto model. Can choose which test to run.
-#' @param data Orginal, full data in vector form.
-#' @param thresholds A set of threshold values (either this or a set of the number of extremes must be given, but not both).
-#' @param nextremes A set of the number of upper extremes to be used.
+#' Wrapper function to test multiple thresholds for goodness-of-fit to the generalized pareto model. Can choose which test to
+#' run from the available tests in this package.
+#' @param data Original, full dataset in vector form.
+#' @param thresholds A set of threshold values (either this or a set of the number of extremes must be given, but not both). Must be provided as a vector.
+#' @param nextremes A set of the number of upper extremes to be used, provided as a vector.
 #' @param method Which test to run to sequentially test the thresholds. Must be one of 'cvm', 'ad', pbscore', 'multscore', 'imasym', or 'impb'.
 #' @param nsim Number of boostrap replicates for the 'cvm', 'ad', 'pbscore', 'multscore', and 'imasym' tests.
 #' @param inner Number of inner boostrap replicates if 'impb' test is chosen.
@@ -11,22 +12,23 @@
 #' @param information To use observed or expected (default) information for the 'pbscore' and 'multscore' tests.
 #' @param allowParallel If selected, should the 'cvm', 'ad', 'pbscore', or 'impb' procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
-#' @details Function returns a matrix containing the thresholds used, the number of observations above each threshold, 
-#' the corresponding test statistics, p-values (raw and transformed), and parameter estimates at each threshold.
+#' @details Function returns a matrix containing the thresholds used, the number of observations above each threshold,
+#' the corresponding test statistics, p-values (raw and transformed), and parameter estimates at each threshold. The user must provide
+#' the data, a vector of thresholds or number of upper extremes to be used, and select the test.
 #' @examples
 #' set.seed(7)
-#' x <- rgpd(10000, 0, 5, 0.2)
+#' x <- rgpd(10000, loc = 0, scale = 5, shape = 0.2)
 #' ## A vector of thresholds to test
-#' threshes <- c(1, 2, 3, 4, 5)
+#' threshes <- c(1.5, 2.5, 3.5, 4.5, 5.5)
 #' gpdSeqTests(x, thresholds = threshes, method = "ad")
 #' @return threshold The threshold used for the test.
 #' @return num.above The number of observations above the given threshold.
-#' @return p.values Raw p-values for the tresholds tested.
+#' @return p.values Raw p-values for the thresholds tested.
 #' @return ForwardStop Transformed p-values according to the ForwardStop stopping rule.
 #' @return StrongStop Transformed p-values according to the StrongStop stopping rule.
 #' @return statistic Returned test statistics of each individual test.
-#' @return est.scale Estimated scale parameter for the given r.
-#' @return est.shape Estimated shape parameter for the given r.
+#' @return est.scale Estimated scale parameter for the given threshold.
+#' @return est.shape Estimated shape parameter for the given threshold.
 #' @export
 
 gpdSeqTests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"),

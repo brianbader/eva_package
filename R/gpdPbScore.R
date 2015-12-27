@@ -58,7 +58,7 @@ gpdPbScore <- function(data, B, information = c("expected", "observed"), allowPa
   teststat <- teststat[!is.na(teststat)]
   B <- length(teststat)
   p <- (sum(teststat > stat) + 1) / (B + 2)
-  names(theta) <- c("scale", "shape")
+  names(theta) <- c("Scale", "Shape")
   out <- list(stat, p, theta)
   names(out) <- c("statistic", "p.value", "theta")
   out

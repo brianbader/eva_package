@@ -1,13 +1,13 @@
-#' GPD Shape Parameter Profile Likelihood
+#' GPD Shape Parameter Profile Likelihood Estimation
 #'
 #' Computes the profile likelihood based confidence interval for the shape parameter of the generalized pareto model.
 #'
 #' @param z A class object returned from gpdFit.
 #' @param conf Confidence level to use. Defaults to 95 percent.
-#' @param opt Optimization method to maximize the profile likelihood if that is selected. The default method is Nelder-Mead.
+#' @param opt Optimization method to maximize the profile likelihood, passed to optim. The default method is Nelder-Mead.
 #'
 #' @examples
-#' x <- rgpd(500, loc = 0, scale = 1, shape = 0.4)
+#' x <- rgpd(500, loc = 0, scale = 1, shape = 0.25)
 #' z <- gpdFit(x, threshold = 0)
 #' gpdProfShape(z)
 #' @return Estimate Estimated shape parameter.

@@ -2,18 +2,19 @@
 #'
 #' Computes m-period return level estimates for the generalized pareto distribution, using either the delta method or profile likelihood.
 #'
-#' @param z An object of class gpd.fit.
+#' @param z An object of class gpdFit.
 #' @param period The number of periods to use for the return level.
 #' @param conf Confidence level. Defaults to 95 percent.
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
-#' @param opt Optimization method to maximize the profile likelihood if that is selected. The default method is Nelder-Mead.
+#' @param opt Optimization method to maximize the profile likelihood if that is selected. Argument passed to optim. The default method is Nelder-Mead.
 #'
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @examples
 #' x <- rgpd(5000, loc = 0, scale = 1, shape = 0.1)
 #' ## Compute 50-period return level.
 #' z <- gpdFit(x, nextremes = 200)
-#' gpdRl(z, 50, method = "delta")
+#' gpdRl(z, period = 50, method = "delta")
+#' gpdRl(z, period = 50, method = "profile")
 #' @return Estimate Estimated m-period return level.
 #' @return CI Confidence interval for the m-period return level.
 #' @return Period The period length used.
