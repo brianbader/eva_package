@@ -1,4 +1,7 @@
 ---
+output: html_document
+---
+---
 title: "Introduction to 'eva' and its capabilities"
 author: Brian Bader
 date: "`r Sys.Date()`"
