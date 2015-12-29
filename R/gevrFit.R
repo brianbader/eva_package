@@ -10,6 +10,8 @@
 #' x <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
 #' result <- gevrFit(x, method = "mps")
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class object 'gevrFit' to be used with diagnostic plots.
+#' ## Put these imports here once so it is generated in the NAMESPACE by roxygen ##
+#' @import stats graphics
 #' @export
 gevrFit <- function (data, method = c("mle", "mps", "pwm"),
                      information = c("expected", "observed"), start = NULL) {

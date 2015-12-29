@@ -3,16 +3,22 @@ Title: Extreme Value Analysis with Goodness-of-Fit Testing
 Date: 2015-12-28
 Version: 0.1.1
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brianbader@mail.com"), person(given = "Jun", family = "Yan", role = "aut"))
-Description: Goodness-of-fit tests for selection of r in the r-largest order statistics (GEVr) model. Goodness-of-fit
-    tests for threshold selection in the peaks-over-threshold approach. Random number generation and density functions
-    for the GEVr distribution. Profile likelihood for return level estimation using the GEVr and generalized pareto distributions.
-    P-value adjustments for sequential, multiple testing error control.
-Imports: parallel
-Depends: R(>= 2.10.0)
-Suggests: knitr, ggplot2
+Description: Goodness-of-fit tests for selection of r in the r-largest order
+    statistics (GEVr) model. Goodness-of-fit tests for threshold selection in the
+    peaks-over-threshold approach. Random number generation and density functions
+    for the GEVr distribution. Profile likelihood for return level estimation
+    using the GEVr and generalized pareto distributions. P-value adjustments for
+    sequential, multiple testing error control.
+Imports:
+    parallel, stats, graphics
+Depends:
+    R(>= 2.10.0)
+Suggests:
+    knitr, ggplot2
 License: GPL (>= 2)
 Repository: CRAN
 VignetteBuilder: knitr
 URL: https://github.com/geekman1/eva_package
 BugReports: https://github.com/geekman1/eva_package/issues
 LazyData: true
+RoxygenNote: 5.0.1
