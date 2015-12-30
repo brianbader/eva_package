@@ -6,9 +6,10 @@
 #' @param thresholds A numeric vector of threshold(s) to plot vertically. Defaults to NULL.
 #' @param conf The level of the confidence bounds to use. Defaults to 0.95.
 #' @param npoints The number of points to interpolate with. Defaults to 100.
-#' @examples ## Not run
-#' @examples ## x <- rgpd(500, loc = 0, scale = 1, shape = 0.1)
-#' @examples ## mrlPlot(x, thresholds = c(2))
+#' @examples
+#' ## Not run
+#' ## x <- rgpd(500, loc = 0, scale = 1, shape = 0.1)
+#' ## mrlPlot(x, thresholds = c(2))
 #' @export
 
 mrlPlot <- function(data, thresholds = NULL, conf = .95, npoints = 100) {

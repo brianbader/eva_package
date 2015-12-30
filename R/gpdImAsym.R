@@ -10,11 +10,12 @@
 #' ## Generate some data from GPD
 #' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
 #' gpdImAsym(x, B = 50)
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Value of theta used in the test.
-#' @return effective_bootnum Effective number of bootstrap replicates used for the covariance estimate. If a
-#' replicate fails to converge, it will not be used in the estimation.
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Value of theta used in the test.}
+#' \item{effective_bootnum}{Effective number of bootstrap replicates used for the covariance estimate. If a
+#' replicate fails to converge, it will not be used in the estimation.}
 #' @export
 
 gpdImAsym <- function(data, B, theta = NULL) {

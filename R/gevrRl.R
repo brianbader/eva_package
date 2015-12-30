@@ -1,6 +1,6 @@
 #' GEVr Return Level Estimate and Confidence Interval
 #'
-#' Computes m-period return level estimates, using either the delta method or profile likelihood. Can be for block maxima (GEV1) or GEVr.
+#' Computes m-period return level estimate and interval, using either the delta method or profile likelihood.
 #'
 #' @param z A class object returned from gevrFit.
 #' @param period The number of periods to use for the return level.
@@ -8,7 +8,7 @@
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
 #' @param opt Optimization method to maximize the profile likelihood if that is selected. The default method is Nelder-Mead.
 #'
-#' @details It is generally accepted that profile likelihood confidence intervals provide better greater accuracy than the delta
+#' @details It is generally accepted that profile likelihood confidence intervals provide greater accuracy than the delta
 #' method, in particular for large return level periods. Also, by their nature, delta method confidence intervals must be symmetric
 #' which may be undesirable for return level estimation.
 #' @references http://www.mas.ncl.ac.uk/~nlf8/teaching/mas8391/background/chapter2.pdf
@@ -18,10 +18,11 @@
 #' z <- gevrFit(x)
 #' ## Compute 250-period return level.
 #' gevrRl(z, 250, method = "delta")
-#' @return Estimate Estimated m-period return level.
-#' @return CI Confidence interval for the m-period return level.
-#' @return Period The period length used.
-#' @return ConfLevel The confidence level used.
+#' @return
+#' \item{Estimate}{Estimated m-period return level.}
+#' \item{CI}{Confidence interval for the m-period return level.}
+#' \item{Period}{The period length used.}
+#' \item{ConfLevel}{The confidence level used.}
 #' @details Caution: The profile likelihood optimization may be slow (on the order of minutes).
 #' @export
 gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),

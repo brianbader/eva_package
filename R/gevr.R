@@ -2,6 +2,7 @@
 #'
 #' Random number generation (rgevr) and density (dgevr) functions for the GEVr distribution with parameters loc, scale, and shape.
 #' Also, quantile function (qgev) and cumulative distribution function (pgev) for the GEV1 distribution.
+#' @name gevr
 #' @param x Vector or matrix of observations. If x is a matrix, each row is taken to be a new observation.
 #' @param q Vector of quantiles.
 #' @param p Vector of probabilities.
@@ -31,10 +32,10 @@
 #' and \eqn{1 + \xi z_j > 0} for \eqn{j=1, \ldots, r}. When \eqn{r = 1}, this distribution is exactly the GEV distribution.
 #'
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
-#'
+NULL
+
 #' @rdname gevr
 #' @export
-#'
 dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE) {
   x <- as.matrix(x)
   r <- ncol(x)
@@ -59,8 +60,8 @@ dgevr <- function(x, loc = 0, scale = 1, shape = 0, log.d = FALSE) {
 }
 
 
-#'@rdname gevr
-#'@export
+#' @rdname gevr
+#' @export
 rgevr <- function(n, r, loc = 0, scale = 1, shape = 0) {
   if (min(scale) <= 0)
     stop("invalid scale")
@@ -76,8 +77,8 @@ rgevr <- function(n, r, loc = 0, scale = 1, shape = 0) {
 }
 
 
-#'@rdname gevr
-#'@export
+#' @rdname gevr
+#' @export
 qgev <- function(p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE) {
   p <- as.vector(p)
   if (log.p)
@@ -97,8 +98,8 @@ qgev <- function(p, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FA
 }
 
 
-#'@rdname gevr
-#'@export
+#' @rdname gevr
+#' @export
 pgev <- function (q, loc = 0, scale = 1, shape = 0, lower.tail = TRUE, log.p = FALSE) {
   q <- as.vector(q)
   if (min(scale) <= 0)

@@ -14,9 +14,10 @@
 #' z2 <- gevrFit(x)
 #' gevrProfShape(z1)
 #' gevrProfShape(z2)
-#' @return Estimate Estimated shape parameter.
-#' @return CI Profile likelihood based confidence interval for the shape parameter.
-#' @return ConfLevel The confidence level used.
+#' @return
+#' \item{Estimate}{Estimated shape parameter.}
+#' \item{CI}{Profile likelihood based confidence interval for the shape parameter.}
+#' \item{ConfLevel}{The confidence level used.}
 #' @export
 gevrProfShape <- function(z, conf = .95, opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
   data <- as.matrix(z$data)

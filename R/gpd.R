@@ -1,7 +1,8 @@
 #' The Generalized Pareto Distribution (GPD)
 #'
-#' Density, distribution function, quantile function and random number generation for the Generalized Pareto
+#' Density, distribution function, quantile function and random number generation for the generalized pareto
 #' distribution with location, scale, and shape parameters.
+#' @name gpd
 #' @param x Vector of observations.
 #' @param q Vector of quantiles.
 #' @param p Vector of probabilities.
@@ -12,21 +13,24 @@
 #' @param log.d Logical; if TRUE, the log density is returned.
 #' @param lower.tail Logical; if TRUE (default), probabilities are P[X <= x], otherwise, P[X > x].
 #' @param log.p Logical; if TRUE, probabilities p are given as log(p).
-#' @examples dgpd(2:4, 1, 0.5, 0.8)
-#' @examples pgpd(2:4, 1, 0.5, 0.8)
-#' @examples qgpd(seq(0.9, 0.6, -0.1), 2, 0.5, 0.8)
-#' @examples rgpd(6, 1, 0.5, 0.8)
-#' @examples p <- (1:9)/10
-#' @examples pgpd(qgpd(p, 1, 2, 0.8), 1, 2, 0.8)
-#' @examples ## [1] 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+#' @examples
+#' dgpd(2:4, 1, 0.5, 0.8)
+#' pgpd(2:4, 1, 0.5, 0.8)
+#' qgpd(seq(0.9, 0.6, -0.1), 2, 0.5, 0.8)
+#' rgpd(6, 1, 0.5, 0.8)
+#' p <- (1:9)/10
+#' pgpd(qgpd(p, 1, 2, 0.8), 1, 2, 0.8)
+#' ## [1] 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
 #'
-#' @details The Genralized Pareto distribution function is given (Pickands, 1975)
+#' @details The generalized pareto distribution function is given (Pickands, 1975)
 #' by \deqn{H(y) = 1 - \Big[1 + \frac{\xi (y - \mu)}{\sigma}\Big]^{-1/\xi}} defined
 #' on \eqn{\{y : y > 0, (1 + \xi (y - \mu) / \sigma) > 0 \}}, with location \eqn{\mu},
-#' scale \eqn{\sigma}, and shape parameter \eqn{\xi}.
+#' scale \eqn{\sigma > 0}, and shape parameter \eqn{\xi}.
 #'
 #' @references Pickands III, J. (1975). Statistical inference using extreme order statistics. Annals of Statistics, 119-131.
-#'
+NULL
+
+
 #' @rdname gpd
 #' @export
 rgpd <- function(n, loc = 0, scale = 1, shape = 0) {

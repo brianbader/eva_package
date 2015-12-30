@@ -8,11 +8,12 @@
 #' @examples
 #' x <- rgpd(100, loc = 0, scale = 1, shape = 0.25)
 #' gpdMultScore(x, 1000)
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Value of theta used in the test.
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Value of theta used in the test.}
 #' @export
-#'
+
 gpdMultScore <- function(data, B, theta = NULL, information = c("expected", "observed")) {
   n <- length(data)
   information <-  match.arg(information)

@@ -8,11 +8,12 @@
 #' @examples
 #' x <- rgevr(500, 5, loc = 0.5, scale = 1, shape = 0.3)
 #' result <- gevrMultScore(x, 1000)
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Value of theta used in the test.
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Value of theta used in the test.}
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
-#' @references Bader B., Jun Y., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
+#' @references Bader B., Yan J., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
 #' @export
 
 gevrMultScore <- function(data, B, theta = NULL, information = c("expected", "observed")) {

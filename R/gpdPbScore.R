@@ -27,9 +27,10 @@ gpdPbGen <- function(n, theta, information) {
 #' ## Generate some data from GPD
 #' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
 #' gpdPbScore(x, 100)
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Estimated value of theta for the initial data.
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Estimated value of theta for the initial data.}
 #' @import parallel
 #' @export
 

@@ -10,9 +10,10 @@
 #' x <- rgpd(500, loc = 0, scale = 1, shape = 0.25)
 #' z <- gpdFit(x, threshold = 0)
 #' gpdProfShape(z)
-#' @return Estimate Estimated shape parameter.
-#' @return CI Profile likelihood based confidence interval for the shape parameter.
-#' @return ConfLevel The confidence level used.
+#' @return
+#' \item{Estimate}{Estimated shape parameter.}
+#' \item{CI}{Profile likelihood based confidence interval for the shape parameter.}
+#' \item{ConfLevel}{The confidence level used.}
 #' @export
 gpdProfShape <- function(z, conf = .95, opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
   data <- z$data

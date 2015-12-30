@@ -21,14 +21,15 @@
 #' ## A vector of thresholds to test
 #' threshes <- c(1.5, 2.5, 3.5, 4.5, 5.5)
 #' gpdSeqTests(x, thresholds = threshes, method = "ad")
-#' @return threshold The threshold used for the test.
-#' @return num.above The number of observations above the given threshold.
-#' @return p.values Raw p-values for the thresholds tested.
-#' @return ForwardStop Transformed p-values according to the ForwardStop stopping rule.
-#' @return StrongStop Transformed p-values according to the StrongStop stopping rule.
-#' @return statistic Returned test statistics of each individual test.
-#' @return est.scale Estimated scale parameter for the given threshold.
-#' @return est.shape Estimated shape parameter for the given threshold.
+#' @return
+#' \item{threshold}{The threshold used for the test.}
+#' \item{num.above}{The number of observations above the given threshold.}
+#' \item{p.values}{Raw p-values for the thresholds tested.}
+#' \item{ForwardStop}{Transformed p-values according to the ForwardStop stopping rule.}
+#' \item{StrongStop}{Transformed p-values according to the StrongStop stopping rule.}
+#' \item{statistic}{Returned test statistics of each individual test.}
+#' \item{est.scale}{Estimated scale parameter for the given threshold.}
+#' \item{est.shape}{Estimated shape parameter for the given threshold.}
 #' @export
 
 gpdSeqTests <- function(data, thresholds = NA, nextremes = NA, method = c("cvm", "ad", "pbscore", "multscore", "imasym", "impb"),

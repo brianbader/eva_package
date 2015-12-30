@@ -35,9 +35,10 @@ gpdAdGen <- function(n, theta) {
 #' .001 to .999. For p-values below .001, a linear equation exists by regressing -log(p-value)
 #' on the critical values for the tail of the distribution (.950 to .999 upper percentiles). This
 #' regression provides a method to extrapolate to arbitrarily small p-values.
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Estimated value of theta for the initial data.
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Estimated value of theta for the initial data.}
 #' @import parallel
 #' @export
 

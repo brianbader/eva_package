@@ -34,10 +34,11 @@ gpdImGen <- function(n, theta, inner) {
 #' ## Not run
 #' # x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
 #' # gpdImPb(x, inner = 20, outer = 99)
-#' @return statistic Test statistic.
-#' @return p.value P-value for the test.
-#' @return theta Estimate of theta for the initial dataset.
-#' @return effective_bootnum Effective number of outer bootstrap replicates used (only those that converged are used).
+#' @return
+#' \item{statistic}{Test statistic.}
+#' \item{p.value}{P-value for the test.}
+#' \item{theta}{Estimate of theta for the initial dataset.}
+#' \item{effective_bootnum}{Effective number of outer bootstrap replicates used (only those that converged are used).}
 #' @details Warning: This test can be very slow, since the covariance estimation is nested within the outer replicates. It would be
 #' recommended to use a small number of replicates for the covariance estimate (at most 50).
 #' @import parallel

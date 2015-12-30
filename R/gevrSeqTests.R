@@ -10,15 +10,17 @@
 #' @examples
 #' x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.25)
 #' gevrSeqTests(x, method = "ed")
-#' @return Function returns a matrix containing the test statistics, estimates, and p-value results of the sequential tests.
-#' @return r Value of r to be tested.
-#' @return p.values Raw p-values from the individual tests at each value of r.
-#' @return ForwardStop Transformed p-values according to the ForwardStop stopping rule.
-#' @return StrongStop Transformed p-values according to the StrongStop stopping rule.
-#' @return statistic Returned test statistics of each individual test.
-#' @return est.loc Estimated location parameter for the given r.
-#' @return est.scale Estimated scale parameter for the given r.
-#' @return est.shape Estimated shape parameter for the given r.
+#' @return
+#' Function returns a matrix containing the test statistics, estimates, and p-value results of the sequential tests.
+#'
+#' \item{r}{Value of r to be tested.}
+#' \item{p.values}{Raw p-values from the individual tests at each value of r.}
+#' \item{ForwardStop}{Transformed p-values according to the ForwardStop stopping rule.}
+#' \item{StrongStop}{Transformed p-values according to the StrongStop stopping rule.}
+#' \item{statistic}{Returned test statistics of each individual test.}
+#' \item{est.loc}{Estimated location parameter for the given r.}
+#' \item{est.scale}{Estimated scale parameter for the given r.}
+#' \item{est.shape}{Estimated shape parameter for the given r.}
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
 #' See function 'pSeqStop' for details on transformed p-values.
 #' @export

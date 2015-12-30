@@ -1,6 +1,6 @@
 #' GPD Return Level Estimate and Confidence Interval
 #'
-#' Computes m-period return level estimates for the generalized pareto distribution, using either the delta method or profile likelihood.
+#' Computes m-period return level estimate and interval for the generalized pareto distribution, using either the delta method or profile likelihood.
 #'
 #' @param z An object of class gpdFit.
 #' @param period The number of periods to use for the return level.
@@ -15,10 +15,11 @@
 #' z <- gpdFit(x, nextremes = 200)
 #' gpdRl(z, period = 50, method = "delta")
 #' gpdRl(z, period = 50, method = "profile")
-#' @return Estimate Estimated m-period return level.
-#' @return CI Confidence interval for the m-period return level.
-#' @return Period The period length used.
-#' @return ConfLevel The confidence level used.
+#' @return
+#' \item{Estimate}{Estimated m-period return level.}
+#' \item{CI}{Confidence interval for the m-period return level.}
+#' \item{Period}{The period length used.}
+#' \item{ConfLevel}{The confidence level used.}
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
 gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
