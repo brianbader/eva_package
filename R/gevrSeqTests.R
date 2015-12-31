@@ -11,7 +11,7 @@
 #' x <- rgevr(200, 5, loc = 0.5, scale = 1, shape = 0.25)
 #' gevrSeqTests(x, method = "ed")
 #' @return
-#' Function returns a matrix containing the test statistics, estimates, and p-value results of the sequential tests.
+#' Function returns a dataframe containing the test statistics, estimates, and p-value results of the sequential tests.
 #'
 #' \item{r}{Value of r to be tested.}
 #' \item{p.values}{Raw p-values from the individual tests at each value of r.}

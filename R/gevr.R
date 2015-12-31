@@ -2,8 +2,9 @@
 #'
 #' Random number generation (rgevr) and density (dgevr) functions for the GEVr distribution with parameters loc, scale, and shape.
 #' Also, quantile function (qgev) and cumulative distribution function (pgev) for the GEV1 distribution.
-#' @name gevr
 #' @param x Vector or matrix of observations. If x is a matrix, each row is taken to be a new observation.
+#' @name gevr
+#' @rdname gevr
 #' @param q Vector of quantiles.
 #' @param p Vector of probabilities.
 #' @param n Number of observations
@@ -33,6 +34,7 @@
 #'
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 NULL
+
 
 #' @rdname gevr
 #' @export
