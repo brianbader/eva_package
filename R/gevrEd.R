@@ -38,7 +38,7 @@ gevrEd <- function(data, theta = NULL) {
   Diff <- sum(Diff) / n
   Diff <- sqrt(n)*(Diff  - FirstMom) / sqrt(EstVar)
   p.value <- 2*(1-pnorm(abs(Diff)))
-  out <- list(as.numeric(Diff), as.numeric(p.value), y$par.ests)
+  out <- list(as.numeric(Diff), as.numeric(p.value), theta)
   names(out) <- c("statistic", "p.value", "theta")
   out
 }
