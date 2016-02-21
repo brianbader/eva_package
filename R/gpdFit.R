@@ -6,7 +6,7 @@ findthresh <- function(data, ne) {
 
 #' Parameter estimation for the Generalized Pareto Distribution (GPD)
 #'
-#' Fits exceedances above a chosen threshold to the generalized pareto model. Various estimation procedures can be used,
+#' Fits exceedances above a chosen threshold to the Generalized Pareto model. Various estimation procedures can be used,
 #' including maximum likelihood, probability weighted moments, and maximum product spacing.
 #' @param data Data should be a numeric vector from the GPD.
 #' @param threshold A threshold value (either this or the number of extremes must be given, but not both).

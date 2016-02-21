@@ -1,6 +1,6 @@
 #' The Generalized Pareto Distribution (GPD)
 #'
-#' Density, distribution function, quantile function and random number generation for the generalized pareto
+#' Density, distribution function, quantile function and random number generation for the Generalized Pareto
 #' distribution with location, scale, and shape parameters.
 #' @name gpd
 #' @rdname gpd
@@ -23,7 +23,7 @@
 #' pgpd(qgpd(p, 1, 2, 0.8), 1, 2, 0.8)
 #' ## [1] 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
 #'
-#' @details The generalized pareto distribution function is given (Pickands, 1975)
+#' @details The Generalized Pareto distribution function is given (Pickands, 1975)
 #' by \deqn{H(y) = 1 - \Big[1 + \frac{\xi (y - \mu)}{\sigma}\Big]^{-1/\xi}} defined
 #' on \eqn{\{y : y > 0, (1 + \xi (y - \mu) / \sigma) > 0 \}}, with location \eqn{\mu},
 #' scale \eqn{\sigma > 0}, and shape parameter \eqn{\xi}.

@@ -1,6 +1,6 @@
 #' GPD Return Level Estimate and Confidence Interval
 #'
-#' Computes m-period return level estimate and interval for the generalized pareto distribution, using either the delta method or profile likelihood.
+#' Computes m-period return level estimate and interval for the Generalized Pareto distribution, using either the delta method or profile likelihood.
 #'
 #' @param z An object of class gpdFit.
 #' @param period The number of periods to use for the return level.

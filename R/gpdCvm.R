@@ -24,7 +24,7 @@ gpdCvmGen <- function(n, theta) {
 #' @param B Number of bootstrap replicates.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
-#' @references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the generalized Pareto distribution. Technometrics, 43(4), 478-484.
+#' @references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the Generalized Pareto distribution. Technometrics, 43(4), 478-484.
 #' @examples
 #' ## Generate some data from GPD
 #' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)

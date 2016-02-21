@@ -1,6 +1,6 @@
 #' GPD Multiple Threshold Goodness-of-Fit Testing
 #'
-#' Wrapper function to test multiple thresholds for goodness-of-fit to the generalized pareto model. Can choose which test to
+#' Wrapper function to test multiple thresholds for goodness-of-fit to the Generalized Pareto model. Can choose which test to
 #' run from the available tests in this package.
 #' @param data Original, full dataset in vector form.
 #' @param thresholds A set of threshold values (either this or a set of the number of extremes must be given, but not both). Must be provided as a vector.
