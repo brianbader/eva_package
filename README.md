@@ -1,6 +1,6 @@
 ## **To Do:** ##
 
-* Incorporate non-stationarity into the fitting
+* Allow GEVr diagnostic plots to accomodate nonstationary fitting
 
 * Add Moran's and Northrop's score test (for GPD)
 

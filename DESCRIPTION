@@ -1,7 +1,7 @@
 Package: eva
 Title: Extreme Value Analysis with Goodness-of-Fit Testing
-Date: 2016-02-21
-Version: 0.1.3
+Date: 2016-02-28
+Version: 0.1.4
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brianbader@mail.com"), person(given = "Jun", family = "Yan", role = "ctb"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order
     statistics (GEVr) model. Goodness-of-fit tests for threshold selection in the
