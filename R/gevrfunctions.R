@@ -10,9 +10,9 @@ plot.gevrFit <- function(x, ...) {
 }
 
 
-summary.gevrFit <- function(object, ...) {
-  object$data <- NULL
-  object
+print.gevrFit <- function(x, ...) {
+  cat("Summary of fit:\n")
+  print(x$par.sum)
 }
 
 

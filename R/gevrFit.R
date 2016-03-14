@@ -37,8 +37,8 @@ adjScale <- function(x) {
 #' result1 <- gevrFit(x1, method = "mps")
 #'
 #' ## A linear trend in the location parameter
-#' n <- 80
-#' r <- 5
+#' n <- 100
+#' r <- 10
 #' x2 <- matrix(0, ncol = r, nrow = n)
 #' for(i in 1:n) {
 #'   x2[i, ] <- rgevr(1, r, loc = 100 + i / 50,  scale = 1 + i / 300, shape = 0)
@@ -53,7 +53,7 @@ adjScale <- function(x) {
 #' scalevars = covs, scaleform = ~ Trend1)
 #'
 #' ## Show summary of estimates
-#' result2$par.sum
+#' result2
 #'
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class
 #' object 'gevrFit' to be used with diagnostic plots.
