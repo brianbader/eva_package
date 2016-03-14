@@ -1,3 +1,17 @@
+## Function to help deal with design matrix
+adjScale <- function(x) {
+  truemeans <- as.numeric(colMeans(x))
+  truevars <- as.numeric(apply(x, 2, sd))
+  adjmeans <- ifelse(truevars == 0, 0, truemeans)
+  adjvars <- ifelse(truevars == 0, truemeans, truevars)
+  if(ncol(x) == 1)
+    adjmeans <- 0
+  x <- t((t(x) - adjmeans) / adjvars)
+  out <- list(x, truemeans, truevars, adjmeans, adjvars)
+  names(out) <- c("mat", "truemeans", "truevars", "adjmeans", "adjvars")
+  out
+}
+
 #' Parameter estimation for the GEVr distribution model
 #'
 #' This function provides maximum likelihood estimation for the GEVr model, with the option of probability weighted moment and maximum product
@@ -7,18 +21,11 @@
 #' For \eqn{r > 1}, only mle can be used.
 #' @param information Whether standard errors should be calculated via observed or expected (default) information. For probability weighted moments,
 #' only expected information will be used if possible. In the case with covariates, only observed information is available.
-#' @param locvars A dataframe of covariates to use for modeling of the location parameter. Parameter intercepts are automatically handled by the function. Defaults to NULL.
-#' @param scalevars A dataframe of covariates to use for modeling of the scale parameter. Parameter intercepts are automatically handled by the function. Defaults to NULL.
-#' @param shapevars A dataframe of covariates to use for modeling of the shape parameter. Parameter intercepts are automatically handled by the function. Defaults to NULL.
-#' @param locform An object of class `formula' (or one that can be coerced into that class), specifying the model of the location
-#' parameter. If NULL, assumes stationary (intercept only) model. See details.
-#' @param scaleform An object of class `formula' (or one that can be coerced into that class), specifying the model of the scale
-#' parameter. If NULL, assumes stationary (intercept only) model. See details.
-#' @param shapeform An object of class `formula' (or one that can be coerced into that class), specifying the model of the shape
-#' parameter. If NULL, assumes stationary (intercept only) model. See details.
-#' @param loclink A link function specifying the relationship between the covariates and location parameter. Defaults to the identity function.
-#' @param scalelink A link function specifying the relationship between the covariates and scale parameter. Defaults to the identity function.
-#' @param shapelink A link function specifying the relationship between the covariates and shape parameter. Defaults to the identity function.
+#' @param locvars,scalevars,shapevars A dataframe of covariates to use for modeling of the each parameter. Parameter
+#' intercepts are automatically handled by the function. Defaults to NULL for the stationary model.
+#' @param locform,scaleform,shapeform An object of class `formula' (or one that can be coerced into that class), specifying the model
+#' of each parameter. By default, assumes stationary (intercept only) model. See details.
+#' @param loclink,scalelink,shapelink A link function specifying the relationship between the covariates and each parameter. Defaults to the identity function.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts
 #' to find good starting parameters. See details.
 #' @param opt Optimization method to use with optim.
@@ -34,35 +41,39 @@
 #' r <- 5
 #' x2 <- matrix(0, ncol = r, nrow = n)
 #' for(i in 1:n) {
-#'   x2[i, ] <- rgevr(1, r, loc = 100 + i/40, scale = 1, shape = 0)
+#'   x2[i, ] <- rgevr(1, r, loc = 100 + i / 50,  scale = 1 + i / 300, shape = 0)
 #' }
 #'
 #' covs <- as.data.frame(seq(1, n, 1))
-#' names(covs) <- c("Trend")
-#' result2 <- gevrFit(data = x2, method = "mle", locvars = covs, locform = ~ Trend)
+#' names(covs) <- c("Trend1")
+#' ## Create some unrelated covariates
+#' covs$Trend2 <- rnorm(n)
+#' covs$Trend3 <- 30 * runif(n)
+#' result2 <- gevrFit(data = x2, method = "mle", locvars = covs, locform = ~ Trend1 + Trend2*Trend3,
+#' scalevars = covs, scaleform = ~ Trend1)
 #'
-#' ## Calculate p-values for the parameters
-#' 2 * pnorm(abs(result2$par.ests / result2$par.ses), lower.tail = FALSE)
+#' ## Show summary of estimates
+#' result2$par.sum
 #'
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class
 #' object 'gevrFit' to be used with diagnostic plots.
 #' @details In the stationary case (no covariates), starting parameters for mle and mps estimation are the probability weighted moment estimates.
 #' In the case where covariates are used, the starting intercept parameters are the probability weighted moment estimates from the stationary case
 #' and the parameters based on covariates are initially set to zero. For non-stationary parameters, the first reported estimate refers to the
-#' intercept term. \cr
-#' Formulas for generalized linear modeling of the parameters should be given in the form `~ var1 + var2 + $\eqn{\ldots}'. Essentially, specification
+#' intercept term. Covariates are centered and scaled automatically to speed up optimization, and then transformed back to original scale. \cr
+#' Formulas for generalized linear modeling of the parameters should be given in the form `~ var1 + var2 + \eqn{\cdots}'. Essentially, specification
 #' here is the same as would be if using function `lm' for only the right hand side of the equation. Interactions, polynomials, etc. can be
 #' handled as in the `formula' class. \cr
 #' Intercept terms are automatically handled by the function. By default, the link functions are the identity function and the covariate dependent
 #' scale parameter estimates are forced to be positive. For some link function \eqn{f(\cdot)} and for example, location parameter \eqn{\mu}, the
-#' link is written as \eqn{\mu = f(\mu_1 x_1 + \mu_2 x_2 + \ldots + \mu_k x_k)}. \cr
+#' link is written as \eqn{\mu = f(\mu_1 x_1 + \mu_2 x_2 + \cdots + \mu_k x_k)}. \cr
 #' Maximum likelihood estimation can be used in all cases. Probability weighted moment estimation can only be used if \eqn{r = 1} and data is
 #' assumed to be stationary. Maximum product spacings estimation can be used in the non-stationary case, but only if \eqn{r = 1}.
 #'
 #' @import stats graphics
 #' @export
 gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expected", "observed"), locvars = NULL, scalevars = NULL,
-                    shapevars = NULL, locform = NULL, scaleform = NULL, shapeform = NULL, loclink = identity, scalelink = identity,
+                    shapevars = NULL, locform = ~ 1, scaleform = ~ 1, shapeform = ~ 1, loclink = identity, scalelink = identity,
                     shapelink = identity, start = NULL, opt = "Nelder-Mead", maxit = 10000, ...) {
   data <- as.matrix(data)
   n <- nrow(data)
@@ -78,62 +89,55 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   if(!is.null(shapevars))
     if(nrow(shapevars) != n)
       stop("Dimension of covariates does not match dimension of responses!")
-  if((!is.null(locform) & is.null(locvars)) | (!is.null(scaleform) & is.null(scalevars)) | (!is.null(shapeform) & is.null(shapevars)))
+  if(((locform != ~ 1) & is.null(locvars)) | ((scaleform != ~ 1) & is.null(scalevars)) | ((shapeform != ~ 1) & is.null(shapevars)))
     stop("Need to specify covariates!")
   if(R > 1 & (method == "mps" | method == "pwm"))
     stop("If R > 1, MLE must be used")
   if((!is.null(locvars) | !is.null(scalevars) | !is.null(shapevars)) & method == "pwm")
     stop("Probability weighted moments can only be fitted for stationary data")
 
-  locvars.model <- as.matrix(rep(1, n))
-  scalevars.model <- as.matrix(rep(1, n))
-  shapevars.model <- as.matrix(rep(1, n))
+  if(locform == ~ 1)
+    locvars <- as.data.frame(rep(1, n))
 
+  if(scaleform == ~ 1)
+    scalevars <- as.data.frame(rep(1, n))
+
+  if(shapeform == ~ 1)
+    shapevars <- as.data.frame(rep(1, n))
+
+  locvars.model <- model.matrix(locform, data = locvars)
   locnames <- colnames(locvars.model)
+  loccheck <- adjScale(locvars.model)
+  if(sum(loccheck$truevars == 0) > 1)
+    stop("Location design matrix is singular")
+  locvars.model <- loccheck$mat
+  loctrans1 <- loccheck$adjmeans
+  loctrans2 <- loccheck$adjvars
+
+  scalevars.model <- model.matrix(scaleform, data = scalevars)
   scalenames <- colnames(scalevars.model)
+  scalecheck <- adjScale(scalevars.model)
+  if(sum(scalecheck$truevars == 0) > 1)
+    stop("Scale design matrix is singular")
+  scalevars.model <- scalecheck$mat
+  scaletrans1 <- scalecheck$adjmeans
+  scaletrans2 <- scalecheck$adjvars
+
+  shapevars.model <- model.matrix(shapeform, data = shapevars)
   shapenames <- colnames(shapevars.model)
-
-  loctrans1 <- 0
-  scaletrans1 <- 0
-  shapetrans1 <- 0
-
-  loctrans2 <- 1
-  scaletrans2 <- 1
-  shapetrans2 <- 1
-
-  if(!is.null(locform)) {
-    locvars.model <- model.matrix(locform, data = locvars)
-    locnames <- colnames(locvars.model)[2:ncol(locvars.model)]
-    locvars.model <- scale(model.matrix(locform, data = locvars)[, -1])
-    loctrans1 <- c(loctrans1, attr(locvars.model, "scaled:center"))
-    loctrans2 <- c(loctrans2, attr(locvars.model, "scaled:scale"))
-    locvars.model <- cbind(rep(1, n), locvars.model)
-  }
-
-  if(!is.null(scaleform)) {
-    scalevars.model <- model.matrix(scaleform, data = scalevars)
-    scalenames <- colnames(scalevars.model)[2:ncol(scalevars.model)]
-    scalevars.model <- scale(model.matrix(scaleform, data = scalevars)[, -1])
-    scaletrans1 <- c(scaletrans1, attr(scalevars.model, "scaled:center"))
-    scaletrans2 <- c(scaletrans2, attr(scalevars.model, "scaled:scale"))
-    scalevars.model <- cbind(rep(1, n), scalevars.model)
-  }
-
-  if(!is.null(shapeform)) {
-    shapevars.model <- model.matrix(shapeform, data = shapevars)
-    shapenames <- colnames(shapevars.model)[2:ncol(shapevars.model)]
-    shapevars.model <- scale(model.matrix(shapeform, data = shapevars)[, -1])
-    shapetrans1 <- c(shapetrans1, attr(shapevars.model, "scaled:center"))
-    shapetrans2 <- c(shapetrans2, attr(shapevars.model, "scaled:scale"))
-    shapevars.model <- cbind(rep(1, n), shapevars.model)
-  }
+  shapecheck <- adjScale(shapevars.model)
+  if(sum(shapecheck$truevars == 0) > 1)
+    stop("Shape design matrix is singular")
+  shapevars.model <- shapecheck$mat
+  shapetrans1 <- shapecheck$adjmeans
+  shapetrans2 <- shapecheck$adjvars
 
   trans1 <- c(loctrans1, scaletrans1, shapetrans1)
   trans2 <- c(loctrans2, scaletrans2, shapetrans2)
 
-  locvars.model1 <- t((t(locvars.model) * loctrans2) + loctrans1)
-  scalevars.model1 <- t((t(scalevars.model) * scaletrans2) + scaletrans1)
-  shapevars.model1 <- t((t(shapevars.model) * shapetrans2) + shapetrans1)
+  locvars.model.orig <- t((t(locvars.model) * loctrans2) + loctrans1)
+  scalevars.model.orig <- t((t(scalevars.model) * scaletrans2) + scaletrans1)
+  shapevars.model.orig <- t((t(shapevars.model) * shapetrans2) + shapetrans1)
 
   ## Probability Weighted Moments
   ## Also use this as the intial estimates for other methods
@@ -171,118 +175,128 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R,
-                stationary = TRUE)
+                stationary = TRUE, parnum = c(1, 1, 1),
+                covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
     names(out$par.ests) <- c("Location", "Scale", "Shape")
   }
 
-  if(method == "mle") {
-    negloglik <- function(vars, locvars1, scalevars1, shapevars1) {
-      loc <- vars[1:length(locinit)]
-      scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
-      shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
+  negloglik <- function(vars, locvars1, scalevars1, shapevars1) {
+    loc <- vars[1:length(locinit)]
+    scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
+    shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
 
-      locmat <- t(loc * t(locvars1))
-      scalemat <- t(scale * t(scalevars1))
-      shapemat <- t(shape * t(shapevars1))
+    locmat <- t(loc * t(locvars1))
+    scalemat <- t(scale * t(scalevars1))
+    shapemat <- t(shape * t(shapevars1))
 
-      locvec <- loclink(rowSums(locmat))
-      scalevec <- scalelink(rowSums(scalemat))
-      shapevec <- shapelink(rowSums(shapemat))
+    locvec <- loclink(rowSums(locmat))
+    scalevec <- scalelink(rowSums(scalemat))
+    shapevec <- shapelink(rowSums(shapemat))
 
-      w <- matrix(((data - locvec) / scalevec), ncol = R)
-      z <- matrix(w * shapevec, ncol = R)
-      z <- pmax(z, -1)
+    w <- matrix(((data - locvec) / scalevec), ncol = R)
+    z <- matrix(w * shapevec, ncol = R)
+    z <- pmax(z, -1)
 
-      log.density <- ifelse(shapevec == 0, rowSums(-log1p(scalevec -1) - w) - exp(-w[,R]),
-                            rowSums(-log1p(scalevec - 1) - ((1/shapevec) + 1) * log1p(z)) - exp((-1/shapevec) * log1p(z[,R])))
+    if(any(scalevec < 0)) {
+      out <- .Machine$double.xmax
+    } else {
+      log.density <- ifelse(shapevec == 0, rowSums(-log(scalevec) - w) - exp(-w[,R]),
+                            rowSums(-log(scalevec) - ((1/shapevec) + 1) * log1p(z)) - exp((-1/shapevec) * log1p(z[,R])))
       log.density[is.nan(log.density) | is.infinite(log.density)] <- -Inf
-
-      if(any(scalevec < 0)) {
-        out <- .Machine$double.xmax
-      } else {
-        out <- - sum(log.density)
-      }
-      out
+      out <- - sum(log.density)
     }
+    out
+  }
 
-    init.fit <- optim(init, negloglik, hessian = TRUE, method = opt, control = list(maxit = maxit, ...),
-                      locvars1 = locvars.model, scalevars1 = scalevars.model, shapevars1 = shapevars.model)
+  mpsobj <- function(vars, locvars1, scalevars1, shapevars1) {
+    loc <- vars[1:length(locinit)]
+    scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
+    shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
 
-    fit <- optim(init.fit$par / trans2, negloglik, hessian = TRUE, method = opt, control = list(maxit = maxit, ...),
-                 locvars1 = locvars.model1, scalevars1 = scalevars.model1, shapevars1 = shapevars.model1)
+    locmat <- t(loc * t(locvars1))
+    scalemat <- t(scale * t(scalevars1))
+    shapemat <- t(shape * t(shapevars1))
+
+    locvec <- loclink(rowSums(locmat))
+    scalevec <- scalelink(rowSums(scalemat))
+    shapevec <- shapelink(rowSums(shapemat))
+
+    w <- as.vector((data - locvec) / scalevec)
+    z <- pmax(w * shapevec, -1)
+    cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
+    cdf <- sort(cdf)
+
+    if(any(scalevec < 0)) {
+      out <- .Machine$double.xmax
+    } else {
+      cdf <- c(0, cdf, 1)
+      D <- diff(cdf)
+      ## Check if any differences are zero due to rounding and adjust
+      D <- ifelse(D == 0, .Machine$double.eps, D)
+      out <- - sum(log(D))
+    }
+    out
+  }
+
+  if(method == "mle")
+    objfun <- negloglik
+  if(method == "mps")
+    objfun <- mpsobj
+
+  if(method == "mle" | method == "mps") {
+    fit <- optim(init, objfun, hessian = FALSE, method = opt, control = list(maxit = maxit, ...),
+                 locvars1 = locvars.model, scalevars1 = scalevars.model, shapevars1 = shapevars.model)
 
     if(fit$convergence)
       warning("optimization may not have succeeded")
-    par.ests <- fit$par
-    if(information == "observed" | (!is.null(locvars) | !is.null(scalevars) | !is.null(shapevars))) {
-      varcov <- unname(solve(fit$hessian), force = TRUE)
+
+    loc.ests <- fit$par[1:length(locinit)] / loctrans2
+    scale.ests <- fit$par[(length(locinit) + 1):(length(locinit) + length(scaleinit))] / scaletrans2
+    shape.ests <- fit$par[(length(locinit) + length(scaleinit) + 1):length(fit$par)] / shapetrans2
+
+    loc.ests <- ifelse(loccheck$truevars == 0, loc.ests - sum(loc.ests * loctrans1), loc.ests)
+    scale.ests <- ifelse(scalecheck$truevars == 0, scale.ests - sum(scale.ests * scaletrans1), scale.ests)
+    shape.ests <- ifelse(shapecheck$truevars == 0, shape.ests - sum(shape.ests * shapetrans1), shape.ests)
+
+    par.ests <- c(loc.ests, scale.ests, shape.ests)
+
+    if(information == "observed" | locform != ~ 1 | scaleform != ~ 1 | shapeform != ~ 1) {
+      varcov <- solve(optimHess(par.ests, objfun, locvars1 = locvars.model.orig,
+                                scalevars1 = scalevars.model.orig, shapevars1 = shapevars.model.orig))
     } else {
       varcov <- gevrFisher(data, par.ests) / n
     }
     par.ses <- sqrt(diag(varcov))
-    out <- list(n = n, data = data, type = "mle",
-                par.ests = par.ests, par.ses = par.ses, varcov = varcov,
-                converged = fit$convergence, nllh.final = fit$value, R = R,
-                stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)))
 
-    names(out$par.ests) <- c("Location Intercept", locnames, "Scale Intercept", scalenames, "Shape Intercept", shapenames)
-    names(out$par.ses) <- names(out$par.ests)
-  }
 
-  if(method == "mps") {
-    mpsobj <- function(vars, locvars1, scalevars1, shapevars1) {
-      loc <- vars[1:length(locinit)]
-      scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
-      shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
+    names(par.ests) <- c(paste('Location', colnames(locvars.model.orig), sep = ' '),
+                         paste('Scale', colnames(scalevars.model.orig), sep = ' '),
+                         paste('Shape', colnames(shapevars.model.orig), sep = ' '))
+    names(par.ses) <- names(par.ests)
 
-      locmat <- t(loc * t(locvars1))
-      scalemat <- t(scale * t(scalevars1))
-      shapemat <- t(shape * t(shapevars1))
+    par.sum <- data.frame(par.ests, par.ses, par.ests / par.ses, 2 * pnorm(abs(par.ests / par.ses), lower.tail = FALSE))
+    colnames(par.sum) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
 
-      locvec <- loclink(rowSums(locmat))
-      scalevec <- scalelink(rowSums(scalemat))
-      shapevec <- shapelink(rowSums(shapemat))
-
-      w <- as.vector((data - locvec) / scalevec)
-      z <- pmax(w * shapevec, -1)
-      cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
-      cdf <- sort(cdf)
-
-      if(any(scalevec < 0)) {
-        out <- .Machine$double.xmax
-      } else {
-        cdf <- c(0, cdf, 1)
-        D <- diff(cdf)
-        ## Check if any differences are zero due to rounding and adjust
-        D <- ifelse(D == 0, .Machine$double.eps, D)
-        out <- - sum(log1p(D - 1))
-      }
-      out
-    }
-
-    init.fit <- optim(init, mpsobj, hessian = TRUE, method = opt, control = list(maxit = maxit, ...),
-                      locvars1 = locvars.model, scalevars1 = scalevars.model, shapevars1 = shapevars.model)
-
-    fit <- optim(init.fit$par / trans2, mpsobj, hessian = TRUE, method = opt, control = list(maxit = maxit, ...),
-                 locvars1 = locvars.model1, scalevars1 = scalevars.model1, shapevars1 = shapevars.model1)
-
-    if (fit$convergence)
-      warning("optimization may not have succeeded")
-    par.ests <- fit$par
-    if(information == "observed" | (!is.null(locvars) | !is.null(scalevars) | !is.null(shapevars))) {
-      varcov <- unname(solve(fit$hessian), force = TRUE)
+    if(method == "mle") {
+      out <- list(n = n, data = data, type = "mle",
+                  par.ests = par.ests, par.ses = par.ses, varcov = varcov,
+                  converged = fit$convergence, nllh.final = fit$value, R = R,
+                  stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)),
+                  parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
+                  par.sum = par.sum,
+                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
     } else {
-      varcov <- gevrFisher(data, par.ests) / n
+      out <- list(n = n, data = as.matrix(data), type = "mps",
+                  par.ests = par.ests, par.ses = par.ses, varcov = varcov,
+                  converged = fit$convergence, moran = fit$value, R = R,
+                  stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)),
+                  parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
+                  par.sum = par.sum,
+                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
     }
-    par.ses <- sqrt(diag(varcov))
-    out <- list(n = n, data = as.matrix(data), type = "mps",
-                par.ests = par.ests, par.ses = par.ses, varcov = varcov,
-                converged = fit$convergence, moran = fit$value, R = R,
-                stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)))
 
-    names(out$par.ests) <- c("Location Intercept", locnames, "Scale Intercept", scalenames, "Shape Intercept", shapenames)
-    names(out$par.ses) <- names(out$par.ests)
   }
+
   class(out) <- "gevrFit"
   out
 }
