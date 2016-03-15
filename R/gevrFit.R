@@ -36,7 +36,7 @@ adjScale <- function(x) {
 #' x1 <- rgevr(500, 1, loc = 0.5, scale = 1, shape = 0.3)
 #' result1 <- gevrFit(x1, method = "mps")
 #'
-#' ## A linear trend in the location parameter
+#' ## A linear trend in the location and scale parameter
 #' n <- 100
 #' r <- 10
 #' x2 <- matrix(0, ncol = r, nrow = n)
