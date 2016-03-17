@@ -4,15 +4,18 @@ nzsh <- function(x, shape) {
 }
 
 
-## S3 functions for class gevrFit
-plot.gevrFit <- function(x, ...) {
-  gevrDiag(x, ...)
-}
-
-
-print.gevrFit <- function(x, ...) {
-  cat("Summary of fit:\n")
-  print(x$par.sum)
+## Function to help deal with design matrix
+adjScale <- function(x) {
+  truemeans <- as.numeric(colMeans(x))
+  truevars <- as.numeric(apply(x, 2, sd))
+  adjmeans <- ifelse(truevars == 0, 0, truemeans)
+  adjvars <- ifelse(truevars == 0, truemeans, truevars)
+  if(ncol(x) == 1)
+    adjmeans <- 0
+  x <- t((t(x) - adjmeans) / adjvars)
+  out <- list(x, truemeans, truevars, adjmeans, adjvars)
+  names(out) <- c("mat", "truemeans", "truevars", "adjmeans", "adjvars")
+  out
 }
 
 

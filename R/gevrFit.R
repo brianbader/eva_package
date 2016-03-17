@@ -1,17 +1,3 @@
-## Function to help deal with design matrix
-adjScale <- function(x) {
-  truemeans <- as.numeric(colMeans(x))
-  truevars <- as.numeric(apply(x, 2, sd))
-  adjmeans <- ifelse(truevars == 0, 0, truemeans)
-  adjvars <- ifelse(truevars == 0, truemeans, truevars)
-  if(ncol(x) == 1)
-    adjmeans <- 0
-  x <- t((t(x) - adjmeans) / adjvars)
-  out <- list(x, truemeans, truevars, adjmeans, adjvars)
-  names(out) <- c("mat", "truemeans", "truevars", "adjmeans", "adjvars")
-  out
-}
-
 #' Parameter estimation for the GEVr distribution model
 #'
 #' This function provides maximum likelihood estimation for the GEVr model, with the option of probability weighted moment and maximum product
@@ -25,7 +11,8 @@ adjScale <- function(x) {
 #' intercepts are automatically handled by the function. Defaults to NULL for the stationary model.
 #' @param locform,scaleform,shapeform An object of class `formula' (or one that can be coerced into that class), specifying the model
 #' of each parameter. By default, assumes stationary (intercept only) model. See details.
-#' @param loclink,scalelink,shapelink A link function specifying the relationship between the covariates and each parameter. Defaults to the identity function.
+#' @param loclink,scalelink,shapelink A link function specifying the relationship between the covariates and each parameter. Defaults to the identity function. For
+#' the stationary model, only the identity link should be used.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts
 #' to find good starting parameters. See details.
 #' @param opt Optimization method to use with optim.
@@ -172,12 +159,14 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   }
 
   if(method == "pwm") {
+    names(theta0) <- c("Location", "Scale", "Shape")
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R,
                 stationary = TRUE, parnum = c(1, 1, 1),
-                covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
-    names(out$par.ests) <- c("Location", "Scale", "Shape")
+                par.sum = theta0,
+                covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
+                links = list(loclink, scalelink, shapelink))
   }
 
   negloglik <- function(vars, locvars1, scalevars1, shapevars1) {
@@ -276,27 +265,49 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
     par.sum <- data.frame(par.ests, par.ses, par.ests / par.ses, 2 * pnorm(abs(par.ests / par.ses), lower.tail = FALSE))
     colnames(par.sum) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)")
+    par.sum$codes <- ifelse(par.sum[, 4] < 0.001, '***',
+                            ifelse(par.sum[, 4] < 0.01, '**',
+                                   ifelse(par.sum[, 4] < 0.05, '*',
+                                          ifelse(par.sum[, 4] < 0.1, '.', ' '))))
+    colnames(par.sum) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "")
 
     if(method == "mle") {
       out <- list(n = n, data = data, type = "mle",
                   par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, nllh.final = fit$value, R = R,
-                  stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)),
+                  stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
                   parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
                   par.sum = par.sum,
-                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
+                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
+                  links = list(loclink, scalelink, shapelink))
     } else {
       out <- list(n = n, data = as.matrix(data), type = "mps",
                   par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, moran = fit$value, R = R,
-                  stationary = (is.null(locvars) & is.null(scalevars) & is.null(shapevars)),
+                  stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
                   parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
                   par.sum = par.sum,
-                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig))
+                  covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
+                  links = list(loclink, scalelink, shapelink))
     }
 
   }
 
   class(out) <- "gevrFit"
   out
+}
+
+
+## S3 functions for class gevrFit
+#' @export
+plot.gevrFit <- function(x, ...) {
+  gevrDiag(x, ...)
+}
+
+
+#' @export
+print.gevrFit <- function(x, ...) {
+  cat("Summary of fit:\n")
+  print(x$par.sum, digits = 5)
+  cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
 }

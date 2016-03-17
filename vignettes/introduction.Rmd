@@ -39,7 +39,7 @@ pgev_naive <- function(q, loc = 0, scale = 1, shape = 1) {
 
 
 curve(pgev_naive(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
-curve(eva:::pgev(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
+curve(pgev(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
 
 # Similarly for the GPD cdf
 pgpd_naive <- function(q, loc = 0, scale = 1, shape = 1) {
@@ -47,7 +47,7 @@ pgpd_naive <- function(q, loc = 0, scale = 1, shape = 1) {
 }
 
 curve(pgpd_naive(1, 0, 1, x), 1e-20, .01, log = "x", n = 1025)
-curve(eva:::pgpd(1, 0, 1, x),  1e-20, .01, log = "x", n = 1025)
+curve(pgpd(1, 0, 1, x),  1e-20, .01, log = "x", n = 1025)
 
 
 ```
@@ -160,8 +160,8 @@ The previous chunk of code demonstrates the benefit of using a larger $r$ than j
 ```{r nonstatfit2}
 
 ## Show summary of estimates
-eva:::print.gevrFit(result1)
-eva:::print.gevrFit(result2)
+result1
+result2
 
 ```
 

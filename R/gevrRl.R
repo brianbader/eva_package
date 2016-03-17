@@ -1,8 +1,8 @@
-#' GEVr Return Level Estimate and Confidence Interval
+#' GEVr Return Level Estimate and Confidence Interval for Stationary Models
 #'
-#' Computes m-period return level estimate and interval, using either the delta method or profile likelihood.
+#' Computes stationary m-period return level estimate and interval, using either the delta method or profile likelihood.
 #'
-#' @param z A class object returned from gevrFit.
+#' @param z A class object returned from gevrFit. Must be a stationary fit.
 #' @param period The number of periods to use for the return level.
 #' @param conf Confidence level. Defaults to 95 percent.
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
@@ -27,6 +27,8 @@
 #' @export
 gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
                              opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
+  if(!z$stationary)
+    stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)
   data <- as.matrix(z$data)
   theta <- z$par.ests

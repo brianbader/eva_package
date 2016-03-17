@@ -71,12 +71,12 @@ gpdQQ <- function(z) {
 #' @export
 gpdDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
-  opar <- par(ask = TRUE, mfcol = c(2, 2))
+  par(ask = TRUE, mfcol = c(2, 2))
   try(gpdRlPlot(z, conf, method), silent = TRUE)
   try(gpdHist(z), silent = TRUE)
   try(gpdPP(z), silent = TRUE)
   try(gpdQQ(z), silent = TRUE)
-  par(opar)
+  par(mfrow = c(1, 1))
 }
 
 

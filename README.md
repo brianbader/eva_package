@@ -1,7 +1,5 @@
 ## **To Do:** ##
 
-* Allow GEVr diagnostic plots to accomodate nonstationary fitting
-
 * Add Moran's and Northrop's score test (for GPD)
 
 * Add AD / CVM tests for GEV1, similar to GPD

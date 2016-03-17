@@ -18,45 +18,68 @@ gevrRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
 }
 
 
-pgevMarg <- function(data, theta, j) {
-  data <- as.matrix(data)
-  n <- nrow(data)
-  p <- rep(0, n)
-  for(i in 1:n) {
+pgevMarg1 <- function(z, j) {
+  p <- rep(0, z$n)
+  locvec <- z$links[[1]](rowSums(t(z$par.ests[1:z$parnum[1]] * t(z$covars[[1]]))))
+  scalevec <- z$links[[2]](rowSums(t(z$par.ests[(z$parnum[1] + 1):(z$parnum[1] + z$parnum[2])] * t(z$covars[[2]]))))
+  shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
+  for(i in 1:z$n) {
     for(k in 0:(j-1)) {
-      p[i] <- p[i] + nzsh((data[i, 1] - theta[1])/theta[2], theta[3])^k / gamma(k+1)
+      p[i] <- p[i] + nzsh((z$data[i, j] - locvec[i]) / scalevec[i], shapevec[i])^k / gamma(k+1)
     }
-    p[i] <- p[i] * exp(-nzsh((data[i, 1] - theta[1])/theta[2], theta[3]))
+    p[i] <- p[i] * exp(-nzsh((z$data[i, j] - locvec[i]) / scalevec[i], shapevec[i]))
   }
   p
+}
+
+
+pgevMarg2 <- function(x, z, j, i) {
+  p <- 0
+  locvec <- z$links[[1]](rowSums(t(z$par.ests[1:z$parnum[1]] * t(z$covars[[1]]))))
+  scalevec <- z$links[[2]](rowSums(t(z$par.ests[(z$parnum[1] + 1):(z$parnum[1] + z$parnum[2])] * t(z$covars[[2]]))))
+  shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
+  for(k in 0:(j-1)) {
+    p <- p + nzsh((x - locvec[i]) / scalevec[i], shapevec[i])^k / gamma(k+1)
+  }
+  p * exp(-nzsh((x - locvec[i]) / scalevec[i], shapevec[i]))
+}
+
+
+gevrQQ <- function(z, j) {
+  qgevMarg <- function(x, q, i) {
+    q - pgevMarg2(x, z, j, i)
+  }
+  emp <- rep(0, z$n)
+  Series <- seq(1, z$n, 1) / (z$n + 1)
+  locvec <- z$links[[1]](rowSums(t(z$par.ests[1:z$parnum[1]] * t(z$covars[[1]]))))
+  scalevec <- z$links[[2]](rowSums(t(z$par.ests[(z$parnum[1] + 1):(z$parnum[1] + z$parnum[2])] * t(z$covars[[2]]))))
+  shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
+  ztrans <- nzsh(-(z$data[, j] - locvec) / scalevec, - shapevec)
+  Series <- Series[order(Series)[rank(ztrans)]]
+  for(i in 1:z$n) {
+    emp[i] <- uniroot(qgevMarg, interval = c(min(z$data[, j]) - 2, max(z$data[, j]) + 2), q = Series[i], i = i)$root
+  }
+  plot(z$data[, j], emp, xlab = "Empirical", ylab = "Model",
+       xlim = c(min(z$data[, j], emp), max(z$data[, j], emp)), ylim = c(min(z$data[, j], emp), max(z$data[, j], emp)))
+  if(z$stationary)
+    title(paste("Quantile Plot, j=", j, sep = ""))
+  if(!z$stationary)
+    title(paste("Residual Quantile Plot, j=", j, sep = ""))
+  abline(0, 1, col = 4)
 }
 
 
 ## Provide it the fitted object and which marginal statistic to plot (j)
 gevrPP <- function(z, j) {
   n <- z$n
-  Series <- seq(1, n, 1) / (n+1)
-  p <- pgevMarg(z$data[,j], z$par.ests, j)
+  Series <- seq(1, z$n, 1) / (z$n + 1)
+  p <- pgevMarg1(z, j)
   p <- sort(p)
   plot(p, Series, xlab = "Empirical", ylab = "Model", xlim = c(0,1), ylim = c(0,1))
-  title(paste("Probability Plot, ", "j=", j, sep = ""))
-  abline(0, 1, col = 4)
-}
-
-
-gevrQQ <- function(z, j) {
-  n <- z$n
-  qgevMarg <- function(x, q) {
-    q - pgevMarg(x, z$par.ests, j)
-  }
-  emp <- rep(0, n)
-  Series <- seq(1, n, 1) / (n+1)
-  for(i in 1:n) {
-    emp[i] <- uniroot(qgevMarg, interval = c(min(z$data[, j]) - 2, max(z$data[, j]) + 2), q = Series[i])$root
-  }
-  plot(sort(z$data[, j]), emp, xlab = "Empirical", ylab = "Model",
-       xlim = c(min(z$data[, j], emp), max(z$data[, j], emp)), ylim = c(min(z$data[, j], emp), max(z$data[, j], emp)))
-  title(paste("Quantile Plot, j=", j, sep = ""))
+  if(z$stationary)
+    title(paste("Probability Plot, ", "j=", j, sep = ""))
+  if(!z$stationary)
+    title(paste("Residual Probability Plot, ", "j=", j, sep = ""))
   abline(0, 1, col = 4)
 }
 
@@ -95,22 +118,23 @@ gevrHist <- function(z, j) {
 #' # x <- rgevr(500, 2, loc = 0.5, scale = 1, shape = 0.1)
 #' # z <- gevrFit(x)
 #' # gevrDiag(z)
-#' @return Provides return level plot and density, probability, and quantile plots for each marginal order statistic.
-#' The overlaid density is the 'true' marginal density for the estimated parameters.
+#' @return For stationary models, provides return level plot and density, probability,
+#' and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal
+#' density for the estimated parameters. For nonstationary models, provides only residual probability and quantile plots.
 #' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
 #' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
 #' @export
 gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)
-  opar <- par(ask = TRUE, mfcol = c(2, 2))
-  try(gevrRlPlot(z, conf, method), silent = TRUE)
+  par(ask = TRUE, mfcol = c(2, 2))
+  if(z$stationary)
+    try(gevrRlPlot(z, conf, method), silent = TRUE)
   for(i in 1:z$R) {
-    try(gevrHist(z, i), silent = TRUE)
+    if(z$stationary)
+      try(gevrHist(z, i), silent = TRUE)
     try(gevrPP(z, i), silent = TRUE)
     try(gevrQQ(z, i), silent = TRUE)
   }
-  par(opar)
+  par(mfrow = c(1, 1))
 }
-
-
