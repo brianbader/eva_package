@@ -311,3 +311,18 @@ print.gevrFit <- function(x, ...) {
   print(x$par.sum, digits = 5)
   cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
 }
+
+
+#' @export
+logLik.gevrFit <- function (x, ...) {
+  if(!missing(...))
+    warning("Extra arguments discarded")
+  if(x$type != "mle")
+    stop("Estimation method is not maximum likelihood")
+  val <- - x$nllh.final
+  attr(val, "nobs") <- x$n
+  attr(val, "df") <- sum(x$parnum)
+  class(val) <- "logLik"
+  val
+}
+
