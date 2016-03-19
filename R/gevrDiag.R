@@ -1,4 +1,6 @@
 gevrRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
+  if(!z$stationary)
+    stop("Model must be stationary")
   method <- match.arg(method)
   p <- c(seq(0.001, 0.01, by = 0.005), seq(0.01, 0.09, by = 0.01), 0.1, 0.2, 0.3, 0.4, 0.5,
          0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 0.995, 0.999)
@@ -85,6 +87,8 @@ dgevMarg <- function(x, j, loc = loc, scale = scale, shape = shape) {
 
 
 gevrHist <- function(z, j) {
+  if(!z$stationary)
+    stop("Model must be stationary")
   h <- hist(z$data[, j], plot = FALSE)
   x <- seq(min(h$breaks), max(h$breaks), (max(h$breaks) - min(h$breaks))/1000)
   if(j == 1)
@@ -95,6 +99,32 @@ gevrHist <- function(z, j) {
        xlab = "x", ylab = "Density", main = paste("Density Plot, j=", j, sep = ""))
   points(z$data[, j], rep(0, length(z$data[, j])))
   lines(x, y, col = 4)
+}
+
+
+## Plots Frechet residuals (r=1) vs. the covariates
+gevrResid <- function(z, locvec, scalevec, shapevec) {
+  if(z$stationary)
+    stop("Model cannot be stationary")
+  resid <- nzsh((z$data[, 1] - locvec) / scalevec, shapevec)
+  if(z$parnum[1] > 1) {
+    for(i in 2:z$parnum[1]) {
+      plot(z$covars[[1]][, i], resid, xlab = paste("Location", colnames(z$covars[[1]])[i], sep = " "), ylab = "Residuals")
+      lines(lowess(z$covars[[1]][, i], resid), col = "red")
+    }
+  }
+  if(z$parnum[2] > 1) {
+    for(i in 2:z$parnum[2]) {
+      plot(z$covars[[2]][, i], resid, xlab = paste("Scale", colnames(z$covars[[1]])[i], sep = " "), ylab = "Residuals")
+      lines(lowess(z$covars[[2]][, i], resid), col = "red")
+    }
+  }
+  if(z$parnum[3] > 1) {
+    for(i in 2:z$parnum[3]) {
+      plot(z$covars[[3]][, i], resid, xlab = paste("Shape", colnames(z$covars[[1]])[i], sep = " "), ylab = "Residuals")
+      lines(lowess(z$covars[[3]][, i], resid), col = "red")
+    }
+  }
 }
 
 
@@ -111,7 +141,8 @@ gevrHist <- function(z, j) {
 #' # plot(z)
 #' @return For stationary models, provides return level plot and density, probability,
 #' and quantile plots for each marginal order statistic. The overlaid density is the 'true' marginal
-#' density for the estimated parameters. For nonstationary models, provides only residual probability and quantile plots.
+#' density for the estimated parameters. For nonstationary models, provides residual probability and quantile plots. In addition,
+#' nonstationary models provide plots of the residuals vs. the parameter covariates.
 #' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
 #' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
@@ -122,13 +153,18 @@ gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   locvec <- z$links[[1]](rowSums(t(z$par.ests[1:z$parnum[1]] * t(z$covars[[1]]))))
   scalevec <- z$links[[2]](rowSums(t(z$par.ests[(z$parnum[1] + 1):(z$parnum[1] + z$parnum[2])] * t(z$covars[[2]]))))
   shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
-  if(z$stationary)
-    try(gevrRlPlot(z, conf, method), silent = TRUE)
-  for(i in 1:z$R) {
-    if(z$stationary)
-      try(gevrHist(z, i), silent = TRUE)
-    try(gevrPP(z, i, locvec, scalevec, shapevec), silent = TRUE)
-    try(gevrQQ(z, i, locvec, scalevec, shapevec), silent = TRUE)
+  choice <- 1
+  while(choice > 0) {
+    choice <- menu(c("Return Level Plot", "Marginal Density Plot(s)", "Marginal PP Plot(s)", 
+                     "Marginal QQ Plot(s)", "Residual Scatterplot(s)"), title = "\nMake a plot selection (or 0 to exit):")
+    switch(choice + 1,
+           cat("Exited\n"),
+           if(!z$stationary) stop("Model must be stationary") else try(gevrRlPlot(z, conf, method), silent = TRUE),
+           if(!z$stationary) stop("Model must be stationary") else for(i in 1:z$R) try(gevrHist(z, i), silent = TRUE),
+           for(i in 1:z$R) try(gevrPP(z, i, locvec, scalevec, shapevec), silent = TRUE),
+           for(i in 1:z$R) try(gevrQQ(z, i, locvec, scalevec, shapevec), silent = TRUE),
+           if(z$stationary) stop("Model cannot be stationary") else try(gevrResid(z, locvec, scalevec, shapevec))
+    )
   }
   par(mfrow = c(1, 1))
 }

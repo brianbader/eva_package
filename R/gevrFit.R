@@ -314,14 +314,14 @@ print.gevrFit <- function(x, ...) {
 
 
 #' @export
-logLik.gevrFit <- function (x, ...) {
+logLik.gevrFit <- function (object, ...) {
   if(!missing(...))
     warning("Extra arguments discarded")
-  if(x$type != "mle")
+  if(object$type != "mle")
     stop("Estimation method is not maximum likelihood")
-  val <- - x$nllh.final
-  attr(val, "nobs") <- x$n
-  attr(val, "df") <- sum(x$parnum)
+  val <- - object$nllh.final
+  attr(val, "nobs") <- object$n
+  attr(val, "df") <- sum(object$parnum)
   class(val) <- "logLik"
   val
 }
