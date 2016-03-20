@@ -115,13 +115,13 @@ gevrResid <- function(z, locvec, scalevec, shapevec) {
   }
   if(z$parnum[2] > 1) {
     for(i in 2:z$parnum[2]) {
-      plot(z$covars[[2]][, i], resid, xlab = paste("Scale", colnames(z$covars[[1]])[i], sep = " "), ylab = "Residuals")
+      plot(z$covars[[2]][, i], resid, xlab = paste("Scale", colnames(z$covars[[2]])[i], sep = " "), ylab = "Residuals")
       lines(lowess(z$covars[[2]][, i], resid), col = "red")
     }
   }
   if(z$parnum[3] > 1) {
     for(i in 2:z$parnum[3]) {
-      plot(z$covars[[3]][, i], resid, xlab = paste("Shape", colnames(z$covars[[1]])[i], sep = " "), ylab = "Residuals")
+      plot(z$covars[[3]][, i], resid, xlab = paste("Shape", colnames(z$covars[[3]])[i], sep = " "), ylab = "Residuals")
       lines(lowess(z$covars[[3]][, i], resid), col = "red")
     }
   }
@@ -155,7 +155,7 @@ gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
   choice <- 1
   while(choice > 0) {
-    choice <- menu(c("Return Level Plot", "Marginal Density Plot(s)", "Marginal PP Plot(s)", 
+    choice <- menu(c("Return Level Plot", "Marginal Density Plot(s)", "Marginal PP Plot(s)",
                      "Marginal QQ Plot(s)", "Residual Scatterplot(s)"), title = "\nMake a plot selection (or 0 to exit):")
     switch(choice + 1,
            cat("Exited\n"),
@@ -163,7 +163,7 @@ gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
            if(!z$stationary) stop("Model must be stationary") else for(i in 1:z$R) try(gevrHist(z, i), silent = TRUE),
            for(i in 1:z$R) try(gevrPP(z, i, locvec, scalevec, shapevec), silent = TRUE),
            for(i in 1:z$R) try(gevrQQ(z, i, locvec, scalevec, shapevec), silent = TRUE),
-           if(z$stationary) stop("Model cannot be stationary") else try(gevrResid(z, locvec, scalevec, shapevec))
+           if(z$stationary) stop("Model cannot be stationary") else try(gevrResid(z, locvec, scalevec, shapevec), silent = TRUE)
     )
   }
   par(mfrow = c(1, 1))

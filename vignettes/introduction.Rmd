@@ -167,5 +167,26 @@ result2
 
 From the output, one can see from the fit summary that using $r=10$, both the correct trend in location and scale are deemed significant. However, using $r=1$ a test for significance in the scale trend fails, and further one of the erroneous covariates, 'Trend3' shows up as significant in the location parameter modeling.
 
+```{r nonstatfit3}
 
+## Compare AIC of two models
+result3 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
+scalevars = covs, scaleform = ~ Trend1)
+
+result4 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
+scalevars = covs, scaleform = ~ Trend1, gumbel = TRUE)
+
+AIC(result1)
+AIC(result3)
+AIC(result4)
+
+LRT <- as.numeric(2 * (logLik(result3) - logLik(result4)))
+
+pval <- pchisq(LRT, df = 1, ncp = 0, lower.tail = FALSE, log.p = FALSE)
+
+pval
+
+```
+
+Next, we fit another model, with 
 

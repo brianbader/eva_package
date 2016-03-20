@@ -13,6 +13,7 @@
 #' of each parameter. By default, assumes stationary (intercept only) model. See details.
 #' @param loclink,scalelink,shapelink A link function specifying the relationship between the covariates and each parameter. Defaults to the identity function. For
 #' the stationary model, only the identity link should be used.
+#' @param gumbel Whether to fit the Gumbel (type I) extreme value distribution, i.e., shape parameter equals zero. Defaults to FALSE.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts
 #' to find good starting parameters. See details.
 #' @param opt Optimization method to use with optim.
@@ -60,13 +61,15 @@
 #' @import stats graphics
 #' @export
 gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expected", "observed"), locvars = NULL, scalevars = NULL,
-                    shapevars = NULL, locform = ~ 1, scaleform = ~ 1, shapeform = ~ 1, loclink = identity, scalelink = identity,
-                    shapelink = identity, start = NULL, opt = "Nelder-Mead", maxit = 10000, ...) {
+                     shapevars = NULL, locform = ~ 1, scaleform = ~ 1, shapeform = ~ 1, loclink = identity, scalelink = identity,
+                     shapelink = identity, gumbel = FALSE, start = NULL, opt = "Nelder-Mead", maxit = 10000, ...) {
   data <- as.matrix(data)
   n <- nrow(data)
   R <- ncol(data)
   method <- match.arg(method)
   information <- match.arg(information)
+  if((gumbel) & ((!is.null(shapevars)) | (shapeform != ~ 1)))
+    stop("Cannot specify covariates in shape parameter for Gumbel distribution!")
   if(!is.null(locvars))
     if(nrow(locvars) != n)
       stop("Dimension of covariates does not match dimension of responses!")
@@ -128,43 +131,54 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
   ## Probability Weighted Moments
   ## Also use this as the intial estimates for other methods
-  y <- function(x, w0, w1, w2) {
-    (3^x - 1)/(2^x - 1) - (3 * w2 - w0)/(2 * w1 - w0)
+  x <- sort(as.vector(data[, 1]))
+  solve_shape <- function(sh, mom0, mom1, mom2) {
+    (3^sh - 1) / (2^sh - 1) - (3 * mom2 - mom0) / (2 * mom1 - mom0)
   }
-  nmom <- 3
-  x <- rev(sort(as.vector(data[,1])))
-  moments <- rep(0, nmom)
-  moments[1] <- mean(x)
-  for (i in 1:n) {
-    weight <- 1/n
-    for (j in 2:nmom) {
-      weight <- weight * (n - i - j + 2)/(n - j + 1)
-      moments[j] <- moments[j] + weight * x[i]
-    }
+  moments <- rep(0, 3)
+  for(j in 1:n) {
+    moments[1] <- moments[1] + (x[j] / n)
+    moments[2] <- moments[2] + ((j - 1) / (n - 1)) * (x[j] / n)
+    moments[3] <- moments[3] + (((j - 1) * (j - 2)) / ((n - 1) * (n - 2))) * (x[j] / n)
   }
-  w0 <- moments[1]
-  w1 <- moments[2]
-  w2 <- moments[3]
-  shape0 <- uniroot(f = y, interval = c(-5, +5), w0 = w0, w1 = w1,
-                    w2 = w2)$root
-  scale0 <- (2 * w1 - w0) * shape0/gamma(1 - shape0)/(2^shape0 - 1)
-  loc0 <- w0 + scale0 * (1 - gamma(1 - shape0))/shape0
-  theta0 <- c(loc0, scale0, shape0)
+  mom0 <- moments[1]
+  mom1 <- moments[2]
+  mom2 <- moments[3]
+
+  if(!gumbel) {
+    shape0 <- uniroot(solve_shape, interval = c(-5, +5), mom0 = mom0, mom1 = mom1, mom2 = mom2)$root
+    scale0 <- ((2 * mom1 - mom0) * shape0) / (gamma(1 - shape0) * (2^shape0 - 1))
+    loc0 <- mom0 + scale0 * (1 - gamma(1 - shape0)) / shape0
+    theta0 <- c(loc0, scale0, shape0)
+  } else {
+    scale0 <- (mom0 - 2 * mom1) / - log(2)
+    loc0 <- mom0 + scale0 * digamma(1)
+    theta0 <- c(loc0, scale0)
+  }
 
   if(is.null(start)) {
     locinit <- c(loc0, rep(0, ncol(locvars.model) - 1))
     scaleinit <- c(scale0, rep(0, ncol(scalevars.model) - 1))
-    shapeinit <- c(shape0, rep(0, ncol(shapevars.model) - 1))
-    init <- c(locinit, scaleinit, shapeinit)
+    if(!gumbel) {
+      shapeinit <- c(shape0, rep(0, ncol(shapevars.model) - 1))
+      init <- c(locinit, scaleinit, shapeinit)
+    } else {
+      init <- c(locinit, scaleinit)
+    }
+  } else {
+    init <- start
   }
 
+  parnum <- c(ncol(locvars.model), ncol(scalevars.model), ncol(shapevars.model))
+  if(gumbel) parnum[3] <- 0
+
   if(method == "pwm") {
-    names(theta0) <- c("Location", "Scale", "Shape")
+    names(theta0) <- c("Location", "Scale", "Shape")[1:length(theta0)]
     out <- list(n = n, data = data, type = "pwm",
                 par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R,
-                stationary = TRUE, parnum = c(1, 1, 1),
-                par.sum = theta0,
+                stationary = TRUE, parnum = parnum,
+                par.sum = theta0, gumbel = gumbel,
                 covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                 links = list(loclink, scalelink, shapelink))
   }
@@ -172,20 +186,16 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   negloglik <- function(vars, locvars1, scalevars1, shapevars1) {
     loc <- vars[1:length(locinit)]
     scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
-    shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
-
+    if(!gumbel) shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)] else shape <- 0
     locmat <- t(loc * t(locvars1))
     scalemat <- t(scale * t(scalevars1))
     shapemat <- t(shape * t(shapevars1))
-
     locvec <- loclink(rowSums(locmat))
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
-
     w <- matrix(((data - locvec) / scalevec), ncol = R)
     z <- matrix(w * shapevec, ncol = R)
     z <- pmax(z, -1)
-
     if(any(scalevec < 0)) {
       out <- .Machine$double.xmax
     } else {
@@ -200,21 +210,17 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   mpsobj <- function(vars, locvars1, scalevars1, shapevars1) {
     loc <- vars[1:length(locinit)]
     scale <- vars[(length(locinit) + 1):(length(locinit) + length(scaleinit))]
-    shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)]
-
+    if(!gumbel) shape <- vars[(length(locinit) + length(scaleinit) + 1):length(vars)] else shape <- 0
     locmat <- t(loc * t(locvars1))
     scalemat <- t(scale * t(scalevars1))
     shapemat <- t(shape * t(shapevars1))
-
     locvec <- loclink(rowSums(locmat))
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
-
     w <- as.vector((data - locvec) / scalevec)
     z <- pmax(w * shapevec, -1)
     cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
     cdf <- sort(cdf)
-
     if(any(scalevec < 0)) {
       out <- .Machine$double.xmax
     } else {
@@ -241,13 +247,15 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
     loc.ests <- fit$par[1:length(locinit)] / loctrans2
     scale.ests <- fit$par[(length(locinit) + 1):(length(locinit) + length(scaleinit))] / scaletrans2
-    shape.ests <- fit$par[(length(locinit) + length(scaleinit) + 1):length(fit$par)] / shapetrans2
+    if(!gumbel)
+      shape.ests <- fit$par[(length(locinit) + length(scaleinit) + 1):length(fit$par)] / shapetrans2
 
     loc.ests <- ifelse(loccheck$truevars == 0, loc.ests - sum(loc.ests * loctrans1), loc.ests)
     scale.ests <- ifelse(scalecheck$truevars == 0, scale.ests - sum(scale.ests * scaletrans1), scale.ests)
-    shape.ests <- ifelse(shapecheck$truevars == 0, shape.ests - sum(shape.ests * shapetrans1), shape.ests)
+    if(!gumbel)
+      shape.ests <- ifelse(shapecheck$truevars == 0, shape.ests - sum(shape.ests * shapetrans1), shape.ests)
 
-    par.ests <- c(loc.ests, scale.ests, shape.ests)
+    if(!gumbel) par.ests <- c(loc.ests, scale.ests, shape.ests) else par.ests <- c(loc.ests, scale.ests)
 
     if(information == "observed" | locform != ~ 1 | scaleform != ~ 1 | shapeform != ~ 1) {
       varcov <- solve(optimHess(par.ests, objfun, locvars1 = locvars.model.orig,
@@ -257,10 +265,15 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     }
     par.ses <- sqrt(diag(varcov))
 
+    if(!gumbel) {
+      names(par.ests) <- c(paste('Location', colnames(locvars.model.orig), sep = ' '),
+                           paste('Scale', colnames(scalevars.model.orig), sep = ' '),
+                           paste('Shape', colnames(shapevars.model.orig), sep = ' '))
+    } else {
+      names(par.ests) <- c(paste('Location', colnames(locvars.model.orig), sep = ' '),
+                           paste('Scale', colnames(scalevars.model.orig), sep = ' '))
+    }
 
-    names(par.ests) <- c(paste('Location', colnames(locvars.model.orig), sep = ' '),
-                         paste('Scale', colnames(scalevars.model.orig), sep = ' '),
-                         paste('Shape', colnames(shapevars.model.orig), sep = ' '))
     names(par.ses) <- names(par.ests)
 
     par.sum <- data.frame(par.ests, par.ses, par.ests / par.ses, 2 * pnorm(abs(par.ests / par.ses), lower.tail = FALSE))
@@ -276,8 +289,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
                   par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, nllh.final = fit$value, R = R,
                   stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
-                  parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
-                  par.sum = par.sum,
+                  parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                   links = list(loclink, scalelink, shapelink))
     } else {
@@ -285,8 +297,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
                   par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, moran = fit$value, R = R,
                   stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
-                  parnum = c(length(loc.ests), length(scale.ests), length(shape.ests)),
-                  par.sum = par.sum,
+                  parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                   links = list(loclink, scalelink, shapelink))
     }
@@ -309,7 +320,8 @@ plot.gevrFit <- function(x, ...) {
 print.gevrFit <- function(x, ...) {
   cat("Summary of fit:\n")
   print(x$par.sum, digits = 5)
-  cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
+  if(x$type != "pwm")
+    cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
 }
 
 
