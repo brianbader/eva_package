@@ -3,7 +3,7 @@
 #' Sequentially performs the entropy difference (ED) test or the multiplier or parametric bootstrap score tests for the GEVr model.
 #' @param data Data should be contain n rows, each a GEVr observation.
 #' @param method Which test to run: ED test (ed), multiplier (multscore) or parametric bootstrap (pbscore) score test.
-#' @param nsim If method equals 'pbscore' or 'multscore', the number of bootstrap simulations to use.
+#' @param bootnum If method equals 'pbscore' or 'multscore', the number of bootstrap simulations to use.
 #' @param information To use expected (default) or observed information in the score tests.
 #' @param allowParallel If method equals 'pbscore', should the parametric boostrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
@@ -25,22 +25,22 @@
 #' See function 'pSeqStop' for details on transformed p-values.
 #' @export
 
-gevrSeqTests <- function(data, nsim = NULL, method = c("ed", "pbscore", "multscore"), information = c("expected", "observed"),
+gevrSeqTests <- function(data, bootnum = NULL, method = c("ed", "pbscore", "multscore"), information = c("expected", "observed"),
                               allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)
   R <- ncol(data)
   method <- match.arg(method)
   if(method != "ed") {
-    if(is.null(nsim))
+    if(is.null(bootnum))
       stop("Must enter the number of bootstrap replicates!")
     information <- match.arg(information)
     result <- matrix(0, R, 8)
     for(i in 1:R) {
       result[i, 1] <- i
       if(method == "multscore")
-        fit <- gevrMultScore(data[, 1:i], nsim, NULL, information)
+        fit <- gevrMultScore(data[, 1:i], bootnum, information)
       if(method == "pbscore")
-        fit <- gevrPbScore(data[, 1:i], nsim, information, allowParallel, numCores)
+        fit <- gevrPbScore(data[, 1:i], bootnum, information, allowParallel, numCores)
       result[i, 2] <- fit$p.value
       result[i, 5] <- fit$statistic
       result[i, 6:8] <- fit$theta

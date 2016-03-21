@@ -34,19 +34,22 @@ gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
   theta <- z$par.ests
   cov <- z$varcov
   m <- -log1p(-(1/period))
-  est <- theta[1] - (theta[2]/theta[3])*(-expm1(-theta[3]*log(m)))
+  if(!z$gumbel) est <- theta[1] - (theta[2]/theta[3])*(-expm1(-theta[3]*log(m))) else est <- theta[1] - theta[2]*log(m)
   est <- as.numeric(est)
   if(method == "delta") {
-    del <- matrix(ncol = 1, nrow = 3)
-    del[1, 1] <- 1
-    del[2, 1] <- -((theta[3])^(-1))*(-expm1(-theta[3]*log(m)))
-    del[3, 1] <- ((theta[2])*(theta[3]^(-2))*(-expm1(-theta[3]*log(m)))) - ((theta[2])*((theta[3])^(-1))*((1+expm1(-theta[3]*log(m)))*log(m)))
-    se <- sqrt(t(del) %*% cov %*% del)
-    se <- as.vector(se)
+    if(!z$gumbel) {
+      del <- matrix(ncol = 1, nrow = 3)
+      del[1, 1] <- 1
+      del[2, 1] <- -((theta[3])^(-1))*(-expm1(-theta[3]*log(m)))
+      del[3, 1] <- ((theta[2])*(theta[3]^(-2))*(-expm1(-theta[3]*log(m)))) - ((theta[2])*((theta[3])^(-1))*((1+expm1(-theta[3]*log(m)))*log(m)))
+      se <- as.numeric(sqrt(t(del) %*% cov %*% del))
+    } else {
+      se <- as.numeric(sqrt(cov[1, 1] - ((cov[2, 2] + cov[2, 1]) * log(m)) + (cov[2, 2] * (log(m))^2)))
+    }
     alpha <- (1-conf)/2
     lower <- est - qnorm(1-alpha)*se
     upper <- est + qnorm(1-alpha)*se
-    CI <- as.numeric(c(lower, upper))
+    CI <- c(lower, upper)
   } else {
     opt <- match.arg(opt)
     sol <- c(theta[2], theta[3])

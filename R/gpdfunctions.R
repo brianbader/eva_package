@@ -48,32 +48,6 @@ gpdInd <- function(data, theta) {
 }
 
 
-## Feed a 3 by 3 matrix in, outputs the inverse (done analytically)
-solve3by3 <- function(V) {
-  a <- V[1,1]
-  b <- V[1,2]
-  c <- V[1,3]
-  d <- V[2,1]
-  e <- V[2,2]
-  f <- V[2,3]
-  g <- V[3,1]
-  h <- V[3,2]
-  i <- V[3,3]
-  W <- matrix(0, 3, 3)
-  W[1,1] <- e*i - f*h
-  W[1,2] <- c*h - b*i
-  W[1,3] <- b*f - c*e
-  W[2,1] <- f*g - d*i
-  W[2,2] <- a*i - c*g
-  W[2,3] <- c*d - a*f
-  W[3,1] <- d*h - e*g
-  W[3,2] <- b*g - a*h
-  W[3,3] <- a*e - b*d
-  m <- a*(e*i - f*h) - b*(d*i - f*g) + c*(d*h - e*g)
-  W <- W / m
-  W
-}
-
 ## Helper function for gpd.imcov
 gpdImCovGen <- function(n, theta) {
   scale <- theta[1]
@@ -106,7 +80,7 @@ gpdImCov<- function(data, B, theta) {
   temp[,2] <- temp[,2] - Dbar[2]
   temp[,3] <- temp[,3] - Dbar[3]
   V <- (1/(B-1)) * t(temp) %*% temp
-  V <- solve3by3(V)
+  V <- solve(V)
   out <- list(V, B)
   names(out) <- c("cov", "boot_adj")
   out

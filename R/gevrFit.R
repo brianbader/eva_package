@@ -261,7 +261,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
       varcov <- solve(optimHess(par.ests, objfun, locvars1 = locvars.model.orig,
                                 scalevars1 = scalevars.model.orig, shapevars1 = shapevars.model.orig))
     } else {
-      varcov <- gevrFisher(data, par.ests) / n
+      varcov <- gevrFisher(data, par.ests, gumbel)
     }
     par.ses <- sqrt(diag(varcov))
 
