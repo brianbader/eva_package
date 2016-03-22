@@ -1,6 +1,6 @@
 ## Helper function to handle (1 + x*shape)^(-1/shape) as shape -> 0
 nzsh <- function(x, shape) {
-  exp((-1/shape) * log1p(x * shape))
+  ifelse(shape == 0, exp(-x), exp((-1/shape) * log1p(x * shape)))
 }
 
 

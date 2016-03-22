@@ -91,10 +91,11 @@ gevrHist <- function(z, j) {
     stop("Model must be stationary")
   h <- hist(z$data[, j], plot = FALSE)
   x <- seq(min(h$breaks), max(h$breaks), (max(h$breaks) - min(h$breaks))/1000)
+  if(!z$gumbel) shape <- z$par.ests[3] else shape <- 0
   if(j == 1)
-    y <- dgevr(x, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
+    y <- dgevr(x, loc = z$par.ests[1], scale = z$par.ests[2], shape = shape)
   if(j > 1)
-    y <- dgevMarg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = z$par.ests[3])
+    y <- dgevMarg(x, j, loc = z$par.ests[1], scale = z$par.ests[2], shape = shape)
   hist(z$data[, j], freq = FALSE, ylim = c(0, max(max(h$density), max(y))),
        xlab = "x", ylab = "Density", main = paste("Density Plot, j=", j, sep = ""))
   points(z$data[, j], rep(0, length(z$data[, j])))
@@ -152,7 +153,11 @@ gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   par(ask = TRUE, mfcol = c(2, 2))
   locvec <- z$links[[1]](rowSums(t(z$par.ests[1:z$parnum[1]] * t(z$covars[[1]]))))
   scalevec <- z$links[[2]](rowSums(t(z$par.ests[(z$parnum[1] + 1):(z$parnum[1] + z$parnum[2])] * t(z$covars[[2]]))))
-  shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
+  if(!z$gumbel) {
+    shapevec <- z$links[[3]](rowSums(t(z$par.ests[(z$parnum[1] + z$parnum[2] + 1):(z$parnum[1] + z$parnum[2] + z$parnum[3])] * t(z$covars[[3]]))))
+  } else {
+    shapevec <- rep(0, z$n)
+  }
   choice <- 1
   while(choice > 0) {
     choice <- menu(c("Return Level Plot", "Marginal Density Plot(s)", "Marginal PP Plot(s)",

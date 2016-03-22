@@ -28,6 +28,7 @@ gevrPbGen <- function(n, R, theta, information) {
 #' \item{statistic}{Test statistic.}
 #' \item{p.value}{P-value for the test.}
 #' \item{theta}{Initial value of theta used in the test.}
+#' \item{effective_bootnum}{Effective number of bootstrap replicates (only those that converged are used).}
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
 #' @import parallel
 #' @references Bader B., Yan J., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
@@ -46,17 +47,17 @@ gevrPbScore <- function(data, bootnum, information = c("expected", "observed"), 
   if(allowParallel == TRUE) {
     cl <- makeCluster(numCores)
     fun <- function(cl) {
-      parSapply(cl, 1:B, function(i,...) {gevrPbGen(n, R, theta, information)})
+      parSapply(cl, 1:bootnum, function(i,...) {gevrPbGen(n, R, theta, information)})
     }
     teststat <- fun(cl)
     stopCluster(cl)
   } else {
-    teststat <- replicate(B, gevrPbGen(n, R, theta, information))
+    teststat <- replicate(bootnum, gevrPbGen(n, R, theta, information))
   }
   teststat <- teststat[!is.na(teststat)]
-  B <- length(teststat)
-  p <- (sum(teststat > stat) + 1) / (bootnum + 2)
-  out <- list(stat, p, theta)
-  names(out) <- c("statistic", "p.value", "theta")
+  eff <- length(teststat)
+  p <- (sum(teststat > stat) + 1) / (eff + 2)
+  out <- list(stat, p, theta, eff)
+  names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
   out
 }

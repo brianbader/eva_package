@@ -20,6 +20,8 @@
 #' \item{ConfLevel}{The confidence level used.}
 #' @export
 gevrProfShape <- function(z, conf = .95, opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
+  if(z$gumbel)
+    stop("Object cannot be from a Gumbel fit!")
   data <- as.matrix(z$data)
   theta <- as.numeric(z$par.ests)
   opt <- match.arg(opt)

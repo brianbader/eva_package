@@ -10,7 +10,8 @@
 #'
 #' @details It is generally accepted that profile likelihood confidence intervals provide greater accuracy than the delta
 #' method, in particular for large return level periods. Also, by their nature, delta method confidence intervals must be symmetric
-#' which may be undesirable for return level estimation.
+#' which may be undesirable for return level estimation. If the original fit was Gumbel, then return levels will be for the Gumbel
+#' distribution.
 #' @references http://www.mas.ncl.ac.uk/~nlf8/teaching/mas8391/background/chapter2.pdf
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @examples
@@ -52,7 +53,7 @@ gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
     CI <- c(lower, upper)
   } else {
     opt <- match.arg(opt)
-    sol <- c(theta[2], theta[3])
+    if(!z$gumbel) sol <- c(theta[2], theta[3]) else sol <- c(theta[2])
     gevrLik <- function(a, xp) {
       loc <- xp + (a[1]/a[2])*(-expm1(-a[2]*log(m)))
       if(a[1] <= 0) {
@@ -65,11 +66,29 @@ gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
       }
       out
     }
+    gumLik <- function(a, xp) {
+      loc <- xp + a*log(m)
+      if(a <= 0) {
+        out <- .Machine$double.xmax
+      } else {
+        out <- dgevr(data, loc = loc, scale = a, shape = 0, log.d = TRUE)
+        out <- - sum(out)
+        if(out == Inf)
+          out <- .Machine$double.xmax
+      }
+      out
+    }
     cutoff <- qchisq(conf, 1)
     prof <- function(xp) {
-      lmax <- dgevr(data, theta[1], theta[2], theta[3], log.d = TRUE)
-      lmax <- sum(lmax)
-      yes <- optim(sol, gevrLik, method = opt, xp = xp)
+      if(!z$gumbel) {
+        lmax <- dgevr(data, theta[1], theta[2], theta[3], log.d = TRUE)
+        lmax <- sum(lmax)
+        yes <- optim(sol, gevrLik, method = opt, xp = xp)
+      } else {
+        lmax <- dgevr(data, theta[1], theta[2], 0, log.d = TRUE)
+        lmax <- sum(lmax)
+        yes <- optim(sol, gumLik, method = opt, xp = xp)
+      }
       sol <- yes$par
       lci <- -yes$value
       2*(lmax-lci) - cutoff
