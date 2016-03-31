@@ -23,7 +23,9 @@
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
 gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
-                             opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
+                             opt = c("Nelder-Mead")) {
+  if(!z$stationary)
+    stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)
   m <- period * z$npp
   est <- z$threshold + (z$par.ests[1] / z$par.ests[2]) * ((m * z$rate)^z$par.ests[2] - 1)

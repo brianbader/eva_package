@@ -144,11 +144,11 @@ covs$Trend2 <- rnorm(n)
 covs$Trend3 <- 30 * runif(n)
 
 ## Use full data
-result1 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1 + Trend2*Trend3,
+fit_full <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1 + Trend2*Trend3,
 scalevars = covs, scaleform = ~ Trend1)
 
 ## Only use r = 1
-result2 <- gevrFit(data = x[, 1], method = "mle", locvars = covs, locform = ~ Trend1 + Trend2*Trend3,
+fit_top_only <- gevrFit(data = x[, 1], method = "mle", locvars = covs, locform = ~ Trend1 + Trend2*Trend3,
 scalevars = covs, scaleform = ~ Trend1)
 
 ```
@@ -160,8 +160,8 @@ The previous chunk of code demonstrates the benefit of using a larger $r$ than j
 ```{r nonstatfit2}
 
 ## Show summary of estimates
-result1
-result2
+fit_full
+fit_top_only
 
 ```
 
@@ -169,18 +169,18 @@ From the output, one can see from the fit summary that using $r=10$, both the co
 
 ```{r nonstatfit3}
 
-## Compare AIC of two models
-result3 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
+## Compare AIC of three models
+fit_reduced1 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
 scalevars = covs, scaleform = ~ Trend1)
 
-result4 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
+fit_reduced2 <- gevrFit(data = x, method = "mle", locvars = covs, locform = ~ Trend1,
 scalevars = covs, scaleform = ~ Trend1, gumbel = TRUE)
 
-AIC(result1)
-AIC(result3)
-AIC(result4)
+AIC(fit_full)
+AIC(fit_reduced1)
+AIC(fit_reduced2)
 
-LRT <- as.numeric(2 * (logLik(result3) - logLik(result4)))
+LRT <- as.numeric(2 * (logLik(fit_reduced1) - logLik(fit_reduced2)))
 
 pval <- pchisq(LRT, df = 1, ncp = 0, lower.tail = FALSE, log.p = FALSE)
 
@@ -188,5 +188,7 @@ pval
 
 ```
 
-Next, we fit another model, with 
+Next, we fit another two models (using $r = 10$). The first, labeled 'fit_reduced1' is a GEV$_{10}$ fit containing the true linear trends in the location and scale parameters. The second, 'fit_reduced2' fits the Gumbel equivalent of this model ($\xi = 0$). Note that 'fit_reduced1' is nested within 'fit_full' and 'fit_reduced2' is further nested within 'fit_reduced1'.
+
+One way to compare these models is using the Akaike information criterion (AIC) and choose the model with the smallest value. This metric can be extracted by using AIC(.) on a gevrFit object. By this metric, the chosen model is 'fit_reduced2', which agrees with the true model (Gumbel, with linear trends in the location and scale parameters). We can also test between nested models using the likelihood ratio test (LRT). For example, the test of $H_0$: $\xi = 0$ between 'fit_reduced1' and 'fit_reduced2' is approximately distributed as chi-square with one degree of freedom and its p-value is found to be 0.488. Thus, the further reduced (Gumbel) model 'fit_reduced2'is favored.
 

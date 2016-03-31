@@ -42,7 +42,7 @@ gpdAdGen <- function(n, theta) {
 #' @import parallel
 #' @export
 
-gpdAd <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
+gpdAd <- function(data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
   if(bootstrap == TRUE & is.null(B))
     stop("Must specify some number of boostrap samples")
   n <- length(data)

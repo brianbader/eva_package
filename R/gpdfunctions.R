@@ -13,18 +13,6 @@
 # devtools::use_data(ADQuantiles, CVMQuantiles, internal = TRUE)
 
 
-## S3 functions for class gpdFit
-plot.gpdFit <- function(x, ...) {
-  gpdDiag(x, ...)
-}
-
-
-summary.gpdFit <- function(object, ...) {
-  object$data <- NULL
-  object
-}
-
-
 ## Returns matrix of indicators needed for the GPD IM Test
 gpdInd <- function(data, theta) {
   scale <- theta[1]

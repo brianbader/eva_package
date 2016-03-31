@@ -27,7 +27,7 @@
 #' @details Caution: The profile likelihood optimization may be slow (on the order of minutes).
 #' @export
 gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
-                             opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
+                             opt = c("Nelder-Mead")) {
   if(!z$stationary)
     stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)
