@@ -26,8 +26,7 @@
 #' \item{ConfLevel}{The confidence level used.}
 #' @details Caution: The profile likelihood optimization may be slow (on the order of minutes).
 #' @export
-gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"),
-                             opt = c("Nelder-Mead")) {
+gevrRl <- function(z, period, conf = .95, method = c("delta", "profile"), opt = c("Nelder-Mead")) {
   if(!z$stationary)
     stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)

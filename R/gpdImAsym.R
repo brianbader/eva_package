@@ -1,15 +1,15 @@
 #' GPD Asymptotic Adjusted Information Matrix (IM) Test
 #'
-#' Runs the IM Test using bootstrap estimated covariance matrix. Asymptotically (in sample size) follows the F(3, B-3)
+#' Runs the IM Test using bootstrap estimated covariance matrix. Asymptotically (in sample size) follows the F(3, bootnum - 3)
 #' distribution (see reference for details).
 #' @param data Data should be in vector form.
-#' @param B Number of bootstrap replicates for the covariance estimate.
+#' @param bootnum Number of bootstrap replicates for the covariance estimate.
 #' @param theta Estimate for theta in the vector form (scale, shape). If NULL, uses the MLE.
 #' @references Dhaene, G., & Hoorelbeke, D. (2004). The information matrix test with bootstrap-based covariance matrix estimation. Economics Letters, 82(3), 341-347.
 #' @examples
 #' ## Generate some data from GPD
 #' x <- rgpd(200, loc = 0, scale = 1, shape = 0.2)
-#' gpdImAsym(x, B = 50)
+#' gpdImAsym(x, bootnum = 50)
 #' @return
 #' \item{statistic}{Test statistic.}
 #' \item{p.value}{P-value for the test.}
@@ -18,29 +18,26 @@
 #' replicate fails to converge, it will not be used in the estimation.}
 #' @export
 
-gpdImAsym <- function(data, B, theta = NULL) {
+gpdImAsym <- function(data, bootnum, theta = NULL) {
   n <- length(data)
   if(is.null(theta)) {
     fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
     if(is.null(fit))
       stop("Maximum likelihood failed to converge at initial step")
-    scale <- fit$par.ests[1]
-    shape <- fit$par.ests[2]
-    theta <- c(scale, shape)
+    theta <- fit$par.ests
   }
-  thresh <- findthresh(data, n)
-  data <- data - thresh
-  v <- gpdImCov(data, B, theta)
-  B <- v$boot_adj
+  data <- data - findthresh(data, n)
+  v <- gpdImCov(data, bootnum, theta)
+  eff <- v$boot_adj
   v <- v$cov
   u <- gpdInd(data, theta)
   d <- colSums(u)
   stat <- (1/n) * t(d) %*% v %*% d
   stat <- as.vector(stat)
-  stat <- stat*(B-3) / (3*B-3)
-  p <- 1 - pf(stat, 3, (B-3))
+  stat <- stat*(eff - 3) / (3*eff - 3)
+  p <- 1 - pf(stat, 3, (eff - 3))
   names(theta) <- c("Scale", "Shape")
-  out <- list(stat, p, theta, B)
+  out <- list(stat, p, theta, eff)
   names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
   out
 }

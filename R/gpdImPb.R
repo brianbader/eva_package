@@ -1,20 +1,15 @@
 gpdImGen <- function(n, theta, inner) {
-  scale <- theta[1]
-  shape <- theta[2]
-  x <- rgpd(n, loc = 0, scale = scale, shape = shape)
+  x <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- tryCatch(gpdFit(x, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
   if(is.null(fit1)) {
     teststat <- NA
   } else {
-    scale1 <- fit1$par.ests[1]
-    shape1 <- fit1$par.ests[2]
-    theta1 <- c(scale1, shape1)
-    thresh1 <- findthresh(x, n)
-    x <- x - thresh1
+    theta1 <- fit1$par.ests
+    x <- x - findthresh(x, n)
     v <- gpdImCov(x, inner, theta1)$cov
     u <- gpdInd(x, theta1)
     d <- colSums(u)
-    teststat <-  (1/n) * t(d) %*% v %*% d
+    teststat <- (1/n) * t(d) %*% v %*% d
     teststat <- as.vector(teststat)
   }
   teststat
@@ -49,9 +44,8 @@ gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
   fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
   if(is.null(fit))
     stop("Maximum likelihood failed to converge at initial step")
-  theta <- c(fit$par.ests[1], fit$par.ests[2])
-  thresh <- findthresh(data, n)
-  data <- data - thresh
+  theta <- fit$par.ests
+  data <- data - findthresh(data, n)
   v <- gpdImCov(data, inner, theta)$cov
   u <- gpdInd(data, theta)
   d <- colSums(u)
@@ -68,10 +62,10 @@ gpdImPb <- function(data, inner, outer, allowParallel = FALSE, numCores = 1) {
     teststat <- replicate(outer, gpdImGen(n, theta, inner))
   }
   teststat <- teststat[!is.na(teststat)]
-  outer <- length(teststat)
-  p <- (sum(teststat > stat) + 1) / (outer + 2)
+  eff <- length(teststat)
+  p <- (sum(teststat > stat) + 1) / (eff + 2)
   names(theta) <- c("Scale", "Shape")
-  out <- list(stat, p, theta, outer)
+  out <- list(stat, p, theta, eff)
   names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
   out
 }

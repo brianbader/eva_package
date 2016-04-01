@@ -1,6 +1,6 @@
-#' GPD Shape Parameter Profile Likelihood Estimation
+#' GPD Shape Parameter Profile Likelihood Estimation for Stationary Models
 #'
-#' Computes the profile likelihood based confidence interval for the shape parameter of the generalized pareto model.
+#' Computes the profile likelihood based confidence interval for the shape parameter of the stationary generalized pareto model.
 #'
 #' @param z A class object returned from gpdFit.
 #' @param conf Confidence level to use. Defaults to 95 percent.
@@ -15,7 +15,9 @@
 #' \item{CI}{Profile likelihood based confidence interval for the shape parameter.}
 #' \item{ConfLevel}{The confidence level used.}
 #' @export
-gpdProfShape <- function(z, conf = .95, opt = c("Nelder-Mead", "SANN", "BFGS", "CG", "L-BFGS-B", "Brent")) {
+gpdProfShape <- function(z, conf = .95, opt = c("Nelder-Mead")) {
+  if(!z$stationary)
+    stop("Object cannot be from a nonstationary fit!")
   data <- z$data
   threshold <- z$threshold
   theta <- as.numeric(z$par.ests)

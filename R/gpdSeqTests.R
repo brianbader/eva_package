@@ -53,13 +53,13 @@ gpdSeqTests <- function(data, thresholds = NA, nextremes = NA, method = c("ad", 
     result[i, 1] <- i
     if(method == "cvm") {
       if(!is.null(nsim))
-        fit <- gpdCvm(x, bootstrap = TRUE, B = nsim, allowParallel = allowParallel, numCores = numCores)
+        fit <- gpdCvm(x, bootstrap = TRUE, bootnum = nsim, allowParallel = allowParallel, numCores = numCores)
       else
         fit <- gpdCvm(x, allowParallel = allowParallel, numCores = numCores)
     }
     if(method == "ad") {
       if(!is.null(nsim))
-        fit <- gpdAd(x, bootstrap = TRUE, B = nsim, allowParallel = allowParallel, numCores = numCores)
+        fit <- gpdAd(x, bootstrap = TRUE, bootnum = nsim, allowParallel = allowParallel, numCores = numCores)
       else
         fit <- gpdAd(x, allowParallel = allowParallel, numCores = numCores)
     }

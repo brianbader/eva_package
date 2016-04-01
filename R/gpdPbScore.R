@@ -1,17 +1,8 @@
 gpdPbGen <- function(n, theta, information) {
   data1 <- rgpd(n, loc = 0, scale = theta[1], shape = theta[2])
   fit1 <- tryCatch(gpdFit(data1, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
-  if(is.null(fit1)) {
-    teststat <- NA
-  } else {
-    scale1 <- fit1$par.ests[1]
-    shape1 <- fit1$par.ests[2]
-    theta1 <- c(scale1, shape1)
-    thresh1 <- findthresh(data1, n)
-    data1 <- data1 - thresh1
-    teststat <- gpdTestStat(data1, theta1, information)
-  }
-  teststat
+  if(is.null(fit1)) NA
+  else gpdTestStat(fit1, information)
 }
 
 
@@ -41,12 +32,8 @@ gpdPbScore <- function(data, bootnum, information = c("expected", "observed"), a
   fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
   if(is.null(fit))
     stop("Maximum likelihood failed to converge at initial step")
-  scale <- fit$par.ests[1]
-  shape <- fit$par.ests[2]
-  theta <- c(scale, shape)
-  thresh <- findthresh(data, n)
-  data <- data - thresh
-  stat <- gpdTestStat(data, theta, information)
+  theta <- fit$par.ests
+  stat <- gpdTestStat(fit, information)
   if(allowParallel == TRUE) {
     cl <- makeCluster(numCores)
     fun <- function(cl) {

@@ -13,9 +13,9 @@ gevrRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
   plot(-1/log((1:length(z$data[,1]))/(length(z$data[,1]) + 1)), sort(z$data[,1]), log = "x", type = "n",
        xlab = "Return Period", ylab = "Return Level",  xlim = c(0.1, 1000), ylim = c(min(z$data[, 1], levels[, 1]), max(z$data[, 1], levels[, 1])))
   title("Return Level Plot")
-  lines(-1/log(1-p), levels[,1])
-  lines(-1/log(1-p), levels[,2], col = 4)
-  lines(-1/log(1-p), levels[,3], col = 4)
+  lines(-1/log(1-p), levels[, 1])
+  lines(-1/log(1-p), levels[, 2], col = 4)
+  lines(-1/log(1-p), levels[, 3], col = 4)
   points(-1/log((1:length(z$data[,1]))/(length(z$data[,1]) + 1)), sort(z$data[,1]))
 }
 

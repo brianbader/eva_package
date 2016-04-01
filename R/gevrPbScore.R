@@ -1,13 +1,8 @@
 gevrPbGen <- function(n, R, theta, information) {
   data1 <- rgevr(n, R, theta[1], theta[2], theta[3])
   y1 <- tryCatch(gevrFit(data1, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
-  if(is.null(y1)) {
-    teststat <- NA
-  } else {
-    theta1 <- y1$par.ests
-    teststat <- gevrTestStat(y1, information)
-  }
-  teststat
+  if(is.null(y1)) NA
+  else gevrTestStat(y1, information)
 }
 
 

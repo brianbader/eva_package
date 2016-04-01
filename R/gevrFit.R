@@ -53,8 +53,8 @@
 #' here is the same as would be if using function `lm' for only the right hand side of the equation. Interactions, polynomials, etc. can be
 #' handled as in the `formula' class. \cr
 #' Intercept terms are automatically handled by the function. By default, the link functions are the identity function and the covariate dependent
-#' scale parameter estimates are forced to be positive. For some link function \eqn{f(\cdot)} and for example, location parameter \eqn{\mu}, the
-#' link is written as \eqn{\mu = f(\mu_1 x_1 + \mu_2 x_2 + \cdots + \mu_k x_k)}. \cr
+#' scale parameter estimates are forced to be positive. For some link function \eqn{f(\cdot)} and for example, scale
+#' parameter \eqn{\sigma}, the link is written as \eqn{\sigma = f(\mu_1 x_1 + \mu_2 x_2 + \cdots + \mu_k x_k)}. \cr
 #' Maximum likelihood estimation can be used in all cases. Probability weighted moment estimation can only be used if \eqn{r = 1} and data is
 #' assumed to be stationary. Maximum product spacings estimation can be used in the non-stationary case, but only if \eqn{r = 1}.
 #'
@@ -174,13 +174,13 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
   if(method == "pwm") {
     names(theta0) <- c("Location", "Scale", "Shape")[1:length(theta0)]
-    out <- list(n = n, data = data, type = "pwm",
-                par.ests = theta0, par.ses = NA, varcov = NA,
+    out <- list(n = n, data = data, par.ests = theta0, par.ses = NA, varcov = NA,
                 converged = NA, nllh.final = NA, R = R,
                 stationary = TRUE, parnum = parnum,
                 par.sum = theta0, gumbel = gumbel,
                 covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
-                links = list(loclink, scalelink, shapelink))
+                links = list(loclink, scalelink, shapelink),
+                method = method, information = information)
   }
 
   negloglik <- function(vars, locvars1, scalevars1, shapevars1) {
@@ -218,12 +218,12 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
     w <- as.vector((data - locvec) / scalevec)
-    z <- pmax(w * shapevec, -1)
-    cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
-    cdf <- sort(cdf)
-    if(any(scalevec < 0)) {
+    z <- w * shapevec
+    if(any(scalevec < 0) | any(z < -1)) {
       out <- .Machine$double.xmax
     } else {
+      cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
+      cdf <- sort(cdf)
       cdf <- c(0, cdf, 1)
       D <- diff(cdf)
       ## Check if any differences are zero due to rounding and adjust
@@ -257,7 +257,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
     if(!gumbel) par.ests <- c(loc.ests, scale.ests, shape.ests) else par.ests <- c(loc.ests, scale.ests)
 
-    if(information == "observed" | locform != ~ 1 | scaleform != ~ 1 | shapeform != ~ 1) {
+    if((information == "observed") | (locform != ~ 1) | (scaleform != ~ 1) | (shapeform != ~ 1)) {
       varcov <- solve(optimHess(par.ests, objfun, locvars1 = locvars.model.orig,
                                 scalevars1 = scalevars.model.orig, shapevars1 = shapevars.model.orig))
     } else {
@@ -285,21 +285,21 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     colnames(par.sum) <- c("Estimate", "Std. Error", "z value", "Pr(>|z|)", "")
 
     if(method == "mle") {
-      out <- list(n = n, data = data, type = "mle",
-                  par.ests = par.ests, par.ses = par.ses, varcov = varcov,
+      out <- list(n = n, data = data, par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, nllh.final = fit$value, R = R,
                   stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
                   parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
-                  links = list(loclink, scalelink, shapelink))
+                  links = list(loclink, scalelink, shapelink),
+                  method = method, information = information)
     } else {
-      out <- list(n = n, data = as.matrix(data), type = "mps",
-                  par.ests = par.ests, par.ses = par.ses, varcov = varcov,
+      out <- list(n = n, data = as.matrix(data), par.ests = par.ests, par.ses = par.ses, varcov = varcov,
                   converged = fit$convergence, moran = fit$value, R = R,
                   stationary = ((locform == ~ 1) & (scaleform == ~ 1) & (shapeform == ~ 1)),
                   parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
-                  links = list(loclink, scalelink, shapelink))
+                  links = list(loclink, scalelink, shapelink),
+                  method = method, information = information)
     }
 
   }
@@ -320,7 +320,7 @@ plot.gevrFit <- function(x, ...) {
 print.gevrFit <- function(x, ...) {
   cat("Summary of fit:\n")
   print(x$par.sum, digits = 5)
-  if(x$type != "pwm")
+  if(x$method != "pwm")
     cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
 }
 
@@ -329,7 +329,7 @@ print.gevrFit <- function(x, ...) {
 logLik.gevrFit <- function (object, ...) {
   if(!missing(...))
     warning("Extra arguments discarded")
-  if(object$type != "mle")
+  if(object$method != "mle")
     stop("Estimation method is not maximum likelihood")
   val <- - object$nllh.final
   attr(val, "nobs") <- object$n

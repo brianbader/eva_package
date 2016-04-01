@@ -62,47 +62,27 @@ gpdImCov<- function(data, B, theta) {
   n <- length(data)
   temp <- t(replicate(B, gpdImCovGen(n, theta)))
   temp <- temp[complete.cases(temp), ]
-  B <- nrow(temp)
+  eff <- nrow(temp)
   Dbar <- colMeans(temp)
   temp[,1] <- temp[,1] - Dbar[1]
   temp[,2] <- temp[,2] - Dbar[2]
   temp[,3] <- temp[,3] - Dbar[3]
-  V <- (1/(B-1)) * t(temp) %*% temp
+  V <- (1/(eff - 1)) * t(temp) %*% temp
   V <- solve(V)
-  out <- list(V, B)
+  out <- list(V, eff)
   names(out) <- c("cov", "boot_adj")
   out
 }
 
 
 ## Returns expected inverse fisher information matrix
-gpdFisher <- function(data, theta) {
+gpdFisher <- function(n, theta) {
   scale <- theta[1]
   shape <- theta[2]
-  n <- length(data)
   one <- (2 * (1 + shape) * scale^2)/n
   two <- (1 + shape)^2/n
   cov <- -((1 + shape) * scale)/n
   varcov <- matrix(c(one, cov, cov, two), 2)
-  varcov
-}
-
-
-## Returns observed inverse fisher information matrix
-gpdFisherObs <- function(data, theta) {
-  scale <- theta[1]
-  shape <- theta[2]
-  w <- 1 + (1/shape)
-  z <- 1 + (shape*data/scale)
-  p12 <- - data/(shape*(scale^2)*z) + (w*data)/((scale^2)*z) - (w*(data^2)*shape)/((scale^3)*(z^2))
-  p22 <- - (2*log(z))/(shape^3) + (2*data)/((shape^2)*scale*z) + (w*(data^2))/((scale^2)*(z^2))
-  p11 <- (1/(scale^2)) - (2*w*shape*data)/((scale^3)*z) + (w*(shape^2)*(data^2))/((scale^4)*(z^2))
-  p11 <- sum(p11)
-  p12 <- sum(p12)
-  p22 <- sum(p22)
-  varcov <- matrix(c(p11, p12, p12, p22), 2)
-  varcov <- - varcov
-  varcov <- solve(varcov)
   varcov
 }
 
@@ -124,16 +104,15 @@ gpdScore <- function(data, theta) {
 
 
 ## Returns test statistic for the score test
-gpdTestStat <- function(data, theta, information) {
-  n <- length(data)
-  w <- gpdScore(data, theta)
+gpdTestStat <- function(z, information) {
+  data <- z$data - z$threshold
+  w <- gpdScore(data, z$par.ests)
   w <- colSums(w)
   if(information == "observed") {
-    info <- gpdFisherObs(data, theta)
+    info <- z$varcov
   } else {
-    info <- gpdFisher(data, theta)
+    info <- gpdFisher(length(data), z$par.ests)
   }
   score <- t(w) %*% info %*% w
-  score <- as.vector(score)
-  score
+  as.vector(score)
 }

@@ -21,7 +21,7 @@ gpdCvmGen <- function(n, theta) {
 #' Cramer-von Mises goodness-of-fit test for the Generalized Pareto (GPD) distribution.
 #' @param data Data should be in vector form, assumed to be from the GPD.
 #' @param bootstrap Should bootstrap be used to obtain p-values for the test? By default, a table of critical values is used via interpolation. See details.
-#' @param B Number of bootstrap replicates.
+#' @param bootnum Number of bootstrap replicates.
 #' @param allowParallel Should the bootstrap procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @references Choulakian, V., & Stephens, M. A. (2001). Goodness-of-fit tests for the Generalized Pareto distribution. Technometrics, 43(4), 478-484.
@@ -38,11 +38,13 @@ gpdCvmGen <- function(n, theta) {
 #' \item{statistic}{Test statistic.}
 #' \item{p.value}{P-value for the test.}
 #' \item{theta}{Estimated value of theta for the initial data.}
+#' \item{effective_bootnum}{Effective number of bootstrap replicates if bootstrap
+#' based p-value is used (only those that converged are used).}
 #' @import parallel
 #' @export
 
-gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, numCores = 1) {
-  if(bootstrap == TRUE & is.null(B))
+gpdCvm <- function (data, bootstrap = FALSE, bootnum = NULL, allowParallel = FALSE, numCores = 1) {
+  if(bootstrap == TRUE & is.null(bootnum))
     stop("Must specify some number of boostrap samples")
   n <- length(data)
   fit <- tryCatch(gpdFit(data, nextremes = n, method = "mle"), error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
@@ -62,16 +64,16 @@ gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
     if(allowParallel==TRUE) {
       cl <- makeCluster(numCores)
       fun <- function(cl) {
-        parSapply(cl, 1:B, function(i,...) {gpdCvmGen(n, theta)})
+        parSapply(cl, 1:bootnum, function(i,...) {gpdCvmGen(n, theta)})
       }
       teststat <- fun(cl)
       stopCluster(cl)
     } else {
-      teststat <- replicate(B, gpdCvmGen(n, theta))
+      teststat <- replicate(bootnum, gpdCvmGen(n, theta))
     }
     teststat <- teststat[!is.na(teststat)]
-    B <- length(teststat)
-    p <- (sum(teststat > stat) + 1) / (B + 2)
+    eff <- length(teststat)
+    p <- (sum(teststat > stat) + 1) / (eff + 2)
   } else {
     row <- which(rownames(CVMQuantiles) == max(round(shape, 2), -0.5))
     if(stat > CVMQuantiles[row, 999]) {
@@ -95,7 +97,12 @@ gpdCvm <- function (data, bootstrap = FALSE, B = NULL, allowParallel = FALSE, nu
     }
   }
   names(theta) <- c("Scale", "Shape")
-  out <- list(as.numeric(stat), as.numeric(p), theta)
-  names(out) <- c("statistic", "p.value", "theta")
+  if(!bootstrap) {
+    out <- list(as.numeric(stat), as.numeric(p), theta)
+    names(out) <- c("statistic", "p.value", "theta")
+  } else {
+    out <- list(as.numeric(stat), as.numeric(p), theta, eff)
+    names(out) <- c("statistic", "p.value", "theta", "effective_bootnum")
+  }
   out
 }

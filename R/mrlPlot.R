@@ -34,6 +34,7 @@ mrlPlot <- function(data, thresholds = NULL, conf = .95, npoints = 100) {
       abline(v = thresholds[j], untf = FALSE, col = j)
     }
   }
+  points(data, rep(min(yl), length(data)))
 }
 
 

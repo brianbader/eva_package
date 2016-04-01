@@ -1,12 +1,14 @@
-#' GPD Return Level Estimate and Confidence Interval
+#' GPD Return Level Estimate and Confidence Interval for Stationary Models
 #'
-#' Computes m-period return level estimate and interval for the Generalized Pareto distribution, using either the delta method or profile likelihood.
+#' Computes stationary m-period return level estimate and interval for the Generalized Pareto distribution,
+#' using either the delta method or profile likelihood.
 #'
 #' @param z An object of class gpdFit.
 #' @param period The number of periods to use for the return level.
 #' @param conf Confidence level. Defaults to 95 percent.
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
-#' @param opt Optimization method to maximize the profile likelihood if that is selected. Argument passed to optim. The default method is Nelder-Mead.
+#' @param opt Optimization method to maximize the profile likelihood if that is selected. Argument passed to optim. The
+#' default method is Nelder-Mead.
 #'
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @examples
@@ -22,8 +24,7 @@
 #' \item{ConfLevel}{The confidence level used.}
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
-gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
-                             opt = c("Nelder-Mead")) {
+gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"), opt = c("Nelder-Mead")) {
   if(!z$stationary)
     stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)
@@ -33,11 +34,11 @@ gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"),
   if(method == "delta") {
     cov <- matrix(0, 3, 3)
     cov[2:3, 2:3] <- z$varcov
-    cov[1, 1] <- z$rate * (1 - z$rate) / z$n
+    cov[1, 1] <- (z$rate * (1 - z$rate)) / z$n
     del <- matrix(0, 3, 1)
     del[1, 1] <- z$par.ests[1] * (m^z$par.ests[2]) * (z$rate^(z$par.ests[2] - 1))
     del[2, 1] <- (1 / z$par.ests[2]) * ((m * z$rate)^z$par.ests[2] - 1)
-    del[3, 1] <- (-z$par.ests[1] / z$par.ests[2]^2) * ((m * z$rate)^z$par.ests[2] - 1) +
+    del[3, 1] <- (-z$par.ests[1] / (z$par.ests[2]^2)) * ((m * z$rate)^z$par.ests[2] - 1) +
       (z$par.ests[1] / z$par.ests[2]) * ((m * z$rate)^z$par.ests[2]) * log(m * z$rate)
     se <- sqrt(t(del) %*% cov %*% del)
     se <- as.vector(se)
