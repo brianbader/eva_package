@@ -11,7 +11,8 @@ gpdRlPlot <- function(z, conf = 0.95, method = c("delta", "profile")) {
     levels[i, 2:3] <- y$CI
   }
   plot((z$n + 1) / ((1:z$n) * z$npp), rev(sort(z$data)), type = "n", log = "x",
-       xlab = "Return Period", ylab = "Return Level", xlim = c(max(min(p), min(z$data)), max(p)), ylim = c(min(z$data, levels[, 2]), max(z$data, levels[, 3])))
+       xlab = "Return Period", ylab = "Return Level", xlim = c(min((z$n + 1) / ((1:z$n) * z$npp)), max(p)),
+       ylim = c(min(z$data, levels[, 2]), max(z$data, levels[, 3])))
   title("Return Level Plot")
   lines(p, levels[, 1])
   lines(p, levels[, 2], col = 4)

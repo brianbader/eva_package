@@ -187,12 +187,12 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     shapevec <- shapelink(rowSums(shapemat))
     w <- excess / scalevec
     cond1 <- any(scalevec <= 0)
-    cond2 <- any((shapevec <= 0) & (max(excess) > (-scalevec / shapevec)))
-    if(cond1 || cond2) {
+    cond2 <- min(1 + w * shapevec) <= 0
+    if(cond1 | cond2) {
       out <- .Machine$double.xmax
     } else {
-      log.density <- -log(scalevec) - ifelse(shapevec == 0, w, ((1/shapevec) + 1) * log1p(w*shapevec))
-      log.density[is.nan(log.density) | is.infinite(log.density)] <- -Inf
+      log.density <- -log(scalevec) - ifelse(shapevec == 0, w, ((1/shapevec) + 1) * log1p(w * shapevec))
+      log.density[is.nan(log.density) | is.infinite(log.density)] <- -.Machine$double.xmax
       out <- - sum(log.density)
     }
     out
@@ -206,9 +206,9 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
     cond1 <- any(scalevec <= 0)
-    cond2 <- any((shapevec <= 0) & (max(excess) > (-scalevec / shapevec)))
+    cond2 <- any((shapevec < 0) & (excess > (-scalevec / shapevec)))
     w <- excess / scalevec
-    if(cond1 || cond2) {
+    if(cond1 | cond2) {
       out <- .Machine$double.xmax
     } else {
       cdf <- ifelse(shapevec == 0, 1 - exp(-w), 1 - exp((-1/shapevec)*log1p(w*shapevec)))
@@ -243,7 +243,8 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     par.ests <- c(scale.ests, shape.ests)
 
     if((information == "observed") | (scaleform != ~ 1) | (shapeform != ~ 1)) {
-      varcov <- solve(optimHess(par.ests, objfun, scalevars1 = scalevars.model.orig, shapevars1 = shapevars.model.orig))
+      varcov <- solve(optimHess(par.ests, objfun, scalevars1 = scalevars.model.orig,
+                                shapevars1 = shapevars.model.orig))
     } else {
       varcov <- gpdFisher(Nu, par.ests)
     }
