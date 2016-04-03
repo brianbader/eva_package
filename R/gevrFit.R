@@ -194,17 +194,18 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
     w <- matrix(((data - locvec) / scalevec), ncol = R)
-    z <- matrix(w * shapevec, ncol = R)
-    z <- pmax(z, -1)
-    if(any(scalevec < 0)) {
-      out <- .Machine$double.xmax
+    z <- pmax(matrix(w * shapevec, ncol = R), -1)
+    cond1 <- any(scalevec <= 0)
+    cond2 <- min(1 + w * shapevec) <= 0
+    log.density <- ifelse(shapevec == 0, rowSums(-log(pmax(scalevec, 0)) - w) - exp(-w[,R]),
+                          rowSums(-log(pmax(scalevec, 0)) - ((1/shapevec) + 1) * log1p(z)) -
+                          exp((-1/shapevec) * log1p(z[,R])))
+    log.density[(is.nan(log.density) | is.infinite(log.density))] <- 0
+    if(cond1 | cond2) {
+      abs(sum(log.density)) + 1e6
     } else {
-      log.density <- ifelse(shapevec == 0, rowSums(-log(scalevec) - w) - exp(-w[,R]),
-                            rowSums(-log(scalevec) - ((1/shapevec) + 1) * log1p(z)) - exp((-1/shapevec) * log1p(z[,R])))
-      log.density[is.nan(log.density) | is.infinite(log.density)] <- -Inf
-      out <- - sum(log.density)
+      - sum(log.density)
     }
-    out
   }
 
   mpsobj <- function(vars, locvars1, scalevars1, shapevars1) {
@@ -218,19 +219,21 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
     w <- as.vector((data - locvec) / scalevec)
-    z <- w * shapevec
-    if(any(scalevec < 0) | any(z < -1)) {
-      out <- .Machine$double.xmax
+    z <- pmax(w * shapevec, -1)
+    cond1 <- any(scalevec <= 0)
+    cond2 <- min(1 + w * shapevec) <= 0
+    cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
+    cdf[(is.nan(cdf) | is.infinite(cdf))] <- 0
+    cdf <- sort(cdf)
+    cdf <- c(0, cdf, 1)
+    D <- diff(cdf)
+    ## Check if any differences are zero due to rounding and adjust
+    D <- ifelse(D == 0, .Machine$double.eps, D)
+    if(cond1 | cond2) {
+      abs(sum(log(D))) + 1e6
     } else {
-      cdf <- ifelse(shapevec == 0, exp(-exp(-w)), exp(-exp((-1/shapevec)*log1p(z))))
-      cdf <- sort(cdf)
-      cdf <- c(0, cdf, 1)
-      D <- diff(cdf)
-      ## Check if any differences are zero due to rounding and adjust
-      D <- ifelse(D == 0, .Machine$double.eps, D)
-      out <- - sum(log(D))
+      - sum(log(D))
     }
-    out
   }
 
   if(method == "mle")

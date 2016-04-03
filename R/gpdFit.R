@@ -188,14 +188,14 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     w <- excess / scalevec
     cond1 <- any(scalevec <= 0)
     cond2 <- min(1 + w * shapevec) <= 0
+    log.density <- -log(pmax(scalevec, 0)) -
+      ifelse(shapevec == 0, w, ((1/shapevec) + 1) * log1p(pmax(w * shapevec, -1)))
+    log.density[(is.nan(log.density) | is.infinite(log.density))] <- 0
     if(cond1 | cond2) {
-      out <- .Machine$double.xmax
+      abs(sum(log.density)) + 1e6
     } else {
-      log.density <- -log(scalevec) - ifelse(shapevec == 0, w, ((1/shapevec) + 1) * log1p(w * shapevec))
-      log.density[is.nan(log.density) | is.infinite(log.density)] <- -.Machine$double.xmax
-      out <- - sum(log.density)
+      - sum(log.density)
     }
-    out
   }
 
   mpsobj <- function(vars, scalevars1, shapevars1) {
@@ -205,21 +205,21 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     shapemat <- t(shape * t(shapevars1))
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
-    cond1 <- any(scalevec <= 0)
-    cond2 <- any((shapevec < 0) & (excess > (-scalevec / shapevec)))
     w <- excess / scalevec
+    cond1 <- any(scalevec <= 0)
+    cond2 <- min(1 + w * shapevec) <= 0
+    cdf <- ifelse(shapevec == 0, 1 - exp(-w), 1 - exp((-1/shapevec)*log1p(pmax(w * shapevec, -1))))
+    cdf[(is.nan(cdf) | is.infinite(cdf))] <- 0
+    cdf <- sort(cdf)
+    cdf <- c(0, cdf, 1)
+    D <- diff(cdf)
+    ## Check if any differences are zero due to rounding and adjust
+    D <- ifelse(D == 0, .Machine$double.eps, D)
     if(cond1 | cond2) {
-      out <- .Machine$double.xmax
+      abs(sum(log(D))) + 1e6
     } else {
-      cdf <- ifelse(shapevec == 0, 1 - exp(-w), 1 - exp((-1/shapevec)*log1p(w*shapevec)))
-      cdf <- sort(cdf)
-      cdf <- c(0, cdf, 1)
-      D <- diff(cdf)
-      ## Check if any differences are zero due to rounding and adjust
-      D <- ifelse(D == 0, .Machine$double.eps, D)
-      out <- - sum(log(D))
+      - sum(log(D))
     }
-    out
   }
 
   if(method == "mle")

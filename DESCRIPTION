@@ -1,6 +1,6 @@
 Package: eva
 Title: Extreme Value Analysis with Goodness-of-Fit Testing
-Date: 2016-04-01
+Date: 2016-04-03
 Version: 0.2.1
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brianbader@mail.com"), person(given = "Jun", family = "Yan", role = "ctb"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order
