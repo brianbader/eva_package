@@ -13,7 +13,7 @@
 #' of each parameter. By default, assumes stationary (intercept only) model. See details.
 #' @param loclink,scalelink,shapelink A link function specifying the relationship between the covariates and each parameter. Defaults to the identity function. For
 #' the stationary model, only the identity link should be used.
-#' @param gumbel Whether to fit the Gumbel (type I) extreme value distribution, i.e., shape parameter equals zero. Defaults to FALSE.
+#' @param gumbel Whether to fit the Gumbel (type I) extreme value distribution (i.e. shape parameter equals zero). Defaults to FALSE.
 #' @param start Option to provide a set of starting parameters to optim; a vector of location, scale, and shape, in that order. Otherwise, the routine attempts
 #' to find good starting parameters. See details.
 #' @param opt Optimization method to use with optim.
@@ -27,10 +27,7 @@
 #' ## A linear trend in the location and scale parameter
 #' n <- 100
 #' r <- 10
-#' x2 <- matrix(0, ncol = r, nrow = n)
-#' for(i in 1:n) {
-#'   x2[i, ] <- rgevr(1, r, loc = 100 + i / 50,  scale = 1 + i / 300, shape = 0)
-#' }
+#' x2 <- rgevr(n, r, loc = 100 + 1:n / 50,  scale = 1 + 1:n / 300, shape = 0)
 #'
 #' covs <- as.data.frame(seq(1, n, 1))
 #' names(covs) <- c("Trend1")
@@ -44,7 +41,7 @@
 #' result2
 #'
 #' @return A list describing the fit, including parameter estimates and standard errors for the mle and mps methods. Returns as a class
-#' object 'gevrFit' to be used with diagnostic plots.
+#' object `gevrFit' to be used with diagnostic plots.
 #' @details In the stationary case (no covariates), starting parameters for mle and mps estimation are the probability weighted moment estimates.
 #' In the case where covariates are used, the starting intercept parameters are the probability weighted moment estimates from the stationary case
 #' and the parameters based on covariates are initially set to zero. For non-stationary parameters, the first reported estimate refers to the
@@ -54,7 +51,7 @@
 #' handled as in the `formula' class. \cr
 #' Intercept terms are automatically handled by the function. By default, the link functions are the identity function and the covariate dependent
 #' scale parameter estimates are forced to be positive. For some link function \eqn{f(\cdot)} and for example, scale
-#' parameter \eqn{\sigma}, the link is written as \eqn{\sigma = f(\mu_1 x_1 + \mu_2 x_2 + \cdots + \mu_k x_k)}. \cr
+#' parameter \eqn{\sigma}, the link is written as \eqn{\sigma = f(\sigma_1 x_1 + \sigma_2 x_2 + \cdots + \sigma_k x_k)}. \cr
 #' Maximum likelihood estimation can be used in all cases. Probability weighted moment estimation can only be used if \eqn{r = 1} and data is
 #' assumed to be stationary. Maximum product spacings estimation can be used in the non-stationary case, but only if \eqn{r = 1}.
 #'

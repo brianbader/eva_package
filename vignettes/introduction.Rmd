@@ -128,10 +128,7 @@ In addition, the profile likelihood confidence intervals are compared with the d
 set.seed(7)
 n <- 100
 r <- 10
-x <- matrix(0, ncol = r, nrow = n)
-for(i in 1:n) {
-  x[i, ] <- rgevr(1, r, loc = 100 + i / 50,  scale = 1 + i / 100, shape = 0)
-}
+x <- rgevr(n, r, loc = 100 + 1:n / 50,  scale = 1 + 1:n / 100, shape = 0)
 
 ## Plot the largest order statistic
 plot(x[, 1])

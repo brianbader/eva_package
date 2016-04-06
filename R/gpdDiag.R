@@ -102,6 +102,7 @@ gpdResid <- function(z, scalevec, shapevec) {
 #' the parameter covariates.
 #' @details See the reference for details on how return levels are calculated.
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
+#' @import utils
 #' @export
 gpdDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)

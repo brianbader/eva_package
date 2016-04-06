@@ -147,6 +147,7 @@ gevrResid <- function(z, locvec, scalevec, shapevec) {
 #' @details In certain cases the quantile plot may fail, because it requires solving a root equation. See the references for details.
 #' @references Tawn, J. A. (1988). An extreme-value theory model for dependent observations. Journal of Hydrology, 101(1), 227-250.
 #' @references Smith, R. L. (1986). Extreme value theory based on the r largest annual events. Journal of Hydrology, 86(1), 27-43.
+#' @import utils
 #' @export
 gevrDiag <- function(z, conf = 0.95, method = c("delta", "profile")) {
   method <- match.arg(method)

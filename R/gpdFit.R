@@ -29,7 +29,7 @@ findthresh <- function(data, ne) {
 #' @param opt Optimization method to use with optim.
 #' @param maxit Number of iterations to use in optimization, passed to optim. Defaults to 10,000.
 #' @param ... Additional arguments to pass to optim.
-#' @return A class object 'gpdFit' describing the fit, including parameter estimates and standard errors.
+#' @return A class object `gpdFit' describing the fit, including parameter estimates and standard errors.
 #' @details The base code for finding probability weighted moments is taken from the R package evir. See citation.
 #' In the stationary case (no covariates), starting parameters for mle and mps estimation are the probability weighted moment estimates.
 #' In the case where covariates are used, the starting intercept parameters are the probability weighted moment estimates from the
@@ -41,7 +41,7 @@ findthresh <- function(data, ne) {
 #' polynomials, etc. can be handled as in the `formula' class. \cr
 #' Intercept terms are automatically handled by the function. By default, the link functions are the identity function and
 #' the covariate dependent scale parameter estimates are forced to be positive. For some link function \eqn{f(\cdot)} and for
-#' example, scale parameter \eqn{\sigma}, the link is written as \eqn{\sigma = f(\mu_1 x_1 + \mu_2 x_2 + \cdots + \mu_k x_k)}. \cr
+#' example, scale parameter \eqn{\sigma}, the link is written as \eqn{\sigma = f(\sigma_1 x_1 + \sigma_2 x_2 + \cdots + \sigma_k x_k)}. \cr
 #' Maximum likelihood estimation and maximum product spacing estimation can be used in all cases. Probability weighted moments
 #' can only be used for stationary models.
 #' @examples
@@ -64,10 +64,7 @@ findthresh <- function(data, ne) {
 #' ## A linear trend in the scale parameter
 #' set.seed(7)
 #' n <- 300
-#' x2 <- rep(0, n)
-#' for(i in 1:n) {
-#'   x2[i] <- rgpd(1, loc = 0, scale = 1 + i / 200, shape = 0)
-#' }
+#' x2 <- rgpd(n, loc = 0, scale = 1 + 1:n / 200, shape = 0)
 #'
 #' covs <- as.data.frame(seq(1, n, 1))
 #' names(covs) <- c("Trend1")

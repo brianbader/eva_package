@@ -10,7 +10,7 @@ Description: Goodness-of-fit tests for selection of r in the r-largest order
     using the GEVr and Generalized Pareto distributions. P-value adjustments for
     sequential, multiple testing error control.
 Imports:
-    parallel, stats, graphics
+    parallel, stats, graphics, utils
 Depends:
     R(>= 2.10.0)
 Suggests:
