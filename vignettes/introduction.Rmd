@@ -57,14 +57,14 @@ curve(pgpd(1, 0, 1, x),  1e-20, .01, log = "x", n = 1025)
 The GEV$_r$ distribution has the density function $$f_r (x_1, x_2, ..., x_r | \mu, \sigma, \xi) = \sigma^{-r}\exp\left\{-(1+\xi z_r)^{-\frac{1}{\xi}} - \left(\frac{1}{\xi}+1\right)\sum_{j=1}^{r}\log(1+\xi z_j)\right\}$$ for some location parameter $\mu$, scale parameter $\sigma > 0$
 and shape parameter $\xi$, where $x_1 >  \cdots> x_r$, $z_j = (x_j - \mu) / \sigma$, and $1 + \xi z_j > 0$ for $j=1, \ldots, r$. When $r = 1$,  this distribution is exactly the GEV distribution or block maxima.
 
-This package includes data generation (rgevr), density function (dgevr), fitting (gevrFit), and return levels (gevrRl) for this distribution. If one wants to choose $r > 1$, goodness-of-fit must be tested. This can be done using function gevrSeqTests. Take, for example, the dataset Lowestoft, which includes the top ten sea levels at Lowestoft harbor from 1984 - 2014. Two available tests are available to run in sequence - the entropy difference and score test.
+This package includes data generation (rgevr), density function (dgevr), fitting (gevrFit), and return levels (gevrRl) for this distribution. If one wants to choose $r > 1$, goodness-of-fit must be tested. This can be done using function gevrSeqTests. Take, for example, the dataset Lowestoft, which includes the top ten sea levels at Lowestoft harbor from 1964 - 2014. Two tests are available to run in sequence - the entropy difference and score test.
 
 ```{r seqtesting}
 data(lowestoft)
 gevrSeqTests(lowestoft, method = "ed")
 ```
 
-The entropy difference test fails to reject for any value of $r$ from 1 to 10. A common quantity of interest in extreme value analysis are the $m$-year return levels, which can be thought of as the average maximum value that will be seen over a period of $m$ years. For the Lowestoft data, the 250 year sea level return levels, with 95% confidence intervals are plotting using for $r$ from 1 to 10. The advantage of using more top order statistics can be seen in the plots below. The width of the intervals decrease by over two-thirds from $r=1$ to $r=10$. Similarly decreases can be seen in the estimated parameters.
+The entropy difference test fails to reject for any value of $r$ from 1 to 10. A common quantity of interest in extreme value analysis are the $m$-year return levels, which can be thought of as the average maximum value that will be exceeded over a period of $m$ years. For the Lowestoft data, the 250 year sea level return levels, with 95% confidence intervals are plotted for $r$ from 1 to 10. The advantage of using more top order statistics can be seen in the plots below. The width of the intervals decrease by over two-thirds from $r=1$ to $r=10$. Similarly decreases can be seen in the parameter intervals.
 
 ```{r returnlevel, fig.height = 12, fig.width = 8}
 
@@ -118,9 +118,8 @@ par(mfrow = c(1, 1))
 
 ```
 
+
 In addition, the profile likelihood confidence intervals are compared with the delta method intervals. The advantage of using profile likelihood over the delta method is the allowance for asymmetric intervals. This is especially useful at high quantiles, or large return level periods. In the Lowestoft plots directly above, the asymmetry can be seen in the stable lower bound across values of $r$, while the upper bound decreases.
-
-
 
 
 ```{r nonstatfit1}
@@ -162,7 +161,11 @@ fit_top_only
 
 ```
 
-From the output, one can see from the fit summary that using $r=10$, both the correct trend in location and scale are deemed significant. However, using $r=1$ a test for significance in the scale trend fails, and further one of the erroneous covariates, 'Trend3' shows up as significant in the location parameter modeling.
+From the output, one can see from the fit summary that using $r=10$, both the correct trend in location and scale are deemed significant. However, using $r=1$ a test for significance in the scale trend fails.
+
+Next, we fit another two models (using $r = 10$). The first, labeled 'fit_reduced1' is a GEV$_{10}$ fit incorporating only the true linear trends as covariates in the location and scale parameters. The second, 'fit_reduced2' fits the Gumbel equivalent of this model ($\xi = 0$). Note that 'fit_reduced1' is nested within 'fit_full' and 'fit_reduced2' is further nested within 'fit_reduced1'.
+
+One way to compare these models is using the Akaike information criterion (AIC) and choose the model with the smallest value. This metric can be extracted by using AIC($\cdot$) on a gevrFit object. By this metric, the chosen model is 'fit_reduced2', which agrees with the true model (Gumbel, with linear trends in the location and scale parameters). We can also test between nested models using the likelihood ratio test (LRT). For example, the test of $H_0$: $\xi = 0$ between 'fit_reduced1' and 'fit_reduced2' is approximately distributed as chi-square with one degree of freedom and its p-value is found to be 0.95. Thus, the further reduced (Gumbel) model 'fit_reduced2' is favored.
 
 ```{r nonstatfit3}
 
@@ -181,11 +184,7 @@ LRT <- as.numeric(2 * (logLik(fit_reduced1) - logLik(fit_reduced2)))
 
 pval <- pchisq(LRT, df = 1, ncp = 0, lower.tail = FALSE, log.p = FALSE)
 
-pval
+round(pval, digits = 3)
 
 ```
-
-Next, we fit another two models (using $r = 10$). The first, labeled 'fit_reduced1' is a GEV$_{10}$ fit containing the true linear trends in the location and scale parameters. The second, 'fit_reduced2' fits the Gumbel equivalent of this model ($\xi = 0$). Note that 'fit_reduced1' is nested within 'fit_full' and 'fit_reduced2' is further nested within 'fit_reduced1'.
-
-One way to compare these models is using the Akaike information criterion (AIC) and choose the model with the smallest value. This metric can be extracted by using AIC(.) on a gevrFit object. By this metric, the chosen model is 'fit_reduced2', which agrees with the true model (Gumbel, with linear trends in the location and scale parameters). We can also test between nested models using the likelihood ratio test (LRT). For example, the test of $H_0$: $\xi = 0$ between 'fit_reduced1' and 'fit_reduced2' is approximately distributed as chi-square with one degree of freedom and its p-value is found to be 0.488. Thus, the further reduced (Gumbel) model 'fit_reduced2' is favored.
 
