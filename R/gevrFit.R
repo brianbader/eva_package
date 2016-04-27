@@ -55,7 +55,7 @@
 #' Maximum likelihood estimation can be used in all cases. Probability weighted moment estimation can only be used if \eqn{r = 1} and data is
 #' assumed to be stationary. Maximum product spacings estimation can be used in the non-stationary case, but only if \eqn{r = 1}.
 #'
-#' @import stats graphics
+#' @importFrom Matrix rankMatrix
 #' @export
 gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expected", "observed"), locvars = NULL, scalevars = NULL,
                      shapevars = NULL, locform = ~ 1, scaleform = ~ 1, shapeform = ~ 1, loclink = identity, scalelink = identity,
@@ -95,7 +95,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   locvars.model <- model.matrix(locform, data = locvars)
   locnames <- colnames(locvars.model)
   loccheck <- adjScale(locvars.model)
-  if(sum(loccheck$truevars == 0) > 1)
+  if((rankMatrix(locvars.model)[1] < ncol(locvars.model)) | (rankMatrix(locvars.model)[1] > nrow(locvars.model)))
     stop("Location design matrix is singular")
   locvars.model <- loccheck$mat
   loctrans1 <- loccheck$adjmeans
@@ -104,7 +104,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   scalevars.model <- model.matrix(scaleform, data = scalevars)
   scalenames <- colnames(scalevars.model)
   scalecheck <- adjScale(scalevars.model)
-  if(sum(scalecheck$truevars == 0) > 1)
+  if((rankMatrix(scalevars.model)[1] < ncol(scalevars.model)) | (rankMatrix(scalevars.model)[1] > nrow(scalevars.model)))
     stop("Scale design matrix is singular")
   scalevars.model <- scalecheck$mat
   scaletrans1 <- scalecheck$adjmeans
@@ -113,7 +113,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   shapevars.model <- model.matrix(shapeform, data = shapevars)
   shapenames <- colnames(shapevars.model)
   shapecheck <- adjScale(shapevars.model)
-  if(sum(shapecheck$truevars == 0) > 1)
+  if((rankMatrix(shapevars.model)[1] < ncol(shapevars.model)) | (rankMatrix(shapevars.model)[1] > nrow(shapevars.model)))
     stop("Shape design matrix is singular")
   shapevars.model <- shapecheck$mat
   shapetrans1 <- shapecheck$adjmeans

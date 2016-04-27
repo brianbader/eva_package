@@ -75,6 +75,7 @@ findthresh <- function(data, ne) {
 #' result1
 #'
 #' @references Pfaff, Bernhard, Alexander McNeil, and A. Stephenson. "evir: Extreme Values in R." R package version (2012): 1-7.
+#' @importFrom Matrix rankMatrix
 #' @export
 gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("mle", "mps", "pwm"),
                    information = c("expected", "observed"), scalevars = NULL, shapevars = NULL, scaleform = ~ 1,
@@ -119,7 +120,7 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
   scalevars.model <- model.matrix(scaleform, data = scalevars[exceedtrue, , drop = FALSE])
   scalenames <- colnames(scalevars.model)
   scalecheck <- adjScale(scalevars.model)
-  if(sum(scalecheck$truevars == 0) > 1)
+  if((rankMatrix(scalevars.model)[1] < ncol(scalevars.model)) | (rankMatrix(scalevars.model)[1] > nrow(scalevars.model)))
     stop("Scale design matrix is singular")
   scalevars.model <- scalecheck$mat
   scaletrans1 <- scalecheck$adjmeans
@@ -128,7 +129,7 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
   shapevars.model <- model.matrix(shapeform, data = shapevars[exceedtrue, , drop = FALSE])
   shapenames <- colnames(shapevars.model)
   shapecheck <- adjScale(shapevars.model)
-  if(sum(shapecheck$truevars == 0) > 1)
+  if((rankMatrix(shapevars.model)[1] < ncol(shapevars.model)) | (rankMatrix(shapevars.model)[1] > nrow(shapevars.model)))
     stop("Shape design matrix is singular")
   shapevars.model <- shapecheck$mat
   shapetrans1 <- shapecheck$adjmeans
