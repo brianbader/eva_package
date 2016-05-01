@@ -3,7 +3,7 @@
 #' Computes stationary m-period return level estimate and interval for the Generalized Pareto distribution,
 #' using either the delta method or profile likelihood.
 #'
-#' @param z An object of class gpdFit.
+#' @param z An object of class `gpdFit'.
 #' @param period The number of periods to use for the return level.
 #' @param conf Confidence level. Defaults to 95 percent.
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.

@@ -15,7 +15,7 @@
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each
 #' observation \eqn{i = 1, \ldots, n}. The test uses an asymptotic normality result based on the expected
 #' entropy between the GEVr and GEV(r-1) likelihoods. See reference for detailed information. This test can be
-#' used to sequentially test for the choice of r, implemented in the function 'gevrSeqTests'.
+#' used to sequentially test for the choice of r, implemented in the function `gevrSeqTests'.
 #'
 #' @references Bader B., Yan J., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
 #' @import stats graphics

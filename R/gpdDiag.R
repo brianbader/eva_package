@@ -87,7 +87,7 @@ gpdResid <- function(z, scalevec, shapevec) {
 
 #' Diagnostic plots for a fit to the Generalized Pareto distribution
 #'
-#' @param z A class object returned from 'gpdFit'.
+#' @param z A class object returned from `gpdFit'.
 #' @param conf Confidence level used in the return level plot.
 #' @param method The method to compute the return level confidence interval - either delta method (default) or
 #' profile likelihood. Choosing profile likelihood may be quite slow.
@@ -97,7 +97,7 @@ gpdResid <- function(z, scalevec, shapevec) {
 #' # z <- gpdFit(x, nextremes = 500)
 #' # plot(z)
 #' @return For stationary models, provides return level, density, probability, and quantile plots for the GPD exceedances. The
-#' overlaid density is the 'true' density for the estimated parameters. For nonstationary models, provides
+#' overlaid density is the `true' density for the estimated parameters. For nonstationary models, provides
 #' residual probability and quantile plots. In addition, nonstationary models provide plots of the residuals vs.
 #' the parameter covariates.
 #' @details See the reference for details on how return levels are calculated.

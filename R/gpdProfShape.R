@@ -1,6 +1,6 @@
 #' GPD Shape Parameter Profile Likelihood Estimation for Stationary Models
 #'
-#' Computes the profile likelihood based confidence interval for the shape parameter of the stationary generalized pareto model.
+#' Computes the profile likelihood based confidence interval for the shape parameter of the stationary Generalized Pareto model.
 #'
 #' @param z A class object returned from gpdFit.
 #' @param conf Confidence level to use. Defaults to 95 percent.

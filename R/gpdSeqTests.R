@@ -5,12 +5,12 @@
 #' @param data Original, full dataset in vector form.
 #' @param thresholds A set of threshold values (either this or a set of the number of extremes must be given, but not both). Must be provided as a vector.
 #' @param nextremes A set of the number of upper extremes to be used, provided as a vector.
-#' @param method Which test to run to sequentially test the thresholds. Must be one of 'ad', 'cvm', 'pbscore', 'multscore', 'imasym', or 'impb'.
-#' @param nsim Number of boostrap replicates for the 'ad', 'cvm', 'pbscore', 'multscore', and 'imasym' tests.
-#' @param inner Number of inner boostrap replicates if 'impb' test is chosen.
-#' @param outer Number of outer boostrap replicates if 'impb' test is chosen.
-#' @param information To use observed or expected (default) information for the 'pbscore' and 'multscore' tests.
-#' @param allowParallel If selected, should the 'cvm', 'ad', 'pbscore', or 'impb' procedure be run in parallel or not. Defaults to false.
+#' @param method Which test to run to sequentially test the thresholds. Must be one of `ad', `cvm', `pbscore', `multscore', `imasym', or `impb'.
+#' @param nsim Number of boostrap replicates for the `ad', `cvm', `pbscore', `multscore', and `imasym' tests.
+#' @param inner Number of inner boostrap replicates if `impb' test is chosen.
+#' @param outer Number of outer boostrap replicates if `impb' test is chosen.
+#' @param information To use observed or expected (default) information for the `pbscore' and `multscore' tests.
+#' @param allowParallel If selected, should the `cvm', `ad', `pbscore', or `impb' procedure be run in parallel or not. Defaults to false.
 #' @param numCores If allowParallel is true, specify the number of cores to use.
 #' @details Function returns a matrix containing the thresholds used, the number of observations above each threshold,
 #' the corresponding test statistics, p-values (raw and transformed), and parameter estimates at each threshold. The user must provide

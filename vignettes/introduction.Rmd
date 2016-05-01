@@ -118,9 +118,9 @@ par(mfrow = c(1, 1))
 
 ```
 
-
 In addition, the profile likelihood confidence intervals are compared with the delta method intervals. The advantage of using profile likelihood over the delta method is the allowance for asymmetric intervals. This is especially useful at high quantiles, or large return level periods. In the Lowestoft plots directly above, the asymmetry can be seen in the stable lower bound across values of $r$, while the upper bound decreases.
 
+### Fitting the GEV$_r$ distribution
 
 ```{r nonstatfit1}
 
@@ -188,10 +188,9 @@ round(pval, digits = 3)
 
 ```
 
-One can also use the `gevrFit' function to estimate the parameters of a multivariate model with dependence between GEV marginal distributions using independence likelihood. 
+One can also use the 'gevrFit' function to estimate the parameters of a multivariate model with dependence between GEV marginal distributions using independence likelihood. Here we generate correlation using the multivariate normal distribution and then transform the marginal distributions into GEV.
 
-
-```{r rfa_example}
+```{r rfa_example1}
 
 set.seed(7)
 require(mvtnorm)
@@ -202,9 +201,22 @@ diag(S) <- rep(1, 4)
 n.obs <- 50
 ## Gaussian correlated random variables
 AB <- rmvnorm(mean = rep(0, 4), sig = S, n = n.obs)
+
+```
+
+The previous chunk of code generates data from a correlated multivariate normal random variable and the following chunk transforms the data onto the uniform scale. We can see the transformed (uniform) random variables are still correlated.
+
+```{r rfa_example2}
+
 ## Now U has uniform margins but is correlated
 U <- pnorm(AB)
 cor(U)
+
+```
+
+Next, we transform the uniform data into GEV margins with site specific location means [8, 10, 12, 9] and a shared location trend of 0.1. The design matrix labels each of the four sites as A, B, C, or D. The estimated means can be constructed from the output. Site A is chosen as the reference level, so its location parameter is estimated by the location intercept -- 8.337. The other site specific location parameter estimates can be obtained by adding the intercept and the corresponding site value. For example, site C has a location estimate of 8.337 + 3.844 = 12.181.
+
+```{r rfa_example3}
 
 ## Transform to GEV margins
 locations <- c(8, 10, 12, 9)
