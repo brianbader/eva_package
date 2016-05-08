@@ -42,7 +42,6 @@ gpdAdGen <- function(n, theta) {
 #' based p-value is used (only those that converged are used).}
 #' @import parallel
 #' @export
-
 gpdAd <- function(data, bootstrap = FALSE, bootnum = NULL, allowParallel = FALSE, numCores = 1) {
   if(bootstrap == TRUE & is.null(bootnum))
     stop("Must specify some number of boostrap samples")

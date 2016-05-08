@@ -23,8 +23,8 @@
 #' \item{est.shape}{Estimated shape parameter for the given r.}
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
 #' See function `pSeqStop' for details on transformed p-values.
+#' @import parallel
 #' @export
-
 gevrSeqTests <- function(data, bootnum = NULL, method = c("ed", "pbscore", "multscore"), information = c("expected", "observed"),
                               allowParallel = FALSE, numCores = 1) {
   data <- as.matrix(data)

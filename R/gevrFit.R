@@ -164,6 +164,9 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     }
   } else {
     init <- start
+    locinit <- init[1:ncol(locvars.model)]
+    scaleinit <- init[(ncol(locvars.model) + 1):(ncol(locvars.model) + ncol(scalevars.model))]
+    shapeinit <- init[(ncol(locvars.model) + ncol(scalevars.model) + 1):length(init)]
   }
 
   parnum <- c(ncol(locvars.model), ncol(scalevars.model), ncol(shapevars.model))
@@ -177,6 +180,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
                 par.sum = theta0, gumbel = gumbel,
                 covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                 links = list(loclink, scalelink, shapelink),
+                forms = list(locform, scaleform, shapeform),
                 method = method, information = information)
   }
 
@@ -291,6 +295,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
                   parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                   links = list(loclink, scalelink, shapelink),
+                  forms = list(locform, scaleform, shapeform),
                   method = method, information = information)
     } else {
       out <- list(n = n, data = as.matrix(data), par.ests = par.ests, par.ses = par.ses, varcov = varcov,
@@ -299,6 +304,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
                   parnum = parnum, par.sum = par.sum, gumbel = gumbel,
                   covars = list(locvars.model.orig, scalevars.model.orig, shapevars.model.orig),
                   links = list(loclink, scalelink, shapelink),
+                  forms = list(locform, scaleform, shapeform),
                   method = method, information = information)
     }
 

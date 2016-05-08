@@ -1,16 +1,18 @@
 Package: eva
 Title: Extreme Value Analysis with Goodness-of-Fit Testing
-Date: 2016-05-01
-Version: 0.2.2
+Date: 2016-05-08
+Version: 0.2.3
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brianbader@mail.com"), person(given = "Jun", family = "Yan", role = "ctb"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order
     statistics (GEVr) model. Goodness-of-fit tests for threshold selection in the
-    peaks-over-threshold approach. Random number generation and density functions
+    Generalized Pareto distribution (GPD). Random number generation and density functions
     for the GEVr distribution. Profile likelihood for return level estimation
     using the GEVr and Generalized Pareto distributions. P-value adjustments for
-    sequential, multiple testing error control.
+    sequential, multiple testing error control. Non-stationary fitting of GEVr and
+    GPD, with availability for bootstrap based standard errors in the GEV1 setting
+    to handle dependence.
 Imports:
-    Matrix, parallel, stats, graphics, utils
+    Matrix, parallel, stats, graphics, utils, EnvStats
 Depends:
     R(>= 2.10.0)
 Suggests:

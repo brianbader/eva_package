@@ -30,6 +30,7 @@
 #' \item{statistic}{Returned test statistics of each individual test.}
 #' \item{est.scale}{Estimated scale parameter for the given threshold.}
 #' \item{est.shape}{Estimated shape parameter for the given threshold.}
+#' @import parallel
 #' @export
 
 gpdSeqTests <- function(data, thresholds = NA, nextremes = NA, method = c("ad", "cvm", "pbscore", "multscore", "imasym", "impb"),
