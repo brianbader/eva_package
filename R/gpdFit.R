@@ -176,14 +176,14 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     par.ests <- c(scale0, shape0)
   }
 
-  negloglik <- function(vars, scalevars1, shapevars1) {
+  negloglik <- function(vars, scalevars1, shapevars1, x) {
     scale <- vars[1:length(scaleinit)]
     shape <- vars[(length(scaleinit) + 1):length(vars)]
     scalemat <- t(scale * t(scalevars1))
     shapemat <- t(shape * t(shapevars1))
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
-    w <- excess / scalevec
+    w <- x / scalevec
     cond1 <- any(scalevec <= 0)
     cond2 <- min(1 + w * shapevec) <= 0
     log.density <- -log(pmax(scalevec, 0)) -
@@ -196,38 +196,44 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     }
   }
 
-  mpsobj <- function(vars, scalevars1, shapevars1) {
+  mpsobj <- function(vars, scalevars1, shapevars1, x) {
     scale <- vars[1:length(scaleinit)]
     shape <- vars[(length(scaleinit) + 1):length(vars)]
     scalemat <- t(scale * t(scalevars1))
     shapemat <- t(shape * t(shapevars1))
     scalevec <- scalelink(rowSums(scalemat))
     shapevec <- shapelink(rowSums(shapemat))
-    w <- excess / scalevec
+    w <- x / scalevec
     cond1 <- any(scalevec <= 0)
     cond2 <- min(1 + w * shapevec) <= 0
     cdf <- ifelse(shapevec == 0, 1 - exp(-w), 1 - exp((-1/shapevec)*log1p(pmax(w * shapevec, -1))))
     cdf[(is.nan(cdf) | is.infinite(cdf))] <- 0
-    cdf <- sort(cdf)
     cdf <- c(0, cdf, 1)
     D <- diff(cdf)
+    cond3 <- any(D < 0)
     ## Check if any differences are zero due to rounding and adjust
-    D <- ifelse(D == 0, .Machine$double.eps, D)
-    if(cond1 | cond2) {
+    D <- ifelse(D <= 0, .Machine$double.eps, D)
+    if(cond1 | cond2 | cond3) {
       abs(sum(log(D))) + 1e6
     } else {
       - sum(log(D))
     }
   }
 
-  if(method == "mle")
-    objfun <- negloglik
-  if(method == "mps")
-    objfun <- mpsobj
-
-  if(method == "mle" | method == "mps") {
-    fit <- optim(init, objfun, hessian = FALSE, method = opt, control = list(maxit = maxit, ...),
-                 scalevars1 = scalevars.model, shapevars1 = shapevars.model)
+  if(method != "pwm") {
+    if(method == "mle") {
+      fit <- optim(init, negloglik, hessian = FALSE, method = opt, control = list(maxit = maxit, ...),
+                   scalevars1 = scalevars.model, shapevars1 = shapevars.model, x = excess)
+    } else {
+      excess.order <- order(excess)
+      excess.sort <- sort(excess)
+      scalevars.model.sort <- apply(scalevars.model, 2, function(x) x[excess.order])
+      shapevars.model.sort <- apply(shapevars.model, 2, function(x) x[excess.order])
+      scalevars.model.orig.sort <- apply(scalevars.model.orig, 2, function(x) x[excess.order])
+      shapevars.model.orig.sort <- apply(shapevars.model.orig, 2, function(x) x[excess.order])
+      fit <- optim(init, mpsobj, hessian = FALSE, method = opt, control = list(maxit = maxit, ...),
+                   scalevars1 = scalevars.model.sort, shapevars1 = shapevars.model.sort, x = excess.sort)
+    }
 
     if(fit$convergence)
       warning("optimization may not have succeeded")
@@ -241,8 +247,13 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
     par.ests <- c(scale.ests, shape.ests)
 
     if((information == "observed") | (scaleform != ~ 1) | (shapeform != ~ 1)) {
-      varcov <- solve(optimHess(par.ests, objfun, scalevars1 = scalevars.model.orig,
-                                shapevars1 = shapevars.model.orig))
+      if(method == "mle") {
+        varcov <- solve(optimHess(par.ests, negloglik, scalevars1 = scalevars.model.orig,
+                                  shapevars1 = shapevars.model.orig, x = excess))
+      } else {
+        varcov <- solve(optimHess(par.ests, mpsobj, scalevars1 = scalevars.model.orig.sort,
+                                  shapevars1 = shapevars.model.orig.sort, x = excess.sort))
+      }
     } else {
       varcov <- gpdFisher(Nu, par.ests)
     }

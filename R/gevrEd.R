@@ -18,7 +18,6 @@
 #' used to sequentially test for the choice of r, implemented in the function `gevrSeqTests'.
 #'
 #' @references Bader B., Yan J., & Zhang X. (2015). Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing. Department of Statistics, University of Connecticut.
-#' @import stats graphics
 #' @export
 gevrEd <- function(data, theta = NULL) {
   data <- as.matrix(data)

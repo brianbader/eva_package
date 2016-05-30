@@ -18,9 +18,9 @@ gevCIfit <- function(z, locvec, scalevec, shapevec, umat, resampling, grouping, 
     x <- qgev(as.vector(umat.new)[order(order(grouping, ordering))], loc = locvec, scale = scalevec, shape = shapevec)
   }
   z1 <- tryCatch(gevrFit(x, method = z$method, information = z$information,
-            locvars = as.data.frame(z$covars[[1]]), loclink = z$links[[1]], locform = z$forms[[1]],
-            scalevars = as.data.frame(z$covars[[2]]), scalelink = z$links[[2]], scaleform = z$forms[[2]],
-            shapevars = as.data.frame(z$covars[[3]]), shapelink = z$links[[3]], shapeform = z$forms[[3]],
+            locvars = as.data.frame(z$covars.orig[[1]]), loclink = z$links[[1]], locform = z$forms[[1]],
+            scalevars = as.data.frame(z$covars.orig[[2]]), scalelink = z$links[[2]], scaleform = z$forms[[2]],
+            shapevars = as.data.frame(z$covars.orig[[3]]), shapelink = z$links[[3]], shapeform = z$forms[[3]],
             gumbel = z$gumbel, start = as.numeric(z$par.ests)),
             error = function(w) {return(NULL)}, warning = function(w) {return(NULL)})
   if(is.null(z1)) rep(NA, (length(z$par.ests) + 1))
@@ -117,8 +117,10 @@ gevCIboot <- function(z, conf = .95, bootnum, resampling = c("in", "ht", "sc"), 
   bootsample <- bootsample[, (bootsample[nrow(bootsample), ] == 0 & !is.na(bootsample[nrow(bootsample), ]))]
   eff <- ncol(bootsample)
   bootsample <- bootsample[-nrow(bootsample), ]
+  rownames(bootsample) <- names(z$par.ests)
   CIs <- t(apply(bootsample, 1, quantile, probs = c(alpha, 1 - alpha)))
-  out <- list(CIs, eff, t(bootsample))
-  names(out) <- c("CIs", "effective_bootnum", "replicates")
+  colnames(CIs) <- c("Lower", "Upper")
+  out <- list(CIs, eff, t(bootsample), resampling)
+  names(out) <- c("CIs", "effective_bootnum", "replicates", "resampling")
   out
 }

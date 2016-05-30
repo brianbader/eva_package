@@ -1,6 +1,6 @@
 Package: eva
 Title: Extreme Value Analysis with Goodness-of-Fit Testing
-Date: 2016-05-08
+Date: 2016-05-23
 Version: 0.2.3
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "brianbader@mail.com"), person(given = "Jun", family = "Yan", role = "ctb"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order
@@ -16,7 +16,7 @@ Imports:
 Depends:
     R(>= 2.10.0)
 Suggests:
-    knitr, mvtnorm
+    knitr, SpatialExtremes
 License: GPL (>= 2)
 Repository: CRAN
 VignetteBuilder: knitr
