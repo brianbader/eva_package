@@ -48,8 +48,8 @@ gevCIfit <- function(z, locvec, scalevec, shapevec, umat, resampling, grouping, 
 #' attempt to capture dependence within the resampling process, by preserving the temporal ordering across
 #' groups when generating data. The Spearman-Correlation resampling approach, roughly speaking, generates
 #' multivariate data according to the correlation structure of the original data residuals. Both are
-#' considered semi-parametric approaches. See references and function `simulateMvMatrix' in the EnvStats
-#' package for details.
+#' considered semi-parametric approaches. See references and function \code{\link[EnvStats]{simulateMvMatrix}}
+#' in the EnvStats package for details.
 #'
 #' @references Iman, R. L., & Conover, W. J. (1982). A distribution-free approach to inducing rank correlation among
 #' input variables. Communications in Statistics-Simulation and Computation, 11(3), 311-334.

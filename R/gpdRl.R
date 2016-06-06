@@ -7,12 +7,13 @@
 #' @param period The number of periods to use for the return level.
 #' @param conf Confidence level. Defaults to 95 percent.
 #' @param method The method to compute the confidence interval - either delta method (default) or profile likelihood.
+#' @param plot Plot the profile likelihood and estimate (vertical line)?
 #' @param opt Optimization method to maximize the profile likelihood if that is selected. Argument passed to optim. The
 #' default method is Nelder-Mead.
 #'
 #' @references Coles, S. (2001). An introduction to statistical modeling of extreme values (Vol. 208). London: Springer.
 #' @examples
-#' x <- rgpd(5000, loc = 0, scale = 1, shape = 0.1)
+#' x <- rgpd(5000, loc = 0, scale = 1, shape = -0.1)
 #' ## Compute 50-period return level.
 #' z <- gpdFit(x, nextremes = 200)
 #' gpdRl(z, period = 50, method = "delta")
@@ -24,7 +25,7 @@
 #' \item{ConfLevel}{The confidence level used.}
 #' @details Caution: The profile likelihood optimization may be slow for large datasets.
 #' @export
-gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"), opt = c("Nelder-Mead")) {
+gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"), plot = TRUE, opt = c("Nelder-Mead")) {
   if(!z$stationary)
     stop("Return levels can only be produced for the stationary model!")
   method <- match.arg(method)
@@ -78,6 +79,11 @@ gpdRl <- function(z, period, conf = .95, method = c("delta", "profile"), opt = c
     suppressWarnings(out1 <- uniroot(prof, c(est - 1e-6, est), extendInt="downX"))
     suppressWarnings(out2 <- uniroot(prof, c(est, est + 1e-6), extendInt="upX"))
     CI <- c(min(out1$root, out2$root), max(out1$root, out2$root))
+    if(plot) {
+      prof1 <- function(xp) {- prof(xp)}
+      suppressWarnings(curve(prof1, from = CI[1], to = CI[2], n = 50, xlab = 'Return Level', ylab = 'LRT - Cutoff'))
+      abline(v = est, col = "blue")
+    }
   }
   out <- list(est, CI, period, conf)
   names(out) <- c("Estimate", "CI", "Period", "ConfLevel")

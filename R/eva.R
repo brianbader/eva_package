@@ -15,29 +15,33 @@
 #' for r in the GEVr distribution, with adjusted p-values. It can implement three
 #' tests:
 #'
-#' \code{\link{gevrEd}} An entropy difference test, which uses an asymptotic normal central limit theorem result.
+#' \describe{
+#' \item{\code{\link{gevrEd}}}{An entropy difference test, which uses an asymptotic normal central limit theorem result.}
 #'
-#' \code{\link{gevrPbScore}} A score test, implemented using parametric bootstrap and can be run in parallel.
+#' \item{\code{\link{gevrPbScore}}}{A score test, implemented using parametric bootstrap and can be run in parallel.}
 #'
-#' \code{\link{gevrMultScore}} An asymptotic approximation to the score test (computationally effciient).
+#' \item{\code{\link{gevrMultScore}}}{An asymptotic approximation to the score test (computationally efficient).}
+#' }
 #'
 #' \code{\link{gpdSeqTests}} is a wrapper function that performs sequential testing
 #' for thresholds in the Generalized Pareto distribution (GPD), with adjusted
-#' p-values. It can implement the following tests:
+#' p-values. It can implement the following (six) tests:
 #'
-#' \code{\link{gpdAd}} The Anderson-Darling test, with log-linear interpolated p-values. Can also be bootstrapped
-#' (with a parallel option).
+#' \describe{
+#' \item{\code{\link{gpdAd}}}{The Anderson-Darling test, with log-linear interpolated p-values. Can also be bootstrapped
+#' (with a parallel option).}
 #'
-#' \code{\link{gpdCvm}} The Cramer-Von Mises test, with log-linear interpolated p-values. Can also be bootstrapped
-#' (with a parallel option).
+#' \item{\code{\link{gpdCvm}}}{The Cramer-Von Mises test, with log-linear interpolated p-values. Can also be bootstrapped
+#' (with a parallel option).}
 #'
-#' \code{\link{gpdImAsym}} An asymptotic information matrix test, with bootstrapped covariance estimates.
+#' \item{\code{\link{gpdImAsym}}}{An asymptotic information matrix test, with bootstrapped covariance estimates.}
 #'
-#' \code{\link{gpdImPb}} A full bootstrap version of information matrix test, with bootstrapped covariance estimates and critical values.
+#' \item{\code{\link{gpdImPb}}}{A full bootstrap version of information matrix test, with bootstrapped covariance estimates and critical values.}
 #'
-#' \code{\link{gpdPbScore}} A score test, implemented using parametric bootstrap and can be run in parallel.
+#' \item{\code{\link{gpdPbScore}}}{A score test, implemented using parametric bootstrap and can be run in parallel.}
 #'
-#' \code{\link{gpdMultScore}} An asymptotic approximation to the score test (computationally effciient).
+#' \item{\code{\link{gpdMultScore}}}{An asymptotic approximation to the score test (computationally effciient).}
+#' }
 #'
 #' \code{\link{pSeqStop}} A simple function that reads in raw, ordered p-values and returns two sets that adjust
 #' for the familywise error rate and false discovery rate.
@@ -63,7 +67,7 @@
 #' to speed up optimization.
 #'
 #' \code{\link{gpdFit}} Non-stationary fitting of the GP distribution, with same
-#' options and implementation as \code{\link{gevrFit}}. Allows non-stationary
+#' options and implementation as `gevrFit'. Allows non-stationary
 #' threshold to be used.
 #'
 #' \code{\link{gevrProfShape}} Profile likelihood estimation for the shape
@@ -97,7 +101,7 @@
 #' \code{\link{fortmax}} Top ten annual precipitation events (inches) for
 #' one rain gauge in Fort Collins, Colorado from 1900 through 1999.
 #'
-#' \code{\link{lowestoft}} Top ten annual sea levels at the LoweStoft Station
+#' \code{\link{lowestoft}} Top ten annual sea levels at the LoweStoft station
 #' tide gauge from 1964 - 2014.
 #'
 #' @import stats graphics

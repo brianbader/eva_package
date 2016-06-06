@@ -4,12 +4,13 @@
 #'
 #' @param z A class object returned from gevrFit.
 #' @param conf Confidence level to use. Defaults to 95 percent.
+#' @param plot Plot the profile likelihood and estimate (vertical line)?
 #' @param opt Optimization method to maximize the profile likelihood, passed to optim. The default method is Nelder-Mead.
 #'
 #' @examples
 #' ## Compare the length of the shape confidence intervals using GEV1 vs. GEV10
 #' set.seed(7)
-#' x <- rgevr(200, 10, loc = 0.5, scale = 1, shape = 0.3)
+#' x <- rgevr(200, 10, loc = 0.5, scale = 1, shape = -0.3)
 #' z1 <- gevrFit(x[, 1])
 #' z2 <- gevrFit(x)
 #' gevrProfShape(z1)
@@ -19,7 +20,7 @@
 #' \item{CI}{Profile likelihood based confidence interval for the shape parameter.}
 #' \item{ConfLevel}{The confidence level used.}
 #' @export
-gevrProfShape <- function(z, conf = .95, opt = c("Nelder-Mead")) {
+gevrProfShape <- function(z, conf = .95, plot = TRUE, opt = c("Nelder-Mead")) {
   if(z$gumbel | !z$stationary)
     stop("Object cannot be from a Gumbel and/or a nonstationary fit!")
   data <- as.matrix(z$data)
@@ -50,6 +51,11 @@ gevrProfShape <- function(z, conf = .95, opt = c("Nelder-Mead")) {
   suppressWarnings(out1 <- uniroot(prof, c(theta[3] - 1e-6, theta[3]), extendInt="downX"))
   suppressWarnings(out2 <- uniroot(prof, c(theta[3], theta[3] + 1e-6), extendInt="upX"))
   CI <- c(min(out1$root, out2$root), max(out1$root, out2$root))
+  if(plot) {
+    prof1 <- function(sh) {- prof(sh)}
+    curve(prof1, from = CI[1], to = CI[2], n = 50, xlab = 'Shape', ylab = 'LRT - Cutoff')
+    abline(v = theta[3], col = "blue")
+  }
   out <- list(theta[3], CI, conf)
   names(out) <- c("Estimate", "CI", "ConfLevel")
   out
