@@ -2,12 +2,12 @@ pkg = eva
 
 Rpkg: Rd build  
 	make check 
-	make INSTALL
+##	make INSTALL
 
 Rd: 
 	Rscript -e "library(methods); devtools::document();" 
 
-build:  
+build: Rd 
 	R CMD build ../$(pkg)
 
 check: $(pkg)_*.tar.gz
