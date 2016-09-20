@@ -82,9 +82,6 @@
 #' \code{\link{gpdRl}} Profile likelihood estimation for return levels
 #' of the stationary GP distribution.
 #'
-#' \code{\link{gevCIboot}} Bootstrapped standard errors for fitted GEV1
-#' (block maxima) models, with options to resample under assumed dependence.
-#'
 #' @section Visual Diagnostics:
 #'
 #' \code{\link{gevrDiag}}, \code{\link{gpdDiag}} Diagnostic plots for a fit to
