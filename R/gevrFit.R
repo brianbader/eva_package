@@ -132,15 +132,18 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   solve_shape <- function(sh, mom0, mom1, mom2) {
     (3^sh - 1) / (2^sh - 1) - (3 * mom2 - mom0) / (2 * mom1 - mom0)
   }
-  moments <- rep(0, 3)
-  for(j in 1:n) {
-    moments[1] <- moments[1] + (x[j] / n)
-    moments[2] <- moments[2] + ((j - 1) / (n - 1)) * (x[j] / n)
-    moments[3] <- moments[3] + (((j - 1) * (j - 2)) / ((n - 1) * (n - 2))) * (x[j] / n)
-  }
-  mom0 <- moments[1]
-  mom1 <- moments[2]
-  mom2 <- moments[3]
+  ## moments <- rep(0, 3)
+  ## for(j in 1:n) {
+  ##   moments[1] <- moments[1] + (x[j] / n)
+  ##   moments[2] <- moments[2] + ((j - 1) / (n - 1)) * (x[j] / n)
+  ##   moments[3] <- moments[3] + (((j - 1) * (j - 2)) / ((n - 1) * (n - 2))) * (x[j] / n)
+  ## }
+  ## mom0 <- moments[1]
+  ## mom1 <- moments[2]
+  ## mom2 <- moments[3]
+  mom0 <- mean(x)
+  mom1 <- mean((1:n - 1) / (n - 1) * x)
+  mom2 <- mean((1:n - 1) * (1:n - 2) / (n - 1) / (n - 2) * x)
 
   if(!gumbel) {
     shape0 <- uniroot(solve_shape, interval = c(-5, +5), mom0 = mom0, mom1 = mom1, mom2 = mom2)$root
@@ -275,9 +278,9 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
 
     if((information == "observed") | (locform != ~ 1) | (scaleform != ~ 1) | (shapeform != ~ 1)) {
       if(method == "mle") {
-        varcov <- solve(optimHess(par.ests, negloglik, locvars1 = locvars.model.orig,
+        varcov <- try(solve(optimHess(par.ests, negloglik, locvars1 = locvars.model.orig,
                                   scalevars1 = scalevars.model.orig, shapevars1 = shapevars.model.orig,
-                                  x = data))
+                                  x = data)))
       } else {
         varcov <- solve(optimHess(par.ests, mpsobj, locvars1 = locvars.model.orig.sort,
                                   scalevars1 = scalevars.model.orig.sort, shapevars1 = shapevars.model.orig.sort,
@@ -286,6 +289,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
     } else {
       varcov <- gevrFisher(data, par.ests, gumbel)
     }
+    if (inherits(varcov, "try-error")) varcov <- matrix(NA, length(par.ests), length(par.ests))
     par.ses <- sqrt(diag(varcov))
 
     if(!gumbel) {
@@ -348,7 +352,7 @@ print.gevrFit <- function(x, ...) {
   cat("Summary of fit:\n")
   print(x$par.sum, digits = 5)
   if(x$method != "pwm")
-    cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1")
+    cat("---\nSignif. codes:  0 '***' 0.001 '*' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 }
 
 
