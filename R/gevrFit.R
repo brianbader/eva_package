@@ -146,7 +146,7 @@ gevrFit <- function(data, method = c("mle", "mps", "pwm"), information = c("expe
   mom2 <- mean((1:n - 1) * (1:n - 2) / (n - 1) / (n - 2) * x)
 
   if(!gumbel) {
-    shape0 <- uniroot(solve_shape, interval = c(-5, +5), mom0 = mom0, mom1 = mom1, mom2 = mom2)$root
+    shape0 <- uniroot(solve_shape, interval = c(-5, +5), mom0 = mom0, mom1 = mom1, mom2 = mom2 ,extendInt="yes")$root
     scale0 <- ((2 * mom1 - mom0) * shape0) / (gamma(1 - shape0) * (2^shape0 - 1))
     loc0 <- mom0 + scale0 * (1 - gamma(1 - shape0)) / shape0
     theta0 <- c(loc0, scale0, shape0)
