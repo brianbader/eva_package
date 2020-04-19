@@ -1,3 +1,7 @@
+..Rcheck/
+eva.Rcheck/
+eva_*.tar.gz
+vignettes/*.html
 .Rproj.user
 .Rhistory
 .RData

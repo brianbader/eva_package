@@ -33,12 +33,12 @@
 #' @import parallel
 #' @export
 
-gpdSeqTests <- function(data, thresholds = NA, nextremes = NA, method = c("ad", "cvm", "pbscore", "multscore", "imasym", "impb"),
+gpdSeqTests <- function(data, thresholds = NULL, nextremes = NULL, method = c("ad", "cvm", "pbscore", "multscore", "imasym", "impb"),
                         nsim = NULL, inner = NULL, outer = NULL, information = c("expected", "observed"),
                         allowParallel = FALSE, numCores = 1) {
-  if(is.na(nextremes) && is.na(thresholds))
+  if(is.null(nextremes) && is.null(thresholds))
     stop("Enter either a set of thresholds or number of upper extremes")
-  if(!is.na(nextremes) && !is.na(thresholds))
+  if(!is.null(nextremes) && !is.null(thresholds))
     stop("Enter EITHER a set of thresholds or number of upper extremes")
   information <- match.arg(information)
   method <- match.arg(method)

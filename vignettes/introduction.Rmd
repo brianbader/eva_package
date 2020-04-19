@@ -194,15 +194,17 @@ One can also use the 'gevrFit' function to estimate the parameters of a multivar
 
 ```{r rfa_example1}
 
+if (!requireNamespace("SpacialExtremes", quietly=TRUE))
+  install.packages("SpatialExtremes", repos = c("http://R-Forge.R-project.org"), deps=TRUE)
+
 set.seed(7)
-require(SpatialExtremes)
 n.site <- 4
 n.obs <- 15
 ## Simulate a max-stable random field
 locations <- matrix(runif(2 * n.site, 0, 10), ncol = 2)
 colnames(locations) <- c("lon", "lat")
 ## Smith model
-U <- rmaxstab(n.obs, locations, "gauss", cov11 = 16, cov12 = 0, cov22 = 16)
+U <- SpatialExtremes::rmaxstab(n.obs, locations, "gauss", cov11 = 16, cov12 = 0, cov22 = 16)
 cor(U, method = "spearman")
 
 ```
@@ -213,7 +215,7 @@ The previous chunk of code generates data from a multivariate max stable random 
 
 ## Transform to GEV margins
 locations <- c(8, 10, 12, 9)
-out <- frech2gev(U, loc = 0, scale = 1, shape = 0.2)
+out <- SpatialExtremes::frech2gev(U, loc = 0, scale = 1, shape = 0.2)
 out <- out + t(matrix(rep(locations, nrow(out)), ncol = nrow(out)))
 out <- as.vector(out)
 

@@ -10,6 +10,7 @@ Description: Goodness-of-fit tests for selection of r in the r-largest order
     using the GEVr and Generalized Pareto distributions. P-value adjustments for
     sequential, multiple testing error control. Non-stationary fitting of GEVr and
     GPD.
+Additional_repositories: https://r-forge.r-project.org
 Imports: Matrix, parallel, stats, graphics, utils, EnvStats
 Depends: R(>= 2.10.0)
 Suggests: knitr, SpatialExtremes

@@ -8,7 +8,7 @@ Rd:
 	Rscript -e "library(methods); devtools::document();" 
 
 build: Rd 
-	R CMD build ../$(pkg)
+	R CMD build .
 
 check: $(pkg)_*.tar.gz
 	R CMD check --as-cran $(pkg)_*.tar.gz
