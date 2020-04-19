@@ -141,22 +141,17 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
   scalevars.model.orig <- t((t(scalevars.model) * scaletrans2) + scaletrans1)
   shapevars.model.orig <- t((t(shapevars.model) * shapetrans2) + shapetrans1)
 
-  xbar <- mean(excess)
-  a0 <- xbar
-  gamma <- -0.35
-  delta <- 0
-  pvec <- ((1:Nu) + gamma)/(Nu + delta)
-  a1 <- mean(sort(excess) * (1 - pvec))
-  shape0 <- 2 - a0/(a0 - 2 * a1)
-  scale0 <- (2 * a0 * a1)/(a0 - 2 * a1)
+  shape0 <- 0
+  scale0 <- mean(excess) - threshold
 
   if(is.null(start)) {
     scaleinit <- c(scale0, rep(0, ncol(scalevars.model) - 1))
     shapeinit <- c(shape0, rep(0, ncol(shapevars.model) - 1))
-    init <- c(scaleinit, shapeinit)
   } else {
-    init <- start
+    scaleinit <- start[1:(length(start)/2)]
+    shapeinit <- start[(length(start)/2 + 1):length(start)]
   }
+  init <- c(scaleinit, shapeinit)
 
   parnum <- c(ncol(scalevars.model), ncol(shapevars.model))
 
