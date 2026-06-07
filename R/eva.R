@@ -102,6 +102,4 @@
 #' tide gauge from 1964 - 2014.
 #'
 #' @import stats graphics
-#' @docType package
-#' @name eva
-NULL
+"_PACKAGE"

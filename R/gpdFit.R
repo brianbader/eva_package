@@ -318,6 +318,7 @@ plot.gpdFit <- function(x, ...) {
 }
 
 
+#' @method print gpdFit
 #' @export
 print.gpdFit <- function(x, ...) {
   cat("Summary of fit:\n")

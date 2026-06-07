@@ -20,4 +20,5 @@ VignetteBuilder: knitr
 URL: https://github.com/geekman1/eva_package
 BugReports: https://github.com/geekman1/eva_package/issues
 LazyData: true
-RoxygenNote: 6.1.0
+Encoding: UTF-8
+RoxygenNote: 8.0.0

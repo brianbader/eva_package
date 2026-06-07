@@ -3,8 +3,8 @@
 #' Wrapper function to test multiple thresholds for goodness-of-fit to the Generalized Pareto model. Can choose which test to
 #' run from the available tests in this package.
 #' @param data Original, full dataset in vector form.
-#' @param thresholds A set of threshold values (either this or a set of the number of extremes must be given, but not both). Must be provided as a vector.
-#' @param nextremes A set of the number of upper extremes to be used, provided as a vector.
+#' @param thresholds A set of candidate threshold values (either this or a set of the number of extremes must be given, but not both). Must be provided as a vector.
+#' @param nextremes A set of candidate numbers of upper extremes to be used, provided as a vector.
 #' @param method Which test to run to sequentially test the thresholds. Must be one of `ad', `cvm', `pbscore', `multscore', `imasym', or `impb'.
 #' @param nsim Number of boostrap replicates for the `ad', `cvm', `pbscore', `multscore', and `imasym' tests.
 #' @param inner Number of inner boostrap replicates if `impb' test is chosen.
@@ -15,12 +15,25 @@
 #' @details Function returns a matrix containing the thresholds used, the number of observations above each threshold,
 #' the corresponding test statistics, p-values (raw and transformed), and parameter estimates at each threshold. The user must provide
 #' the data, a vector of thresholds or number of upper extremes to be used, and select the test.
+#' Thresholds are tested in the order supplied. For sequential threshold selection, provide candidate thresholds
+#' from lowest to highest. If using \code{nextremes}, provide the corresponding numbers of upper extremes in
+#' descending order so that the implied thresholds are increasing.
+#' At a chosen significance level, rejecting the first \eqn{k} sequential hypotheses means that the first
+#' \eqn{k} candidate thresholds are rejected as too low. The next candidate threshold, if not rejected,
+#' is the selected threshold. If no adjusted p-value rejects, the first candidate threshold is retained;
+#' if all adjusted p-values reject, none of the candidate thresholds is high enough.
 #' @examples
 #' set.seed(7)
 #' x <- rgpd(10000, loc = 0, scale = 5, shape = 0.2)
-#' ## A vector of thresholds to test
-#' threshes <- c(1.5, 2.5, 3.5, 4.5, 5.5)
-#' gpdSeqTests(x, thresholds = threshes, method = "ad")
+#' ## Candidate thresholds should be listed from lowest to highest.
+#' candidate_thresholds <- c(1.5, 2.5, 3.5, 4.5, 5.5)
+#' z <- gpdSeqTests(x, thresholds = candidate_thresholds, method = "ad")
+#'
+#' ## For a 5% ForwardStop rule, rejecting the first k tests rejects
+#' ## candidate_thresholds[1:k] as too low.
+#' k <- max(which(z$ForwardStop <= 0.05), 0)
+#' rejected_thresholds <- candidate_thresholds[seq_len(k)]
+#' selected_threshold <- if(k < length(candidate_thresholds)) candidate_thresholds[k + 1] else NA
 #' @return
 #' \item{threshold}{The threshold used for the test.}
 #' \item{num.above}{The number of observations above the given threshold.}
@@ -78,8 +91,9 @@ gpdSeqTests <- function(data, thresholds = NULL, nextremes = NULL, method = c("a
     result[i, 7] <- fit$statistic
     result[i, 8:9] <- fit$theta
   }
-  result[, 5] <- rev(pSeqStop(rev(result[, 4]))$ForwardStop)
-  result[, 6] <- rev(pSeqStop(rev(result[, 4]))$StrongStop)
+  seqStop <- pSeqStop(result[, 4])
+  result[, 5] <- seqStop$ForwardStop
+  result[, 6] <- seqStop$StrongStop
   colnames(result) <- c("testnum", "threshold", "num.above", "p.values", "ForwardStop", "StrongStop", "statistic", "est.scale", "est.shape")
   as.data.frame(result)
 }

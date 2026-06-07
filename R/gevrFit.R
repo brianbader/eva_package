@@ -347,6 +347,7 @@ plot.gevrFit <- function(x, ...) {
 }
 
 
+#' @method print gevrFit
 #' @export
 print.gevrFit <- function(x, ...) {
   cat("Summary of fit:\n")
@@ -368,4 +369,3 @@ logLik.gevrFit <- function (object, ...) {
   class(val) <- "logLik"
   val
 }
-

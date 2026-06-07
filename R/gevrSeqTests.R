@@ -22,6 +22,7 @@
 #' \item{est.scale}{Estimated scale parameter for the given r.}
 #' \item{est.shape}{Estimated shape parameter for the given r.}
 #' @details GEVr data (in matrix x) should be of the form \eqn{x[i,1] > x[i, 2] > \cdots > x[i, r]} for each observation \eqn{i = 1, \ldots, n}.
+#' Sequential p-value adjustments are computed in increasing order of \eqn{r}, matching the rows returned by this function.
 #' See function `pSeqStop' for details on transformed p-values.
 #' @import parallel
 #' @export
@@ -57,8 +58,9 @@ gevrSeqTests <- function(data, bootnum = NULL, method = c("ed", "pbscore", "mult
       result[i-1, 6:8] <- fit$theta
     }
   }
-  result[, 3] <- rev(pSeqStop(rev(result[, 2]))$ForwardStop)
-  result[, 4] <- rev(pSeqStop(rev(result[, 2]))$StrongStop)
+  seqStop <- pSeqStop(result[, 2])
+  result[, 3] <- seqStop$ForwardStop
+  result[, 4] <- seqStop$StrongStop
   colnames(result) <- c("r", "p.values", "ForwardStop", "StrongStop", "statistic", "est.loc", "est.scale", "est.shape")
   as.data.frame(result)
 }
