@@ -1,16 +1,45 @@
 citHeader("To cite package 'eva' in publications use:")
 
-year <- sub("-.*", "", meta$Date)
-vers <- sprintf("R package version %s", meta$Version)
+bibentry(
+  bibtype = "Article",
+  title = "Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing",
+  author = c(
+    person("Brian", "Bader"),
+    person("Jun", "Yan"),
+    person("Xuebin", "Zhang")
+  ),
+  journal = "Statistics and Computing",
+  year = "2017",
+  volume = "27",
+  number = "6",
+  pages = "1435--1451",
+  doi = "10.1007/s11222-016-9697-3",
+  textVersion = paste(
+    "Bader, B., Yan, J. and Zhang, X. (2017).",
+    "Automated Selection of r for the r Largest Order Statistics Approach with Adjustment for Sequential Testing.",
+    "Statistics and Computing, 27(6), 1435-1451.",
+    "doi:10.1007/s11222-016-9697-3"
+  )
+)
 
-citEntry(entry="Manual",
-         title = "eva: Extreme Value Analysis with Goodness-of-Fit Testing",
-         author = personList(as.person("Brian Bader"),
-                             as.person("Jun Yan")),
-         year = year,
-	       vers = vers,
-
-         textVersion =
-         paste("Brian Bader, Jun Yan (",year,"), ",
-               "eva: Extreme Value Analysis with Goodness-of-Fit Testing. ",
-			          vers, ".", sep=""))
+bibentry(
+  bibtype = "Article",
+  title = "Automated Threshold Selection for Extreme Value Analysis via Ordered Goodness-of-Fit Tests with Adjustment for False Discovery Rate",
+  author = c(
+    person("Brian", "Bader"),
+    person("Jun", "Yan"),
+    person("Xuebin", "Zhang")
+  ),
+  journal = "The Annals of Applied Statistics",
+  year = "2018",
+  volume = "12",
+  number = "1",
+  pages = "310--329",
+  doi = "10.1214/17-AOAS1092",
+  textVersion = paste(
+    "Bader, B., Yan, J. and Zhang, X. (2018).",
+    "Automated Threshold Selection for Extreme Value Analysis via Ordered Goodness-of-Fit Tests with Adjustment for False Discovery Rate.",
+    "The Annals of Applied Statistics, 12(1), 310-329.",
+    "doi:10.1214/17-AOAS1092"
+  )
+)
