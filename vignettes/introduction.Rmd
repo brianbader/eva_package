@@ -194,7 +194,7 @@ One can also use the 'gevrFit' function to estimate the parameters of a multivar
 
 ```{r rfa_example1}
 
-if (!requireNamespace("SpacialExtremes", quietly=TRUE))
+if (!requireNamespace("SpatialExtremes", quietly=TRUE))
   install.packages("SpatialExtremes", repos = c("http://R-Forge.R-project.org"), deps=TRUE)
 
 set.seed(7)
