@@ -153,10 +153,11 @@ gpdFit <- function(data, threshold = NA, nextremes = NA, npp = 365, method = c("
   if(is.null(start)) {
     scaleinit <- c(scale0, rep(0, ncol(scalevars.model) - 1))
     shapeinit <- c(shape0, rep(0, ncol(shapevars.model) - 1))
-    init <- c(scaleinit, shapeinit)
   } else {
-    init <- start
+    scaleinit <- start[1:ncol(scalevars.model)]
+    shapeinit <- start[(ncol(scalevars.model) + 1):length(start)]
   }
+  init <- c(scaleinit, shapeinit)
 
   parnum <- c(ncol(scalevars.model), ncol(shapevars.model))
 
