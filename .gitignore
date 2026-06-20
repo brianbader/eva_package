@@ -6,3 +6,5 @@ vignettes/*.html
 .Rhistory
 .RData
 .DS_Store
+.claude/
+man/

@@ -1,7 +1,7 @@
 Package: eva
 Title: Extreme Value Analysis with Goodness-of-Fit Testing
-Date: 2019-04-10
-Version: 0.2.6
+Date: 2026-06-20
+Version: 0.2.7
 Authors@R: c(person(given = "Brian", family = "Bader", role = c("aut", "cre"), email = "bbader.stat@gmail.com"), person(given = "Jun", family = "Yan", role = "ctb"))
 Description: Goodness-of-fit tests for selection of r in the r-largest order
     statistics (GEVr) model. Goodness-of-fit tests for threshold selection in the
@@ -10,15 +10,16 @@ Description: Goodness-of-fit tests for selection of r in the r-largest order
     using the GEVr and Generalized Pareto distributions. P-value adjustments for
     sequential, multiple testing error control. Non-stationary fitting of GEVr and
     GPD.
-Additional_repositories: https://r-forge.r-project.org
-Imports: Matrix, parallel, stats, graphics, utils, EnvStats
+    Bader, B., Yan, J. & Zhang, X. (2016) <doi:10.1007/s11222-016-9697-3>.
+    Bader, B., Yan, J. & Zhang, X. (2018) <doi:10.1214/17-AOAS1092>.
+Imports: Matrix, parallel, stats, graphics, utils
 Depends: R(>= 2.10.0)
-Suggests: knitr, SpatialExtremes
+Suggests: rmarkdown, knitr, SpatialExtremes
 License: GPL (>= 2)
 Repository: CRAN
 VignetteBuilder: knitr
-URL: https://github.com/geekman1/eva_package
-BugReports: https://github.com/geekman1/eva_package/issues
+URL: https://github.com/brianbader/eva_package
+BugReports: https://github.com/brianbader/eva_package/issues
 LazyData: true
 Encoding: UTF-8
-RoxygenNote: 8.0.0
+Config/roxygen2/version: 8.0.0

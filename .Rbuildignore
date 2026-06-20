@@ -1,2 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.claude$
+^cran-comments\.md$
+^revdep$
+^\.Rhistory$
+^Makefile$
+^README\.md$
+^\.github$

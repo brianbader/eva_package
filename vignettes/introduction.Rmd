@@ -192,10 +192,7 @@ round(pval, digits = 3)
 
 One can also use the 'gevrFit' function to estimate the parameters of a multivariate model with dependence between GEV marginal distributions using independence likelihood. Here we generate correlation using the multivariate normal distribution and then transform the marginal distributions into GEV.
 
-```{r rfa_example1}
-
-if (!requireNamespace("SpatialExtremes", quietly=TRUE))
-  install.packages("SpatialExtremes", repos = c("http://R-Forge.R-project.org"), deps=TRUE)
+```{r rfa_example1, eval = requireNamespace("SpatialExtremes", quietly = TRUE)}
 
 set.seed(7)
 n.site <- 4
@@ -211,7 +208,7 @@ cor(U, method = "spearman")
 
 The previous chunk of code generates data from a multivariate max stable random variable on the Frechet scale. We can see the correlation is somewhat large. Next, we transform the uniform data into GEV margins with site specific location means [8, 10, 12, 9] and shared scale, trend parameters. The design matrix labels each of the four sites as 1, 2, 3, or 4. The estimated means can be constructed from the output. Site 1 is chosen as the reference level, so its location parameter is estimated by the location intercept -- 8.12. The other site specific location parameter estimates can be obtained by adding the intercept and the corresponding site value. For example, site 3 has a location estimate of 8.12 + 4.02 = 12.14.
 
-```{r rfa_example3}
+```{r rfa_example3, eval = requireNamespace("SpatialExtremes", quietly = TRUE)}
 
 ## Transform to GEV margins
 locations <- c(8, 10, 12, 9)
